@@ -6,6 +6,7 @@ import select
 import sys
 
 def main(): #サーバー側
+  print(socket.gethostbyname(socket.gethostname()))
   (w,h)=(600,600)   #ゲーム画面の大きさ(幅600px,高さ600px)
   pygame.init()     #pygameを初期化
   pygame.display.set_mode((w,h),0,32)   #ディスプレイ設定
@@ -79,8 +80,8 @@ def main(): #サーバー側
   #backlog(int型)をstr型にしたものbacklogsを作成。backlog = プレイヤー数なので、そのデータを後々clientアカウントに送りつける。
   #そのためにstr化したものを作成。
 
-  host = "LAPTOP-4AFJAG80"     #ホスト(server)のIPアドレス、今回は俺のPC、状況によって変更可能
-  port = 1236                  #ポート番号 今回は1236に設定
+  host = "0.0.0.0"   #ホスト(server)のIPアドレス、今回は俺のPC、状況によって変更可能
+  port = 55992                #ポート番号 今回は1236に設定
   bufsize = 4096               #デフォルト4096
 
   server_sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM) #IPアドレスと通信プロトコルはIPv4,TCPを採択                                    #処理候補にサーバーソケットを追加
@@ -135,7 +136,6 @@ def main(): #サーバー側
           if connections == 0:
             bg = pygame.image.load("0-3.jpg").convert_alpha() #背景画像設定
           elif connections == 1:
-            print("ok")
             bg = pygame.image.load("1-3.jpg").convert_alpha() #背景画像設定
           elif connections == 2:
             bg = pygame.image.load("2-3.jpg").convert_alpha() #背景画像設定
@@ -158,9 +158,42 @@ def main(): #サーバー側
         screen.blit(bg,rect_bg) #背景描画
       else:
         msg = sock.recv(bufsize).decode('utf-8')
+        print(msg)
         if msg == "QUIT":
           sock.close()
           readfds.remove(sock)
+          clients_socks.remove(sock)
+        connections = len(clients_socks)
+        c = str(connections)
+        for receiver in clients_socks:
+          receiver.send("plwt".encode('utf-8'))
+          msg = receiver.recv(bufsize).decode('utf-8')
+          receiver.send(c.encode('utf-8'))
+
+        if backlog == 3:
+          if connections == 0:
+            bg = pygame.image.load("0-3.jpg").convert_alpha() #背景画像設定
+          elif connections == 1:
+            bg = pygame.image.load("1-3.jpg").convert_alpha() #背景画像設定
+          elif connections == 2:
+            bg = pygame.image.load("2-3.jpg").convert_alpha() #背景画像設定
+          else:
+            bg = pygame.image.load("3-3.jpg").convert_alpha() #背景画像設定
+            running = False
+        else:
+          if connections == 0:
+            bg = pygame.image.load("0-4.jpg").convert_alpha() #背景画像設定
+          elif connections == 1:
+            bg = pygame.image.load("1-4.jpg").convert_alpha() #背景画像設定
+          elif connections == 2:
+            bg = pygame.image.load("2-4.jpg").convert_alpha() #背景画像設定
+          elif connections == 3:
+            bg = pygame.image.load("3-4.jpg").convert_alpha() #背景画像設定
+          else:
+            bg = pygame.image.load("4-4.jpg").convert_alpha() #背景画像設定
+            running = False
+        rect_bg = bg.get_rect() #背景画像の大きさを取得
+        screen.blit(bg,rect_bg) #背景描画
 
   rect_bg = bg.get_rect() #背景画像の大きさを取得
   screen.blit(bg,rect_bg) #背景描画
@@ -168,7 +201,6 @@ def main(): #サーバー側
   pygame.time.wait(500)
   for receiver in clients_socks:
     receiver.send("STRT".encode('utf-8'))
-    pygame.time.wait(200)
   if backlog == 3:
     bg = pygame.image.load("start3.jpg").convert_alpha() #背景画像設定
   else:
@@ -179,7 +211,6 @@ def main(): #サーバー側
   pygame.time.wait(2000)
   for receiver in clients_socks:
     receiver.send("MAPSTART".encode('utf-8'))
-    pygame.time.wait(200)
   bg = pygame.image.load("catanmap.jpg").convert_alpha() #背景画像設定
   rect_bg = bg.get_rect() #背景画像の大きさを取得
   screen.blit(bg,rect_bg) #背景描画
