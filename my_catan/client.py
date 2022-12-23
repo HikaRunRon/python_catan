@@ -38,8 +38,8 @@ def main(): #クライアント側
   screen.blit(bg,rect_bg) #背景描画
   pygame.display.update() #ディスプレイ更新
   pygame.time.wait(300)
-  host = "LAPTOP-4AFJAG80" 
-  port = 1236         #ポート番号 今回は1236に設定
+  host = "192.168.11.3" 
+  port = 55992         #ポート番号 今回は1236に設定
   bufsize = 4096      #デフォルト4096
 
   sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM) #IPアドレスと通信プロトコルはIPv4,TCPを採択
@@ -68,6 +68,7 @@ def main(): #クライアント側
       for sock in rready:                                   #選択された処理を順次遂行
         msg1 = sock.recv(bufsize).decode('utf-8')
         print("msg1,",msg1)
+        sock.send("ok".encode('utf-8'))
         if msg1 == "plwt":
           msg2 = sock.recv(bufsize).decode('utf-8')
           print("msg2,",msg2)
