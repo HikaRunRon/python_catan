@@ -39,7 +39,7 @@ def main(): #クライアント側
   pygame.display.update() #ディスプレイ更新
   pygame.time.wait(300)
   host = "192.168.11.3" 
-  port = 55992         #ポート番号 今回は1236に設定
+  port = 55992         #ポート番号 今回は55992に設定
   bufsize = 4096      #デフォルト4096
 
   sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM) #IPアドレスと通信プロトコルはIPv4,TCPを採択
