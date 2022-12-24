@@ -81,7 +81,7 @@ def main(): #サーバー側
   #そのためにstr化したものを作成。
 
   host = "0.0.0.0"   #ホスト(server)のIPアドレス、今回は俺のPC、状況によって変更可能
-  port = 55992                #ポート番号 今回は1236に設定
+  port = 55992                #ポート番号 今回は55992に設定
   bufsize = 4096               #デフォルト4096
 
   server_sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM) #IPアドレスと通信プロトコルはIPv4,TCPを採択                                    #処理候補にサーバーソケットを追加
