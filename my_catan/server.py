@@ -110,12 +110,14 @@ def main(): #サーバー側
       if event.type == QUIT:
         for receiver in clients_socks:
           receiver.send("serverdown".encode('utf-8'))
+          receiver.recv(bufsize)
         pygame.quit()
         sys.exit()
       if event.type == KEYDOWN:
         if event.key == K_ESCAPE:
           for receiver in clients_socks:
             receiver.send("serverdown".encode('utf-8'))
+            receiver.recv(bufsize)
           pygame.quit()
           sys.exit()
     rready, wready, xready = select.select(readfds, [], [],0.05) #処理を可能な物から順に選択
@@ -238,22 +240,22 @@ def main(): #サーバー側
   [0,3,[47,48,53],[35,37,46]],[0,0,[38,48],[26,36]],[0,5,[49,54],[28,39]],[0,0,[54,55,62],[38,40,47]],[0,0,[50,55,56],[30,39,41]],[0,0,[56,57,63],[40,42,49]],[0,0,[51,57,58],[32,41,43]],[0,0,[58,59,64],[42,44,51]],[0,0,[52,59,60],[34,43,45]],
   [0,0,[60,61,65],[44,46,53]],[0,3,[53,61],[36,45]],[0,6,[62,66],[39,48]],[0,6,[66,67],[47,49]],[0,0,[63,67,68],[41,48,50]],[0,2,[68,69],[49,51]],[0,2,[64,69,70],[43,50,52]],[0,6,[70,71],[51,53]],[0,6,[65,71],[45,52]]]
 
-
-
   mapmass = []
   mapmassnum = []
 
-  for i in range(19):
+  for i in range(19): #初期マップデータ描画
     xx = Mapdata_Mass[i][4][0]
     yy = Mapdata_Mass[i][4][1]
     mapmas = pygame.image.load("desertmap.png").convert_alpha()
     mapmas_rect = mapmas.get_rect()
     mapmas_rect.center = (xx,yy)
     screen.blit(mapmas,mapmas_rect)
+
     mapmasn = pygame.image.load("card0.png").convert_alpha()
     mapmasn_rect = mapmasn.get_rect()
     mapmasn_rect.center = (xx,yy)
     screen.blit(mapmasn,mapmasn_rect)
+
     mapmass.append(mapmas)
     mapmassnum.append(mapmasn)
 
@@ -261,21 +263,28 @@ def main(): #サーバー側
   mapgenebutton_rect = mapgenebutton.get_rect()
   mapgenebutton_rect.center = (90,510)
   screen.blit(mapgenebutton,mapgenebutton_rect)
+
   land = [0,1,1,1,1,2,2,2,3,3,3,3,4,4,4,4,5,5,5]
   landnumber = [-1 for i in range(19)]
 
   mapmade = False
   running = True
 
-  while running:
+  while running: #map自動生成
     pygame.display.update()
     pygame.time.wait(50)
     for event in pygame.event.get():
       if event.type == QUIT:
+        for receiver in clients_socks:
+          receiver.send("serverdown".encode('utf-8'))
+          receiver.recv(bufsize)
         pygame.quit()
         sys.exit()
       if event.type == KEYDOWN:
         if event.key == K_ESCAPE:
+          for receiver in clients_socks:
+            receiver.send("serverdown".encode('utf-8'))
+            receiver.recv(bufsize)
           pygame.quit()
           sys.exit()
       if event.type == MOUSEBUTTONDOWN and event.button == 1: #右クリ
@@ -284,8 +293,6 @@ def main(): #サーバー側
         if (x-90)*(x-90)+(y-510)*(y-510) <= 5625: #Mapgene枠内判定
           land = mapgene.landform()
           landnumber = mapgene.numberform(land)
-          print(land)
-          print(landnumber)
           gamestbutton = pygame.image.load("gamestart.png").convert_alpha()
           gamestbutton_rect = mapgenebutton.get_rect()
           gamestbutton_rect.center = (510,510)
@@ -338,8 +345,80 @@ def main(): #サーバー側
             mapmasn_rect = mapmasn.get_rect()
             mapmasn_rect.center = (xx,yy)
             screen.blit(mapmasn,mapmasn_rect)
-            
+        elif (x-510)*(x-510)+(y-510)*(y-510) <= 5625 and mapmade: #Gamestar枠内判定
+          running = False #Map確定
+          for sock in clients_socks:
+            sock.send("gamestart".encode('utf-8')) #マップが確定しゲーム開始の旨をクライアントに通知
+            sock.recv(bufsize)
+    if running == False:
+      break
+    rready, wready, xready = select.select(readfds, [], [],0.05) #処理を可能な物から順に選択
+    for sock in rready:                                   #選択された処理を順次遂行
+      msg = sock.recv(bufsize).decode('utf-8')
+      print(msg)
+      if msg == "QUIT":
+        sock.close()
+        readfds.remove(sock)
+        clients_socks.remove(sock)
+        for receiver in clients_socks:
+          receiver.send("serverdown".encode('utf-8'))
+          msg = receiver.recv(bufsize).decode('utf-8')
 
+  print(land)
+  print(landnumber)
+  landdatastr = ""
+  landnumberstr = ""
+  for i in range(18):
+    x = str(land[i])
+    y = str(landnumber[i])
+    landdatastr += x
+    landdatastr += "/"
+    landnumberstr += y
+    landnumberstr += "/"
+  landdatastr += str(land[18])
+  landnumberstr += str(landnumber[18])
+  print(landdatastr)
+  print(landnumberstr)
+  for sock in clients_socks:
+    sock.send("mapdata1".encode('utf-8'))
+    sock.recv(bufsize)
+    sock.send(landdatastr.encode('utf-8'))
+    sock.recv(bufsize)
+    sock.send("mapdata2".encode('utf-8'))
+    sock.recv(bufsize)
+    sock.send(landnumberstr.encode('utf-8'))
+    sock.recv(bufsize)
+
+  running = True
+
+  while running: #map自動生成
+    pygame.display.update()
+    pygame.time.wait(50)
+    for event in pygame.event.get():
+      if event.type == QUIT:
+        for receiver in clients_socks:
+          receiver.send("serverdown".encode('utf-8'))
+          receiver.recv(bufsize)
+        pygame.quit()
+        sys.exit()
+      if event.type == KEYDOWN:
+        if event.key == K_ESCAPE:
+          for receiver in clients_socks:
+            receiver.send("serverdown".encode('utf-8'))
+            receiver.recv(bufsize)
+          pygame.quit()
+          sys.exit()
+    rready, wready, xready = select.select(readfds, [], [],0.05) #処理を可能な物から順に選択
+    for sock in rready:                                   #選択された処理を順次遂行
+      msg = sock.recv(bufsize).decode('utf-8')
+      print(msg)
+      if msg == "QUIT":
+        sock.close()
+        readfds.remove(sock)
+        clients_socks.remove(sock)
+        for receiver in clients_socks:
+          receiver.send("serverdown".encode('utf-8'))
+          msg = receiver.recv(bufsize).decode('utf-8')
   return
 
 if __name__ == '__main__':

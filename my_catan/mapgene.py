@@ -33,6 +33,3 @@ def numberform(land):#nから始める。つまりマップを作るときに"A"
             else:
                 n=nextnumber[n][0]
     return landnumber
-
-print(land)
-print(numberform(land))
