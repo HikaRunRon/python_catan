@@ -6,6 +6,7 @@ from pygame.locals import *
 import select
 from contextlib import closing
 
+
 def main(): #クライアント側
   (w,h)=(600,600)   #ゲーム画面の大きさ(幅600px,高さ600px)
   pygame.init()     #pygameを初期化
@@ -49,8 +50,8 @@ def main(): #クライアント側
   backlog = int(backlogs)
   readfds = set([sock])
 
-  Mapdata_Mass = [[0,0,0,[0,1,2,8,9,10],[153,216]],[0,0,0,[2,3,4,10,11,12],[153,300]],[0,0,0,[4,5,6,12,13,14],[153,385]],[0,0,0,[7,8,9,17,18,19],[226,173]], #資源、サイコロ対応目、盗賊の有無、周囲の６つの頂点番号(const),中心座標(const)
-  [0,0,0,[9,10,11,19,20,21],[226,258]],[0,0,0,[11,12,13,21,22,23],[226,342]],[0,0,0,[13,14,15,23,24,25],[226,427]],[0,0,0,[16,17,18,27,28,29],[300,132]],[0,0,0,[18,19,20,29,30,31],[300,216]],
+  Mapdata_Mass = [[0,0,0,[0,1,2,8,9,10],[153,216]],[0,0,0,[2,3,4,10,11,12],[153,300]],[0,0,0,[4,5,6,12,13,14],[154,385]],[0,0,0,[7,8,9,17,18,19],[226,173]], #資源、サイコロ対応目、盗賊の有無、周囲の６つの頂点番号(const),中心座標(const)
+  [0,0,0,[9,10,11,19,20,21],[226,258]],[0,0,0,[11,12,13,21,22,23],[226,342]],[0,0,0,[13,14,15,23,24,25],[227,427]],[0,0,0,[16,17,18,27,28,29],[300,132]],[0,0,0,[18,19,20,29,30,31],[300,216]],
   [0,0,0,[20,21,22,31,32,33],[300,300]],[0,0,0,[22,23,24,33,34,35],[300,385]],[0,0,0,[24,25,26,35,36,37],[300,469]],[0,0,0,[28,29,30,38,39,40],[374,173]],[0,0,0,[30,31,32,40,41,42],[374,258]],
   [0,0,0,[32,33,34,42,43,44],[374,342]],[0,0,0,[34,35,36,44,45,46],[374,427]],[0,0,0,[39,40,41,47,48,49],[447,216]],[0,0,0,[41,42,43,49,50,51],[447,300]],[0,0,0,[43,44,45,51,52,53],[447,385]]]
 
@@ -70,6 +71,11 @@ def main(): #クライアント側
   [0,0,[33,39],[16,28]],[0,5,[39,40,49],[27,29,38]],[0,0,[34,40,41],[18,28,30]],[0,0,[41,42,50],[29,31,40]],[0,0,[35,42,43],[20,30,32]],[0,0,[43,44,51],[31,33,42]],[0,0,[36,44,45],[22,32,34]],[0,0,[45,46,52],[33,35,44]],[0,0,[37,46,47],[24,34,36]],
   [0,3,[47,48,53],[35,37,46]],[0,0,[38,48],[26,36]],[0,5,[49,54],[28,39]],[0,0,[54,55,62],[38,40,47]],[0,0,[50,55,56],[30,39,41]],[0,0,[56,57,63],[40,42,49]],[0,0,[51,57,58],[32,41,43]],[0,0,[58,59,64],[42,44,51]],[0,0,[52,59,60],[34,43,45]],
   [0,0,[60,61,65],[44,46,53]],[0,3,[53,61],[36,45]],[0,6,[62,66],[39,48]],[0,6,[66,67],[47,49]],[0,0,[63,67,68],[41,48,50]],[0,2,[68,69],[49,51]],[0,2,[64,69,70],[43,50,52]],[0,6,[70,71],[51,53]],[0,6,[65,71],[45,52]]]
+
+  Player_Data = [[0,0,[0,0,0,0,0],0,[0,0,0,0,0,0,0,0,0],5,4,15,0,0],[0,0,[0,0,0,0,0],0,[0,0,0,0,0,0,0,0,0],5,4,15,0,0],[0,0,[0,0,0,0,0],0,[0,0,0,0,0,0,0,0,0],5,4,15,0,0],[0,0,[0,0,0,0,0],0,[0,0,0,0,0,0,0,0,0],5,4,15,0,0]] 
+  #所持ポイント、所持資源カード合計枚数、所持資源カード枚数内訳(木、レンガ、羊、小麦、石)、所持発展カード合計枚数,その内訳(騎士、街道建設、発見、独占、大聖堂、図書館、市場、議会、大学),残り建設可能開拓地数、残り建設可能都市数、残り建設可能街道数、交易路の長さ、騎士力
+
+  yourturn = -1 #プレイヤーのターン、後々サーバーから通知が来る。
 
   with closing(sock):
     running = True
@@ -150,7 +156,7 @@ def main(): #クライアント側
     mapmass = []
     mapmassnum = []
 
-    for i in range(19): #初期マップデータ描画
+    for i in range(19): #初期マップデータ描画,サーバーと同じ
       xx = Mapdata_Mass[i][4][0]
       yy = Mapdata_Mass[i][4][1]
       mapmas = pygame.image.load("desertmap.png").convert_alpha()
@@ -165,11 +171,6 @@ def main(): #クライアント側
 
       mapmass.append(mapmas)
       mapmassnum.append(mapmasn)
-
-    mapgenebutton = pygame.image.load("mapgene.png").convert_alpha()
-    mapgenebutton_rect = mapgenebutton.get_rect()
-    mapgenebutton_rect.center = (90,510)
-    screen.blit(mapgenebutton,mapgenebutton_rect)
 
     land = [0,1,1,1,1,2,2,2,3,3,3,3,4,4,4,4,5,5,5]
     landnumber = [-1 for i in range(19)]
@@ -199,7 +200,7 @@ def main(): #クライアント側
           sys.exit()
         elif msg == "gamestart":
           running = False
-    msg = sock.recv(bufsize).decode('utf-8')
+    msg = sock.recv(bufsize).decode('utf-8')     #マップデータ受け取り
     sock.send("ok".encode('utf-8'))
     if msg == "mapdata1":
       landdatastr = sock.recv(bufsize).decode('utf-8')
@@ -211,6 +212,13 @@ def main(): #クライアント側
       landnumberstr = sock.recv(bufsize).decode('utf-8')
       sock.send("ok".encode('utf-8'))
       print(landnumberstr)
+    msg = sock.recv(bufsize).decode('utf-8')
+    sock.send("ok".encode('utf-8'))
+    if msg == "mapdata3":
+      yourturn = sock.recv(bufsize).decode('utf-8')
+      sock.send("ok".encode('utf-8'))
+      yourturn = int(yourturn)
+      print(yourturn)  
     land = landdatastr.split('/')
     landnumber = landnumberstr.split('/')
     for i in range(19):
@@ -222,7 +230,7 @@ def main(): #クライアント側
       mapmasn = mapmassnum[i]
       l = land[i]
       n = landnumber[i]
-      if l == 0:
+      if l == 0:   #資源描画
         mapmas = pygame.image.load("desertmap.png").convert_alpha()
       elif l == 1:
         mapmas = pygame.image.load("woodmap.png").convert_alpha()
@@ -237,7 +245,7 @@ def main(): #クライアント側
       mapmas_rect = mapmas.get_rect()
       mapmas_rect.center = (xx,yy)
       screen.blit(mapmas,mapmas_rect)
-      if n == 2:
+      if n == 2:    #数字描画
         mapmasn = pygame.image.load("mass2.png").convert_alpha()
       elif n == 3:
         mapmasn = pygame.image.load("mass3.png").convert_alpha()
@@ -258,15 +266,14 @@ def main(): #クライアント側
       elif n == 12:
         mapmasn = pygame.image.load("mass12.png").convert_alpha()
       else:
-        mapmasn = pygame.image.load("space.png").convert_alpha()
+        mapmasn = pygame.image.load("space5050.png").convert_alpha()
       mapmasn_rect = mapmasn.get_rect()
       mapmasn_rect.center = (xx,yy)
-      screen.blit(mapmasn,mapmasn_rect)
-
+      screen.blit(mapmasn,mapmasn_rect)    
 
     running = True
 
-    while running: #map自動生成
+    while running: #初動、開拓地&街道建設フェーズ
       pygame.display.update()
       pygame.time.wait(50)
       for event in pygame.event.get():
