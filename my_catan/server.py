@@ -4,6 +4,7 @@ from pygame.locals import *
 import socket
 import select
 import sys
+import mapgene
 
 def main(): #サーバー側
   print(socket.gethostbyname(socket.gethostname()))
@@ -109,12 +110,14 @@ def main(): #サーバー側
       if event.type == QUIT:
         for receiver in clients_socks:
           receiver.send("serverdown".encode('utf-8'))
+          receiver.recv(bufsize)
         pygame.quit()
         sys.exit()
       if event.type == KEYDOWN:
         if event.key == K_ESCAPE:
           for receiver in clients_socks:
             receiver.send("serverdown".encode('utf-8'))
+            receiver.recv(bufsize)
           pygame.quit()
           sys.exit()
     rready, wready, xready = select.select(readfds, [], [],0.05) #処理を可能な物から順に選択
@@ -215,10 +218,10 @@ def main(): #サーバー側
   screen.blit(bg,rect_bg) #背景描画
   pygame.display.flip() #ディスプレイ更新
 
-  Mapdata_Mass = [[0,0,0,[0,1,2,8,9,10]],[0,0,0,[2,3,4,10,11,12]],[0,0,0,[4,5,6,12,13,14]],[0,0,0,[7,8,9,17,18,19]], #資源、サイコロ対応目、盗賊の有無、周囲の６つの頂点番号(const)
-  [0,0,0,[9,10,11,19,20,21]],[0,0,0,[11,12,13,21,22,23]],[0,0,0,[13,14,15,23,24,25]],[0,0,0,[16,17,18,27,28,29]],[0,0,0,[18,19,20,29,30,31]],
-  [0,0,0,[20,21,22,31,32,33]],[0,0,0,[22,23,24,33,34,35]],[0,0,0,[24,25,26,35,36,37]],[0,0,0,[28,29,30,38,39,40]],[0,0,0,[30,31,32,40,41,42]],
-  [0,0,0,[32,33,34,42,43,44]],[0,0,0,[34,35,36,44,45,46]],[0,0,0,[39,40,41,47,48,49]],[0,0,0,[41,42,43,49,50,51]],[0,0,0,[43,44,45,51,52,53]]]
+  Mapdata_Mass = [[0,0,0,[0,1,2,8,9,10],[153,216]],[0,0,0,[2,3,4,10,11,12],[153,300]],[0,0,0,[4,5,6,12,13,14],[153,385]],[0,0,0,[7,8,9,17,18,19],[226,173]], #資源、サイコロ対応目、盗賊の有無、周囲の６つの頂点番号(const),中心座標(const)
+  [0,0,0,[9,10,11,19,20,21],[226,258]],[0,0,0,[11,12,13,21,22,23],[226,342]],[0,0,0,[13,14,15,23,24,25],[226,427]],[0,0,0,[16,17,18,27,28,29],[300,132]],[0,0,0,[18,19,20,29,30,31],[300,216]],
+  [0,0,0,[20,21,22,31,32,33],[300,300]],[0,0,0,[22,23,24,33,34,35],[300,385]],[0,0,0,[24,25,26,35,36,37],[300,469]],[0,0,0,[28,29,30,38,39,40],[374,173]],[0,0,0,[30,31,32,40,41,42],[374,258]],
+  [0,0,0,[32,33,34,42,43,44],[374,342]],[0,0,0,[34,35,36,44,45,46],[374,427]],[0,0,0,[39,40,41,47,48,49],[447,216]],[0,0,0,[41,42,43,49,50,51],[447,300]],[0,0,0,[43,44,45,51,52,53],[447,385]]]
 
   Mapdata_Side = [[0,[0,1],[1,6]],[0,[1,2],[0,2,7]],[0,[2,3],[1,3,7]],[0,[3,4],[2,4,8]],[0,[4,5],[3,5,8]],[0,[5,6],[4,9]],[0,[0,8],[0,10,11]],[0,[2,10],[1,2,12,13]], #所有者、隣接点(const)、隣接辺(const)
   [0,[4,12],[3,4,14,15]],[0,[6,14],[5,16,17]],[0,[7,8],[6,11,18]],[0,[8,9],[6,10,12,19]],[0,[9,10],[7,11,13,19]],[0,[10,11],[7,12,14,20]],[0,[11,12],[8,13,15,20]],[0,[12,13],[8,14,16,21]],
@@ -236,19 +239,186 @@ def main(): #サーバー側
   [0,0,[33,39],[16,28]],[0,5,[39,40,49],[27,29,38]],[0,0,[34,40,41],[18,28,30]],[0,0,[41,42,50],[29,31,40]],[0,0,[35,42,43],[20,30,32]],[0,0,[43,44,51],[31,33,42]],[0,0,[36,44,45],[22,32,34]],[0,0,[45,46,52],[33,35,44]],[0,0,[37,46,47],[24,34,36]],
   [0,3,[47,48,53],[35,37,46]],[0,0,[38,48],[26,36]],[0,5,[49,54],[28,39]],[0,0,[54,55,62],[38,40,47]],[0,0,[50,55,56],[30,39,41]],[0,0,[56,57,63],[40,42,49]],[0,0,[51,57,58],[32,41,43]],[0,0,[58,59,64],[42,44,51]],[0,0,[52,59,60],[34,43,45]],
   [0,0,[60,61,65],[44,46,53]],[0,3,[53,61],[36,45]],[0,6,[62,66],[39,48]],[0,6,[66,67],[47,49]],[0,0,[63,67,68],[41,48,50]],[0,2,[68,69],[49,51]],[0,2,[64,69,70],[43,50,52]],[0,6,[70,71],[51,53]],[0,6,[65,71],[45,52]]]
+
+  mapmass = []
+  mapmassnum = []
+
+  for i in range(19): #初期マップデータ描画
+    xx = Mapdata_Mass[i][4][0]
+    yy = Mapdata_Mass[i][4][1]
+    mapmas = pygame.image.load("desertmap.png").convert_alpha()
+    mapmas_rect = mapmas.get_rect()
+    mapmas_rect.center = (xx,yy)
+    screen.blit(mapmas,mapmas_rect)
+
+    mapmasn = pygame.image.load("card0.png").convert_alpha()
+    mapmasn_rect = mapmasn.get_rect()
+    mapmasn_rect.center = (xx,yy)
+    screen.blit(mapmasn,mapmasn_rect)
+
+    mapmass.append(mapmas)
+    mapmassnum.append(mapmasn)
+
+  mapgenebutton = pygame.image.load("mapgene.png").convert_alpha()
+  mapgenebutton_rect = mapgenebutton.get_rect()
+  mapgenebutton_rect.center = (90,510)
+  screen.blit(mapgenebutton,mapgenebutton_rect)
+
+  land = [0,1,1,1,1,2,2,2,3,3,3,3,4,4,4,4,5,5,5]
+  landnumber = [-1 for i in range(19)]
+
+  mapmade = False
   running = True
 
-  while running:
+  while running: #map自動生成
     pygame.display.update()
     pygame.time.wait(50)
     for event in pygame.event.get():
       if event.type == QUIT:
+        for receiver in clients_socks:
+          receiver.send("serverdown".encode('utf-8'))
+          receiver.recv(bufsize)
         pygame.quit()
         sys.exit()
       if event.type == KEYDOWN:
         if event.key == K_ESCAPE:
+          for receiver in clients_socks:
+            receiver.send("serverdown".encode('utf-8'))
+            receiver.recv(bufsize)
           pygame.quit()
           sys.exit()
+      if event.type == MOUSEBUTTONDOWN and event.button == 1: #右クリ
+        x, y = event.pos
+        print(x,y)
+        if (x-90)*(x-90)+(y-510)*(y-510) <= 5625: #Mapgene枠内判定
+          land = mapgene.landform()
+          landnumber = mapgene.numberform(land)
+          gamestbutton = pygame.image.load("gamestart.png").convert_alpha()
+          gamestbutton_rect = mapgenebutton.get_rect()
+          gamestbutton_rect.center = (510,510)
+          screen.blit(gamestbutton,gamestbutton_rect)
+          mapmade = True
+          for i in range(19):
+            xx = Mapdata_Mass[i][4][0]
+            yy = Mapdata_Mass[i][4][1]
+            mapmas = mapmass[i]
+            mapmasn = mapmassnum[i]
+            l = land[i]
+            n = landnumber[i]
+            if l == 0:
+              mapmas = pygame.image.load("desertmap.png").convert_alpha()
+            elif l == 1:
+              mapmas = pygame.image.load("woodmap.png").convert_alpha()
+            elif l == 2:
+              mapmas = pygame.image.load("brickmap.png").convert_alpha()
+            elif l == 3:
+              mapmas = pygame.image.load("sheepmap.png").convert_alpha()             
+            elif l == 4:
+              mapmas = pygame.image.load("wheatmap.png").convert_alpha()
+            else:
+              mapmas = pygame.image.load("oremap.png").convert_alpha()
+            mapmas_rect = mapmas.get_rect()
+            mapmas_rect.center = (xx,yy)
+            screen.blit(mapmas,mapmas_rect)
+            if n == 2:
+              mapmasn = pygame.image.load("mass2.png").convert_alpha()
+            elif n == 3:
+              mapmasn = pygame.image.load("mass3.png").convert_alpha()
+            elif n == 4:
+              mapmasn = pygame.image.load("mass4.png").convert_alpha()
+            elif n == 5:
+              mapmasn = pygame.image.load("mass5.png").convert_alpha()             
+            elif n == 6:
+              mapmasn = pygame.image.load("mass6.png").convert_alpha()
+            elif n == 8:
+              mapmasn = pygame.image.load("mass8.png").convert_alpha()
+            elif n == 9:
+              mapmasn = pygame.image.load("mass9.png").convert_alpha()
+            elif n == 10:
+              mapmasn = pygame.image.load("mass10.png").convert_alpha()             
+            elif n == 11:
+              mapmasn = pygame.image.load("mass11.png").convert_alpha()
+            elif n == 12:
+              mapmasn = pygame.image.load("mass12.png").convert_alpha()
+            else:
+              mapmasn = pygame.image.load("space.png").convert_alpha()
+            mapmasn_rect = mapmasn.get_rect()
+            mapmasn_rect.center = (xx,yy)
+            screen.blit(mapmasn,mapmasn_rect)
+        elif (x-510)*(x-510)+(y-510)*(y-510) <= 5625 and mapmade: #Gamestar枠内判定
+          running = False #Map確定
+          for sock in clients_socks:
+            sock.send("gamestart".encode('utf-8')) #マップが確定しゲーム開始の旨をクライアントに通知
+            sock.recv(bufsize)
+    if running == False:
+      break
+    rready, wready, xready = select.select(readfds, [], [],0.05) #処理を可能な物から順に選択
+    for sock in rready:                                   #選択された処理を順次遂行
+      msg = sock.recv(bufsize).decode('utf-8')
+      print(msg)
+      if msg == "QUIT":
+        sock.close()
+        readfds.remove(sock)
+        clients_socks.remove(sock)
+        for receiver in clients_socks:
+          receiver.send("serverdown".encode('utf-8'))
+          msg = receiver.recv(bufsize).decode('utf-8')
+
+  print(land)
+  print(landnumber)
+  landdatastr = ""
+  landnumberstr = ""
+  for i in range(18):
+    x = str(land[i])
+    y = str(landnumber[i])
+    landdatastr += x
+    landdatastr += "/"
+    landnumberstr += y
+    landnumberstr += "/"
+  landdatastr += str(land[18])
+  landnumberstr += str(landnumber[18])
+  print(landdatastr)
+  print(landnumberstr)
+  for sock in clients_socks:
+    sock.send("mapdata1".encode('utf-8'))
+    sock.recv(bufsize)
+    sock.send(landdatastr.encode('utf-8'))
+    sock.recv(bufsize)
+    sock.send("mapdata2".encode('utf-8'))
+    sock.recv(bufsize)
+    sock.send(landnumberstr.encode('utf-8'))
+    sock.recv(bufsize)
+
+  running = True
+
+  while running: #map自動生成
+    pygame.display.update()
+    pygame.time.wait(50)
+    for event in pygame.event.get():
+      if event.type == QUIT:
+        for receiver in clients_socks:
+          receiver.send("serverdown".encode('utf-8'))
+          receiver.recv(bufsize)
+        pygame.quit()
+        sys.exit()
+      if event.type == KEYDOWN:
+        if event.key == K_ESCAPE:
+          for receiver in clients_socks:
+            receiver.send("serverdown".encode('utf-8'))
+            receiver.recv(bufsize)
+          pygame.quit()
+          sys.exit()
+    rready, wready, xready = select.select(readfds, [], [],0.05) #処理を可能な物から順に選択
+    for sock in rready:                                   #選択された処理を順次遂行
+      msg = sock.recv(bufsize).decode('utf-8')
+      print(msg)
+      if msg == "QUIT":
+        sock.close()
+        readfds.remove(sock)
+        clients_socks.remove(sock)
+        for receiver in clients_socks:
+          receiver.send("serverdown".encode('utf-8'))
+          msg = receiver.recv(bufsize).decode('utf-8')
   return
 
 if __name__ == '__main__':
