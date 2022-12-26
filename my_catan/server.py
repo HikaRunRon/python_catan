@@ -614,6 +614,8 @@ def main(): #サーバー側
   for i in range(19):
     if land[i]==0:
       Mapdata_Mass[i][2] = 1
+    Mapdata_Mass[i][0]=land[i]
+    Mapdata_Mass[i][1]=landnumber[i]
 
   landdatastr = "" #クライアントに送信するメッセージの準備
   landnumberstr = ""
@@ -652,8 +654,12 @@ def main(): #サーバー側
 
   if backlog == 3:
     firstphaseturn = [0,1,2,2,1,0]
+    once = [0,0,0]
   else:
     firstphaseturn = [0,1,2,3,3,2,1,0]
+    once = [0,0,0,0]
+
+
 
   for sock in clients_socks: #開拓地と街道を置くフェーズの開始を全クライアントに通知
     sock.send("firstphasestart".encode('utf-8'))
@@ -664,7 +670,7 @@ def main(): #サーバー側
     this_turn_sock = clients_socks[i]
 
     this_turn_sock.send("Yourturn".encode('utf-8')) #次のターンの人にターン通知
-    sock.recv(bufsize)
+    this_turn_sock.recv(bufsize)
 
     running = True
 
@@ -693,6 +699,7 @@ def main(): #サーバー側
 
       for sock in rready:                                   #選択された処理を順次遂行
         msg = sock.recv(bufsize).decode('utf-8')
+        sock.send("ok".encode('utf-8'))
         print(msg)
         if msg == "QUIT":
           sock.close()
@@ -703,7 +710,85 @@ def main(): #サーバー側
             msg = receiver.recv(bufsize).decode('utf-8')
           pygame.quit()
           sys.exit()
+        elif msg == "Mapdata":
+          msg1 = sock.recv(bufsize).decode('utf-8')
+          sock.send("ok".encode('utf-8'))
+          if msg1 == "settlement":
+            msg2 = sock.recv(bufsize).decode('utf-8')
+            sock.send("ok".encode('utf-8'))
+            msg3 = sock.recv(bufsize).decode('utf-8')
+            sock.send("ok".encode('utf-8'))
+            pos = int(msg2)
+            player = int(msg3)
+            print(pos)
+            Mapdata_Edge[pos][0]=player*2 #サーバー側のデータ更新完了
+            if once[player] == 0:
+              for i in range(19):
+                if pos in Mapdata_Mass[i][3]:
+                  x = Mapdata_Mass[i][0]
+                  if x != 0:
+                    Player_Data[player][2][x-1] += 1
+                    Player_Data[player][1] += 1
+            once[player] = 1
+            
+            draw_server(screen,Mapdata_Mass,Mapdata_Side,Mapdata_Edge,Player_Data,land,landnumber,backlog)
+            for sock in clients_socks:
+              sock.send(msg.encode('utf-8'))
+              sock.recv(bufsize)
+              sock.send(msg1.encode('utf-8'))
+              sock.recv(bufsize)
+              sock.send(msg2.encode('utf-8'))
+              sock.recv(bufsize)
+              sock.send(msg3.encode('utf-8'))
+              sock.recv(bufsize)
 
+          elif msg1 == "road":
+            msg2 = sock.recv(bufsize).decode('utf-8')
+            sock.send("ok".encode('utf-8'))
+            msg3 = sock.recv(bufsize).decode('utf-8')
+            sock.send("ok".encode('utf-8'))
+            pos = int(msg2)
+            player = int(msg3)
+            print(pos)
+            Mapdata_Side[pos][0]=player #サーバー側のデータ更新完了
+            
+            draw_server(screen,Mapdata_Mass,Mapdata_Side,Mapdata_Edge,Player_Data,land,landnumber,backlog)
+            for sock in clients_socks:
+              sock.send(msg.encode('utf-8'))
+              sock.recv(bufsize)
+              sock.send(msg1.encode('utf-8'))
+              sock.recv(bufsize)
+              sock.send(msg2.encode('utf-8'))
+              sock.recv(bufsize)
+              sock.send(msg3.encode('utf-8'))
+              sock.recv(bufsize)
+            running = False
+        
+  for sock in clients_socks: #開拓地と街道を置くフェーズの開始を全クライアントに通知
+    sock.send("firstphaseend".encode('utf-8'))
+    sock.recv(bufsize)
+
+  running = True
+
+  while running: #初動、開拓地&街道建設フェーズ
+
+    pygame.display.update()
+    pygame.time.wait(50)
+
+    for event in pygame.event.get():
+      if event.type == QUIT:
+        for receiver in clients_socks:
+          receiver.send("serverdown".encode('utf-8'))
+          receiver.recv(bufsize)
+        pygame.quit()
+        sys.exit()
+      if event.type == KEYDOWN:
+        if event.key == K_ESCAPE:
+          for receiver in clients_socks:
+            receiver.send("serverdown".encode('utf-8'))
+            receiver.recv(bufsize)
+          pygame.quit()
+          sys.exit()  
 
 
   return

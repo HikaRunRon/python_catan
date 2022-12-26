@@ -156,20 +156,20 @@ def draw_server(screen,Mapdata_Mass,Mapdata_Side,Mapdata_Edge,Player_Data,land,l
   draw_image(screen,select_num_image(Player_Data[yourturn][2][4]),390,560)
   draw_image(screen,select_num_image(Player_Data[yourturn][3]),450,560)
 
-  draw_image(screen,select_num_image(Player_Data[rightside][2][0]),40,150)
-  draw_image(screen,select_num_image(Player_Data[rightside][2][1]),40,210)
-  draw_image(screen,select_num_image(Player_Data[rightside][2][2]),40,270)
-  draw_image(screen,select_num_image(Player_Data[rightside][2][3]),40,330)
-  draw_image(screen,select_num_image(Player_Data[rightside][2][4]),40,390)
-  draw_image(screen,select_num_image(Player_Data[rightside][3]),40,450)
+  draw_image(screen,select_num_image(Player_Data[leftside][2][0]),40,150)
+  draw_image(screen,select_num_image(Player_Data[leftside][2][1]),40,210)
+  draw_image(screen,select_num_image(Player_Data[leftside][2][2]),40,270)
+  draw_image(screen,select_num_image(Player_Data[leftside][2][3]),40,330)
+  draw_image(screen,select_num_image(Player_Data[leftside][2][4]),40,390)
+  draw_image(screen,select_num_image(Player_Data[leftside][3]),40,450)
 
   if backlog == 3:
-    draw_image(screen,select_num_image(Player_Data[leftside][2][0]),560,450)
-    draw_image(screen,select_num_image(Player_Data[leftside][2][1]),560,390)
-    draw_image(screen,select_num_image(Player_Data[leftside][2][2]),560,330)
-    draw_image(screen,select_num_image(Player_Data[leftside][2][3]),560,270)
-    draw_image(screen,select_num_image(Player_Data[leftside][2][4]),560,210)
-    draw_image(screen,select_num_image(Player_Data[leftside][3]),560,150)
+    draw_image(screen,select_num_image(Player_Data[rightside][2][0]),560,450)
+    draw_image(screen,select_num_image(Player_Data[rightside][2][1]),560,390)
+    draw_image(screen,select_num_image(Player_Data[rightside][2][2]),560,330)
+    draw_image(screen,select_num_image(Player_Data[rightside][2][3]),560,270)
+    draw_image(screen,select_num_image(Player_Data[rightside][2][4]),560,210)
+    draw_image(screen,select_num_image(Player_Data[rightside][3]),560,150)
   else:
     draw_image(screen,select_num_image(Player_Data[front][2][0]),450,40)
     draw_image(screen,select_num_image(Player_Data[front][2][1]),390,40)
@@ -178,12 +178,12 @@ def draw_server(screen,Mapdata_Mass,Mapdata_Side,Mapdata_Edge,Player_Data,land,l
     draw_image(screen,select_num_image(Player_Data[front][2][4]),210,40)
     draw_image(screen,select_num_image(Player_Data[front][3]),150,40)
 
-    draw_image(screen,select_num_image(Player_Data[leftside][2][0]),560,450)
-    draw_image(screen,select_num_image(Player_Data[leftside][2][1]),560,390)
-    draw_image(screen,select_num_image(Player_Data[leftside][2][2]),560,330)
-    draw_image(screen,select_num_image(Player_Data[leftside][2][3]),560,270)
-    draw_image(screen,select_num_image(Player_Data[leftside][2][4]),560,210)
-    draw_image(screen,select_num_image(Player_Data[leftside][3]),560,150)
+    draw_image(screen,select_num_image(Player_Data[rightside][2][0]),560,450)
+    draw_image(screen,select_num_image(Player_Data[rightside][2][1]),560,390)
+    draw_image(screen,select_num_image(Player_Data[rightside][2][2]),560,330)
+    draw_image(screen,select_num_image(Player_Data[rightside][2][3]),560,270)
+    draw_image(screen,select_num_image(Player_Data[rightside][2][4]),560,210)
+    draw_image(screen,select_num_image(Player_Data[rightside][3]),560,150)
   for i in range(19):
     if Mapdata_Mass[i][2]==1:
       draw_image(screen,"bandit.png",Mapdata_Mass[i][4][0],Mapdata_Mass[i][4][1])
@@ -237,6 +237,82 @@ def draw_server(screen,Mapdata_Mass,Mapdata_Side,Mapdata_Edge,Player_Data,land,l
       draw_image(screen,"settlement_orange.png",Mapdata_Edge[i][4][0],Mapdata_Edge[i][4][1])
     else:
       draw_image(screen,"city_orange.png",Mapdata_Edge[i][4][0],Mapdata_Edge[i][4][1])
+
+def draw_candidate_settlement(screen,player,Mapdata_Edge,Mapdata_Side,x): #配置可能候補地を描写、x==0は初動の開拓地配置、x==1はゲーム本体の開拓地配置
+  l = []
+  for i in range(54):
+    if x == 0:
+      if Mapdata_Edge[i][0]==-1:
+        Judge = True
+        for j in Mapdata_Edge[i][3]:
+          if Mapdata_Edge[j][0]!=-1:
+            Judge = False
+            break
+        if Judge:
+          draw_image(screen,"candidate.png",Mapdata_Edge[i][4][0],Mapdata_Edge[i][4][1])
+          l.append(i)
+    else:
+      if Mapdata_Edge[i][0]==-1:
+        Judge = True
+        for j in Mapdata_Edge[i][3]: #隣接点探索,隣に開拓地や都市が無いことを確認
+          if Mapdata_Edge[j][0]!=-1:
+            Judge = False
+            break
+
+        if Judge:
+          Judge = False
+          for j in Mapdata_Edge[i][2]: #隣接辺探索、隣に道があることを確認
+            if Mapdata_Side[j][0] == player:
+              Judge = True
+              break
+
+          if Judge:
+            draw_image(screen,"candidate.png",Mapdata_Edge[i][4][0],Mapdata_Edge[i][4][1])
+            l.append(i)
+  return l
+
+def draw_candidate_city(screen,player,Mapdata_Edge):
+  l = []
+  for i in range(54):
+    if Mapdata_Edge[i][0] == player*2:
+      draw_image(screen,"candidate.png",Mapdata_Edge[i][4][0],Mapdata_Edge[i][4][1])
+      l.append(i)
+  return l
+
+def draw_candidate_road(screen,player,Mapdata_Edge,Mapdata_Side):
+  l = []
+  for i in range(72):
+    Judge = False
+    for j in Mapdata_Side[i][1]:
+      if Mapdata_Edge[j][0]==player or Mapdata_Edge[j][0]==player+1:
+        Judge = True
+        break
+    if Judge:
+      draw_image(screen,"candidate.png",Mapdata_Side[i][3][0],Mapdata_Side[i][3][1])
+      l.append(i)
+      continue
+    for j in Mapdata_Side[i][2]:
+      if Mapdata_Side[j][0]==player:
+        Judge = True
+        break
+    if Judge:
+      draw_image(screen,"candidate.png",Mapdata_Side[i][3][0],Mapdata_Side[i][3][1])
+      l.append(i)
+  return l
+
+def draw_candidate_road_0(screen,Mapdata_Edge,Mapdata_Side,settlement):
+  l = []
+  for i in Mapdata_Edge[settlement][2]:
+    draw_image(screen,"candidate.png",Mapdata_Side[i][3][0],Mapdata_Side[i][3][1])
+    l.append(i)
+  return l
+
+def draw_candidate_bandit(screen,Mapdata_Mass):
+  l = []
+  for i in range(19):
+    if Mapdata_Mass[i][2]==0:
+      draw_image(screen,"candidate2.png",Mapdata_Mass[i][4][0],Mapdata_Mass[i][4][1])
+
 
 def main(): #クライアント側
   (w,h)=(600,600)   #ゲーム画面の大きさ(幅600px,高さ600px)
@@ -303,7 +379,7 @@ def main(): #クライアント側
   [-1,3,[47,48,53],[35,37,46],[349,469]],[-1,-1,[38,48],[26,36],[325,510]],[-1,5,[49,54],[28,39],[398,132]],[-1,-1,[54,55,62],[38,40,47],[423,173]],[-1,-1,[50,55,56],[30,39,41],[398,216]],[-1,-1,[56,57,63],[40,42,49],[423,258]],[-1,-1,[51,57,58],[32,41,43],[398,300]],[-1,-1,[58,59,64],[42,44,51],[423,342]],[-1,-1,[52,59,60],[34,43,45],[398,384]],
   [-1,-1,[60,61,65],[44,46,53],[423,427]],[-1,3,[53,61],[36,45],[398,469]],[-1,0,[62,66],[39,48],[472,173]],[-1,0,[66,67],[47,49],[496,216]],[-1,-1,[63,67,68],[41,48,50],[472,258]],[-1,2,[68,69],[49,51],[496,300]],[-1,2,[64,69,70],[43,50,52],[472,342]],[-1,0,[70,71],[51,53],[496,384]],[-1,0,[65,71],[45,52],[472,427]]]
 
-  Player_Data = [[0,0,[1,0,0,0,0],0,[0,0,0,0,0,0,0,0,0],5,4,15,0,0,[0,0,0,0,0,0]],[0,0,[0,0,0,0,0],0,[0,0,0,0,0,0,0,0,0],5,4,15,0,0,[0,0,0,0,0,0]],[0,0,[0,0,0,0,0],0,[0,0,0,0,0,0,0,0,0],5,4,15,0,0,[0,0,0,0,0,0]],[0,0,[0,0,0,0,0],0,[0,0,0,0,0,0,0,0,0],5,4,15,0,0,[0,0,0,0,0,0]]]
+  Player_Data = [[0,0,[0,0,0,0,0],0,[0,0,0,0,0,0,0,0,0],5,4,15,0,0,[0,0,0,0,0,0]],[0,0,[0,0,0,0,0],0,[0,0,0,0,0,0,0,0,0],5,4,15,0,0,[0,0,0,0,0,0]],[0,0,[0,0,0,0,0],0,[0,0,0,0,0,0,0,0,0],5,4,15,0,0,[0,0,0,0,0,0]],[0,0,[0,0,0,0,0],0,[0,0,0,0,0,0,0,0,0],5,4,15,0,0,[0,0,0,0,0,0]]]
   #所持ポイント、所持資源カード合計枚数、所持資源カード枚数内訳(木、レンガ、羊、小麦、石)、所持発展カード合計枚数,その内訳(騎士、街道建設、発見、独占、大聖堂、図書館、市場、議会、大学),残り建設可能開拓地数、残り建設可能都市数、残り建設可能街道数、交易路の長さ、騎士力,優位トレード所持(1(wood2-1),2(brick2-1),3(sheep2-1),4(wheat2-1),5(ore2-1),0(3-1))(所持しているときは1(デフォルト0))
 
   yourturn = -1 #プレイヤーのターン、後々サーバーから通知が来る。
@@ -538,6 +614,8 @@ def main(): #クライアント側
     for i in range(19):
       if land[i]==0:
         Mapdata_Mass[i][2] = 1
+      Mapdata_Mass[i][0]=land[i]
+      Mapdata_Mass[i][1]=landnumber[i]
 
     draw_server(screen,Mapdata_Mass,Mapdata_Side,Mapdata_Edge,Player_Data,land,landnumber,backlog,yourturn,rightside,front,leftside)
     pygame.display.update()
@@ -549,6 +627,11 @@ def main(): #クライアント側
     running = True
 
     myturn = False
+
+    if backlog == 3:
+      once = [0,0,0]
+    else:
+      once = [0,0,0,0]
 
     while running: #初動、開拓地&街道建設フェーズ
       pygame.display.update()
@@ -572,7 +655,51 @@ def main(): #クライアント側
           pygame.quit()
           sys.exit()
         elif msg == "Yourturn": #ターン通知を受け取った時、自分のターンを開始する。
-          myturn == True
+          print("ok")
+          myturn = True
+        elif msg == "Mapdata":
+          msg1 = sock.recv(bufsize).decode('utf-8')
+          sock.send("ok".encode('utf-8'))
+          if msg1 == "settlement":
+            msg2 = sock.recv(bufsize).decode('utf-8')
+            sock.send("ok".encode('utf-8'))
+            msg3 = sock.recv(bufsize).decode('utf-8')
+            sock.send("ok".encode('utf-8'))
+            pos = int(msg2)
+            player = int(msg3)
+            Mapdata_Edge[pos][0]=player*2 #クライアント側のデータ更新完了
+            if once[player]==0:
+              for i in range(19):
+                if pos in Mapdata_Mass[i][3]:
+                  x = Mapdata_Mass[i][0]
+                  if x != 0:
+                    Player_Data[player][2][x-1] += 1
+                    Player_Data[player][1] += 1
+            once[player]=1
+            draw_server(screen,Mapdata_Mass,Mapdata_Side,Mapdata_Edge,Player_Data,land,landnumber,backlog,yourturn,rightside,front,leftside) #データをもとに描画更新
+          elif msg1 == "road":
+            msg2 = sock.recv(bufsize).decode('utf-8')
+            sock.send("ok".encode('utf-8'))
+            msg3 = sock.recv(bufsize).decode('utf-8')
+            sock.send("ok".encode('utf-8'))
+            pos = int(msg2)
+            player = int(msg3)
+            Mapdata_Side[pos][0]=player #クライアント側のデータ更新完了
+            draw_server(screen,Mapdata_Mass,Mapdata_Side,Mapdata_Edge,Player_Data,land,landnumber,backlog,yourturn,rightside,front,leftside) #データをもとに描画更新
+        elif msg == "firstphaseend":
+          running = False
+
+
+      if myturn == False:
+        continue
+
+      player_str = str(yourturn)
+
+      print(yourturn)
+
+      settlement = -1
+      settlement_candidates = draw_candidate_settlement(screen,yourturn,Mapdata_Edge,Mapdata_Side,0)
+
       while myturn: #開拓地を置く
         pygame.display.update()
         pygame.time.wait(50)
@@ -586,6 +713,24 @@ def main(): #クライアント側
               sock.send("QUIT".encode('utf-8'))
               pygame.quit()
               sys.exit()
+          if event.type == MOUSEBUTTONDOWN and event.button == 1:
+            x, y = event.pos
+            for i in settlement_candidates:
+              if (Mapdata_Edge[i][4][0]-x)*(Mapdata_Edge[i][4][0]-x)+(Mapdata_Edge[i][4][1]-y)*(Mapdata_Edge[i][4][1]-y)<=500:
+                settlement = i
+                i_str = str(i)
+                sock.send("Mapdata".encode('utf-8'))
+                sock.recv(bufsize)
+                sock.send("settlement".encode('utf-8'))
+                sock.recv(bufsize)
+                sock.send(i_str.encode('utf-8'))
+                sock.recv(bufsize)
+                sock.send(player_str.encode('utf-8'))
+                sock.recv(bufsize)
+                myturn = False
+                break
+        if myturn == False:
+          break
         rready, wready, xready = select.select(readfds, [], [],0.05) #処理を可能な物から順に選択
         for sock in rready:                                   #選択された処理を順次遂行
           msg = sock.recv(bufsize).decode('utf-8')
@@ -595,6 +740,102 @@ def main(): #クライアント側
             pygame.quit()
             sys.exit()
 
+      msg = sock.recv(bufsize).decode('utf-8')
+      sock.send("ok".encode('utf-8'))
+      if msg == "Mapdata":
+        msg1 = sock.recv(bufsize).decode('utf-8')
+        sock.send("ok".encode('utf-8'))
+        if msg1 == "settlement":
+          msg2 = sock.recv(bufsize).decode('utf-8')
+          sock.send("ok".encode('utf-8'))
+          msg3 = sock.recv(bufsize).decode('utf-8')
+          sock.send("ok".encode('utf-8'))
+          pos = int(msg2)
+          print(pos)
+          player = int(msg3)
+          Mapdata_Edge[pos][0]=player*2 #クライアント側のデータ更新完了
+          if once[player]==0:
+            for i in range(19):
+              if pos in Mapdata_Mass[i][3]:
+                x = Mapdata_Mass[i][0]
+                if x != 0:
+                  Player_Data[player][2][x-1] += 1
+                  Player_Data[player][1] += 1
+          once[player]=1
+          draw_server(screen,Mapdata_Mass,Mapdata_Side,Mapdata_Edge,Player_Data,land,landnumber,backlog,yourturn,rightside,front,leftside) #データをもとに描画更新
+      road_candidates = draw_candidate_road_0(screen,Mapdata_Edge,Mapdata_Side,settlement)
+      myturn = True
+
+      while myturn: #街道を置く
+        pygame.display.update()
+        pygame.time.wait(50)
+        for event in pygame.event.get():
+          if event.type == QUIT:
+            sock.send("QUIT".encode('utf-8'))
+            pygame.quit()
+            sys.exit()
+          if event.type == KEYDOWN:
+            if event.key == K_ESCAPE:
+              sock.send("QUIT".encode('utf-8'))
+              pygame.quit()
+              sys.exit()
+          if event.type == MOUSEBUTTONDOWN and event.button == 1:
+            x, y = event.pos
+            for i in road_candidates:
+              if (Mapdata_Side[i][3][0]-x)*(Mapdata_Side[i][3][0]-x)+(Mapdata_Side[i][3][1]-y)*(Mapdata_Side[i][3][1]-y)<=500:
+                i_str = str(i)
+                sock.send("Mapdata".encode('utf-8'))
+                sock.recv(bufsize)
+                sock.send("road".encode('utf-8'))
+                sock.recv(bufsize)
+                sock.send(i_str.encode('utf-8'))
+                sock.recv(bufsize)
+                sock.send(player_str.encode('utf-8'))
+                sock.recv(bufsize)
+                myturn = False
+                break
+        if myturn == False:
+          break
+        rready, wready, xready = select.select(readfds, [], [],0.05) #処理を可能な物から順に選択
+        for sock in rready:                                   #選択された処理を順次遂行
+          msg = sock.recv(bufsize).decode('utf-8')
+          print(msg)
+          sock.send("ok".encode('utf-8'))
+          if msg == "serverdown":
+            pygame.quit()
+            sys.exit()
+
+      msg = sock.recv(bufsize).decode('utf-8')
+      sock.send("ok".encode('utf-8'))
+      if msg == "Mapdata":
+        msg1 = sock.recv(bufsize).decode('utf-8')
+        sock.send("ok".encode('utf-8'))
+        if msg1 == "road":
+          msg2 = sock.recv(bufsize).decode('utf-8')
+          sock.send("ok".encode('utf-8'))
+          msg3 = sock.recv(bufsize).decode('utf-8')
+          sock.send("ok".encode('utf-8'))
+          pos = int(msg2)
+          print(pos)
+          player = int(msg3)
+          Mapdata_Side[pos][0]=player #クライアント側のデータ更新完了
+          draw_server(screen,Mapdata_Mass,Mapdata_Side,Mapdata_Edge,Player_Data,land,landnumber,backlog,yourturn,rightside,front,leftside) #データをもとに描画更新
+
+    running = True
+
+    while running: #初動、開拓地&街道建設フェーズ
+      pygame.display.update()
+      pygame.time.wait(50)
+      for event in pygame.event.get():
+        if event.type == QUIT:
+          sock.send("QUIT".encode('utf-8'))
+          pygame.quit()
+          sys.exit()
+        if event.type == KEYDOWN:
+          if event.key == K_ESCAPE:
+            sock.send("QUIT".encode('utf-8'))
+            pygame.quit()
+            sys.exit()
   return
 
 if __name__ == '__main__':
