@@ -122,6 +122,16 @@ def draw_server(screen,Mapdata_Mass,Mapdata_Side,Mapdata_Edge,Player_Data,land,l
     mapmasn_rect = mapmasn.get_rect()
     mapmasn_rect.center = (xx,yy)
     screen.blit(mapmasn,mapmasn_rect)
+  if backlog == 3:
+    draw_image(screen,"back_white.png",300,560)
+    draw_image(screen,"back_red2.png",40,300)
+    draw_image(screen,"back_blue2.png",560,300)
+  else:
+    draw_image(screen,"back_white.png",300,560)
+    draw_image(screen,"back_red2.png",40,300)
+    draw_image(screen,"back_blue.png",300,40)
+    draw_image(screen,"back_orange2.png",560,300)
+
   draw_image(screen,"woodcard.png",150,560)
   draw_image(screen,"brickcard.png",210,560)
   draw_image(screen,"sheepcard.png",270,560)
