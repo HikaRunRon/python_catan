@@ -116,7 +116,7 @@ def draw_server(screen,Mapdata_Mass,Mapdata_Side,Mapdata_Edge,Player_Data,land,l
     elif n == 12:
       mapmasn = pygame.image.load("./picture/Tile_Number/mass12.png").convert_alpha()
     else:
-      mapmasn = pygame.image.load(".picturespace5050.png").convert_alpha()
+      mapmasn = pygame.image.load(".picture/space5050.png").convert_alpha()
     mapmasn_rect = mapmasn.get_rect()
     mapmasn_rect.center = (xx,yy)
     screen.blit(mapmasn,mapmasn_rect)
@@ -382,7 +382,7 @@ def main(): #クライアント側
   screen.blit(bg,rect_bg) #背景描画
   pygame.display.update() #ディスプレイ更新
   pygame.time.wait(300)
-  host = "192.168.11.3" 
+  host = "192.168.0.6" 
   port = 55992         #ポート番号 今回は55992に設定
   bufsize = 4096      #デフォルト4096
 
