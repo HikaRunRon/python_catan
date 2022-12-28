@@ -116,7 +116,7 @@ def draw_server(screen,Mapdata_Mass,Mapdata_Side,Mapdata_Edge,Player_Data,land,l
     elif n == 12:
       mapmasn = pygame.image.load("./picture/Tile_Number/mass12.png").convert_alpha()
     else:
-      mapmasn = pygame.image.load(".picture/space5050.png").convert_alpha()
+      mapmasn = pygame.image.load("./picture/space5050.png").convert_alpha()
     mapmasn_rect = mapmasn.get_rect()
     mapmasn_rect.center = (xx,yy)
     screen.blit(mapmasn,mapmasn_rect)
