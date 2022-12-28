@@ -14,64 +14,64 @@ def draw_image(screen,image,x,y): #画像(image)を座標(x,y)に描画
 
 def select_num_image(x):  #数字　→　対応する画像
   if x == 0:
-    return "card0.png"
+    return "./picture/Card_Number/card0.png"
   elif x == 1:
-    return "card1.png"
+    return "./picture/Card_Number/card1.png"
   elif x == 2:
-    return "card2.png"
+    return "./picture/Card_Number/card2.png"
   elif x == 3:
-    return "card3.png"
+    return "./picture/Card_Number/card3.png"
   elif x == 4:
-    return "card4.png"
+    return "./picture/Card_Number/card4.png"
   elif x == 5:
-    return "card5.png"
+    return "./picture/Card_Number/card5.png"
   elif x == 6:
-    return "card6.png"
+    return "./picture/Card_Number/card6.png"
   elif x == 7:
-    return "card7.png"
+    return "./picture/Card_Number/card7.png"
   elif x == 8:
-    return "card8.png"
+    return "./picture/Card_Number/card8.png"
   elif x == 9:
-    return "card9.png"
+    return "./picture/Card_Number/card9.png"
   elif x == 10:
-    return "card10.png"
+    return "./picture/Card_Number/card10.png"
   elif x == 11:
-    return "card11.png"
+    return "./picture/Card_Number/card11.png"
   elif x == 12:
-    return "card12.png"
+    return "./picture/Card_Number/card12.png"
   elif x == 13:
-    return "card13.png"
+    return "./picture/Card_Number/card13.png"
   elif x == 14:
-    return "card14.png"
+    return "./picture/Card_Number/card14.png"
   elif x == 15:
-    return "card15.png"
+    return "./picture/Card_Number/card15.png"
   elif x == 16:
-    return "card16.png"
+    return "./picture/Card_Number/card16.png"
   elif x == 17:
-    return "card17.png"
+    return "./picture/Card_Number/card17.png"
   elif x == 18:
-    return "card18.png"
+    return "./picture/Card_Number/card18.png"
   elif x == 19:
-    return "card19.png"
+    return "./picture/Card_Number/card19.png"
   elif x == 20:
-    return "card20.png"
+    return "./picture/Card_Number/card20.png"
   elif x == 21:
-    return "card21.png"
+    return "./picture/Card_Number/card21.png"
   elif x == 22:
-    return "card22.png"
+    return "./picture/Card_Number/card22.png"
   elif x == 23:
-    return "card23.png"
+    return "./picture/Card_Number/card23.png"
   elif x == 24:
-    return "card24.png"
+    return "./picture/Card_Number/card24.png"
   elif x == 25:
-    return "card25.png"
+    return "./picture/Card_Number/card25.png"
   elif x >= 26:
-    return "card25+.png"
+    return "./picture/Card_Number/card25+.png"
   else:
-    return "space5050.png"
+    return "./picture/space5050.png"
 
 def draw_server(screen,Mapdata_Mass,Mapdata_Side,Mapdata_Edge,Player_Data,land,landnumber,backlog,yourturn,rightside,front,leftside): #現在のマップ状況を全て表示する関数
-  bg = pygame.image.load("catanmap.jpg").convert_alpha() #背景画像設定   
+  bg = pygame.image.load("./picture/catanmap.jpg").convert_alpha() #背景画像設定   
   rect_bg = bg.get_rect() #背景画像の大きさを取得
   screen.blit(bg,rect_bg) #背景描画
   pygame.display.update() #ディスプレイ更新
@@ -81,109 +81,109 @@ def draw_server(screen,Mapdata_Mass,Mapdata_Side,Mapdata_Edge,Player_Data,land,l
     l = land[i]
     n = landnumber[i]
     if l == 0: #資源描画
-      mapmas = pygame.image.load("desertmap.png").convert_alpha()
+      mapmas = pygame.image.load("./picture/Resource_Tile/desertmap.png").convert_alpha()
     elif l == 1:
-      mapmas = pygame.image.load("woodmap.png").convert_alpha()
+      mapmas = pygame.image.load("./picture/Resource_Tile/woodmap.png").convert_alpha()
     elif l == 2:
-      mapmas = pygame.image.load("brickmap.png").convert_alpha()
+      mapmas = pygame.image.load("./picture/Resource_Tile/brickmap.png").convert_alpha()
     elif l == 3:
-      mapmas = pygame.image.load("sheepmap.png").convert_alpha()             
+      mapmas = pygame.image.load("./picture/Resource_Tile/sheepmap.png").convert_alpha()             
     elif l == 4:
-      mapmas = pygame.image.load("wheatmap.png").convert_alpha()
+      mapmas = pygame.image.load("./picture/Resource_Tile/wheatmap.png").convert_alpha()
     else:
-      mapmas = pygame.image.load("oremap.png").convert_alpha()
+      mapmas = pygame.image.load("./picture/Resource_Tile/oremap.png").convert_alpha()
     mapmas_rect = mapmas.get_rect()
     mapmas_rect.center = (xx,yy)
     screen.blit(mapmas,mapmas_rect)
     if n == 2: #数字描画
-      mapmasn = pygame.image.load("mass2.png").convert_alpha()
+      mapmasn = pygame.image.load("./picture/Tile_Number/mass2.png").convert_alpha()
     elif n == 3:
-      mapmasn = pygame.image.load("mass3.png").convert_alpha()
+      mapmasn = pygame.image.load("./picture/Tile_Number/mass3.png").convert_alpha()
     elif n == 4:
-      mapmasn = pygame.image.load("mass4.png").convert_alpha()
+      mapmasn = pygame.image.load("./picture/Tile_Number/mass4.png").convert_alpha()
     elif n == 5:
-      mapmasn = pygame.image.load("mass5.png").convert_alpha()             
+      mapmasn = pygame.image.load("./picture/Tile_Number/mass5.png").convert_alpha()             
     elif n == 6:
-      mapmasn = pygame.image.load("mass6.png").convert_alpha()
+      mapmasn = pygame.image.load("./picture/Tile_Number/mass6.png").convert_alpha()
     elif n == 8:
-      mapmasn = pygame.image.load("mass8.png").convert_alpha()
+      mapmasn = pygame.image.load("./picture/Tile_Number/mass8.png").convert_alpha()
     elif n == 9:
-      mapmasn = pygame.image.load("mass9.png").convert_alpha()
+      mapmasn = pygame.image.load("./picture/Tile_Number/mass9.png").convert_alpha()
     elif n == 10:
-      mapmasn = pygame.image.load("mass10.png").convert_alpha()             
+      mapmasn = pygame.image.load("./picture/Tile_Number/mass10.png").convert_alpha()             
     elif n == 11:
-      mapmasn = pygame.image.load("mass11.png").convert_alpha()
+      mapmasn = pygame.image.load("./picture/Tile_Number/mass11.png").convert_alpha()
     elif n == 12:
-      mapmasn = pygame.image.load("mass12.png").convert_alpha()
+      mapmasn = pygame.image.load("./picture/Tile_Number/mass12.png").convert_alpha()
     else:
-      mapmasn = pygame.image.load("space5050.png").convert_alpha()
+      mapmasn = pygame.image.load(".picturespace5050.png").convert_alpha()
     mapmasn_rect = mapmasn.get_rect()
     mapmasn_rect.center = (xx,yy)
     screen.blit(mapmasn,mapmasn_rect)
 
   if backlog == 3:
     if yourturn == 0:
-      draw_image(screen,"back_white.png",300,560)
-      draw_image(screen,"back_red2.png",40,300)
-      draw_image(screen,"back_blue2.png",560,300)
+      draw_image(screen,"./picture/Background/back_white.png",300,560)
+      draw_image(screen,"./picture/Background/back_red2.png",40,300)
+      draw_image(screen,"./picture/Background/back_blue2.png",560,300)
     elif yourturn == 1:
-      draw_image(screen,"back_red.png",300,560)
-      draw_image(screen,"back_blue2.png",40,300)
-      draw_image(screen,"back_white2.png",560,300)
+      draw_image(screen,"./picture/Background/back_red.png",300,560)
+      draw_image(screen,"./picture/Background/back_blue2.png",40,300)
+      draw_image(screen,"./picture/Background/back_white2.png",560,300)
     elif yourturn == 2:
-      draw_image(screen,"back_blue.png",300,560)
-      draw_image(screen,"back_white2.png",40,300)
-      draw_image(screen,"back_red2.png",560,300)
+      draw_image(screen,"./picture/Background/back_blue.png",300,560)
+      draw_image(screen,"./picture/Background/back_white2.png",40,300)
+      draw_image(screen,"./picture/Background/back_red2.png",560,300)
   else:
     if yourturn == 0:
-      draw_image(screen,"back_white.png",300,560)
-      draw_image(screen,"back_red2.png",40,300)
-      draw_image(screen,"back_blue.png",300,40)
-      draw_image(screen,"back_orange2.png",560,300)
+      draw_image(screen,"./picture/Background/back_white.png",300,560)
+      draw_image(screen,"./picture/Background/back_red2.png",40,300)
+      draw_image(screen,"./picture/Background/back_blue.png",300,40)
+      draw_image(screen,"./picture/Background/back_orange2.png",560,300)
     elif yourturn == 1:
-      draw_image(screen,"back_red.png",300,560)
-      draw_image(screen,"back_blue2.png",40,300)
-      draw_image(screen,"back_orange.png",300,40)
-      draw_image(screen,"back_white2.png",560,300)
+      draw_image(screen,"./picture/Background/back_red.png",300,560)
+      draw_image(screen,"./picture/Background/back_blue2.png",40,300)
+      draw_image(screen,"./picture/Background/back_orange.png",300,40)
+      draw_image(screen,"./picture/Background/back_white2.png",560,300)
     elif yourturn == 2:
-      draw_image(screen,"back_blue.png",300,560)
-      draw_image(screen,"back_orange2.png",40,300)
-      draw_image(screen,"back_white.png",300,40)
-      draw_image(screen,"back_red2.png",560,300)
+      draw_image(screen,"./picture/Background/back_blue.png",300,560)
+      draw_image(screen,"./picture/Background/back_orange2.png",40,300)
+      draw_image(screen,"./picture/Background/back_white.png",300,40)
+      draw_image(screen,"./picture/Background/back_red2.png",560,300)
     elif yourturn == 3:
-      draw_image(screen,"back_orange.png",300,560)
-      draw_image(screen,"back_white2.png",40,300)
-      draw_image(screen,"back_red.png",300,40)
-      draw_image(screen,"back_blue2.png",560,300)
+      draw_image(screen,"./picture/Background/back_orange.png",300,560)
+      draw_image(screen,"./picture/Background/back_white2.png",40,300)
+      draw_image(screen,"./picture/Background/back_red.png",300,40)
+      draw_image(screen,"./picture/Background/back_blue2.png",560,300)
 
-  draw_image(screen,"woodcard.png",150,560)
-  draw_image(screen,"brickcard.png",210,560)
-  draw_image(screen,"sheepcard.png",270,560)
-  draw_image(screen,"wheatcard.png",330,560)
-  draw_image(screen,"orecard.png",390,560)
-  draw_image(screen,"secretcard.png",450,560)
+  draw_image(screen,"./picture/Resource_Card/woodcard.png",150,560)
+  draw_image(screen,"./picture/Resource_Card/brickcard.png",210,560)
+  draw_image(screen,"./picture/Resource_Card/sheepcard.png",270,560)
+  draw_image(screen,"./picture/Resource_Card/wheatcard.png",330,560)
+  draw_image(screen,"./picture/Resource_Card/orecard.png",390,560)
+  draw_image(screen,"./picture/Resource_Card/secretcard.png",450,560)
 
-  draw_image(screen,"woodcard2.png",40,150)
-  draw_image(screen,"brickcard2.png",40,210)
-  draw_image(screen,"sheepcard2.png",40,270)
-  draw_image(screen,"wheatcard2.png",40,330)
-  draw_image(screen,"orecard2.png",40,390)
-  draw_image(screen,"secretcard2.png",40,450)
+  draw_image(screen,"./picture/Resource_Card/woodcard2.png",40,150)
+  draw_image(screen,"./picture/Resource_Card/brickcard2.png",40,210)
+  draw_image(screen,"./picture/Resource_Card/sheepcard2.png",40,270)
+  draw_image(screen,"./picture/Resource_Card/wheatcard2.png",40,330)
+  draw_image(screen,"./picture/Resource_Card/orecard2.png",40,390)
+  draw_image(screen,"./picture/Resource_Card/secretcard2.png",40,450)
 
-  draw_image(screen,"woodcard2.png",560,450)
-  draw_image(screen,"brickcard2.png",560,390)
-  draw_image(screen,"sheepcard2.png",560,330)
-  draw_image(screen,"wheatcard2.png",560,270)
-  draw_image(screen,"orecard2.png",560,210)
-  draw_image(screen,"secretcard2.png",560,150)
+  draw_image(screen,"./picture/Resource_Card/woodcard2.png",560,450)
+  draw_image(screen,"./picture/Resource_Card/brickcard2.png",560,390)
+  draw_image(screen,"./picture/Resource_Card/sheepcard2.png",560,330)
+  draw_image(screen,"./picture/Resource_Card/wheatcard2.png",560,270)
+  draw_image(screen,"./picture/Resource_Card/orecard2.png",560,210)
+  draw_image(screen,"./picture/Resource_Card/secretcard2.png",560,150)
 
   if backlog == 4:
-    draw_image(screen,"woodcard.png",450,40)
-    draw_image(screen,"brickcard.png",390,40)
-    draw_image(screen,"sheepcard.png",330,40)
-    draw_image(screen,"wheatcard.png",270,40)
-    draw_image(screen,"orecard.png",210,40)
-    draw_image(screen,"secretcard.png",150,40)
+    draw_image(screen,"./picture/Resource_Card/woodcard.png",450,40)
+    draw_image(screen,"./picture/Resource_Card/brickcard.png",390,40)
+    draw_image(screen,"./picture/Resource_Card/sheepcard.png",330,40)
+    draw_image(screen,"./picture/Resource_Card/wheatcard.png",270,40)
+    draw_image(screen,"./picture/Resource_Card/orecard.png",210,40)
+    draw_image(screen,"./picture/Resource_Card/secretcard.png",150,40)
 
   draw_image(screen,select_num_image(Player_Data[yourturn][2][0]),150,560)
   draw_image(screen,select_num_image(Player_Data[yourturn][2][1]),210,560)
@@ -222,57 +222,57 @@ def draw_server(screen,Mapdata_Mass,Mapdata_Side,Mapdata_Edge,Player_Data,land,l
     draw_image(screen,select_num_image(Player_Data[rightside][3]),560,150)
   for i in range(19):
     if Mapdata_Mass[i][2]==1:
-      draw_image(screen,"bandit.png",Mapdata_Mass[i][4][0],Mapdata_Mass[i][4][1])
+      draw_image(screen,"./picture/Tile_Number/bandit.png",Mapdata_Mass[i][4][0],Mapdata_Mass[i][4][1])
   for i in range(72):
     if Mapdata_Side[i][0]==-1:
       continue
     elif Mapdata_Side[i][0]==0:
       if Mapdata_Side[i][4]==0:
-        draw_image(screen,"road_white_0.png",Mapdata_Side[i][3][0],Mapdata_Side[i][3][1])
+        draw_image(screen,"./picture/Building/road_white_0.png",Mapdata_Side[i][3][0],Mapdata_Side[i][3][1])
       elif Mapdata_Side[i][4]==1:
-        draw_image(screen,"road_white_120.png",Mapdata_Side[i][3][0],Mapdata_Side[i][3][1])
+        draw_image(screen,"./picture/Building/road_white_120.png",Mapdata_Side[i][3][0],Mapdata_Side[i][3][1])
       else:
-        draw_image(screen,"road_white_240.png",Mapdata_Side[i][3][0],Mapdata_Side[i][3][1])
+        draw_image(screen,"./picture/Building/road_white_240.png",Mapdata_Side[i][3][0],Mapdata_Side[i][3][1])
     elif Mapdata_Side[i][0]==1:
       if Mapdata_Side[i][4]==0:
-        draw_image(screen,"road_red_0.png",Mapdata_Side[i][3][0],Mapdata_Side[i][3][1])
+        draw_image(screen,"./picture/Building/road_red_0.png",Mapdata_Side[i][3][0],Mapdata_Side[i][3][1])
       elif Mapdata_Side[i][4]==1:
-        draw_image(screen,"road_red_120.png",Mapdata_Side[i][3][0],Mapdata_Side[i][3][1])
+        draw_image(screen,"./picture/Building/road_red_120.png",Mapdata_Side[i][3][0],Mapdata_Side[i][3][1])
       else:
-        draw_image(screen,"road_red_240.png",Mapdata_Side[i][3][0],Mapdata_Side[i][3][1])
+        draw_image(screen,"./picture/Building/road_red_240.png",Mapdata_Side[i][3][0],Mapdata_Side[i][3][1])
     elif Mapdata_Side[i][0]==2:
       if Mapdata_Side[i][4]==0:
-        draw_image(screen,"road_blue_0.png",Mapdata_Side[i][3][0],Mapdata_Side[i][3][1])
+        draw_image(screen,"./picture/Building/road_blue_0.png",Mapdata_Side[i][3][0],Mapdata_Side[i][3][1])
       elif Mapdata_Side[i][4]==1:
-        draw_image(screen,"road_blue_120.png",Mapdata_Side[i][3][0],Mapdata_Side[i][3][1])
+        draw_image(screen,"./picture/Building/road_blue_120.png",Mapdata_Side[i][3][0],Mapdata_Side[i][3][1])
       else:
-        draw_image(screen,"road_blue_240.png",Mapdata_Side[i][3][0],Mapdata_Side[i][3][1])
+        draw_image(screen,"./picture/Building/road_blue_240.png",Mapdata_Side[i][3][0],Mapdata_Side[i][3][1])
     else:
       if Mapdata_Side[i][4]==0:
-        draw_image(screen,"road_orange_0.png",Mapdata_Side[i][3][0],Mapdata_Side[i][3][1])
+        draw_image(screen,"./picture/Building/road_orange_0.png",Mapdata_Side[i][3][0],Mapdata_Side[i][3][1])
       elif Mapdata_Side[i][4]==1:
-        draw_image(screen,"road_orange_120.png",Mapdata_Side[i][3][0],Mapdata_Side[i][3][1])
+        draw_image(screen,"./picture/Building/road_orange_120.png",Mapdata_Side[i][3][0],Mapdata_Side[i][3][1])
       else:
-        draw_image(screen,"road_orange_240.png",Mapdata_Side[i][3][0],Mapdata_Side[i][3][1])
+        draw_image(screen,"./picture/Building/road_orange_240.png",Mapdata_Side[i][3][0],Mapdata_Side[i][3][1])
   for i in range(54):
     if Mapdata_Edge[i][0]==-1:
       continue
     elif Mapdata_Edge[i][0]==0:
-      draw_image(screen,"settlement_white.png",Mapdata_Edge[i][4][0],Mapdata_Edge[i][4][1])
+      draw_image(screen,"./picture/Building/settlement_white.png",Mapdata_Edge[i][4][0],Mapdata_Edge[i][4][1])
     elif Mapdata_Edge[i][0]==1:
-      draw_image(screen,"city_white.png",Mapdata_Edge[i][4][0],Mapdata_Edge[i][4][1])
+      draw_image(screen,"./picture/Building/city_white.png",Mapdata_Edge[i][4][0],Mapdata_Edge[i][4][1])
     elif Mapdata_Edge[i][0]==2:
-      draw_image(screen,"settlement_red.png",Mapdata_Edge[i][4][0],Mapdata_Edge[i][4][1])
+      draw_image(screen,"./picture/Building/settlement_red.png",Mapdata_Edge[i][4][0],Mapdata_Edge[i][4][1])
     elif Mapdata_Edge[i][0]==3:
-      draw_image(screen,"city_red.png",Mapdata_Edge[i][4][0],Mapdata_Edge[i][4][1])
+      draw_image(screen,"./picture/Building/city_red.png",Mapdata_Edge[i][4][0],Mapdata_Edge[i][4][1])
     elif Mapdata_Edge[i][0]==4:
-      draw_image(screen,"settlement_blue.png",Mapdata_Edge[i][4][0],Mapdata_Edge[i][4][1])
+      draw_image(screen,"./picture/Building/settlement_blue.png",Mapdata_Edge[i][4][0],Mapdata_Edge[i][4][1])
     elif Mapdata_Edge[i][0]==5:
-      draw_image(screen,"city_blue.png",Mapdata_Edge[i][4][0],Mapdata_Edge[i][4][1])
+      draw_image(screen,"./picture/Building/city_blue.png",Mapdata_Edge[i][4][0],Mapdata_Edge[i][4][1])
     elif Mapdata_Edge[i][0]==6:
-      draw_image(screen,"settlement_orange.png",Mapdata_Edge[i][4][0],Mapdata_Edge[i][4][1])
+      draw_image(screen,"./picture/Building/settlement_orange.png",Mapdata_Edge[i][4][0],Mapdata_Edge[i][4][1])
     else:
-      draw_image(screen,"city_orange.png",Mapdata_Edge[i][4][0],Mapdata_Edge[i][4][1])
+      draw_image(screen,"./picture/Building/city_orange.png",Mapdata_Edge[i][4][0],Mapdata_Edge[i][4][1])
 
 def draw_candidate_settlement(screen,player,Mapdata_Edge,Mapdata_Side,x): #配置可能候補地を描写、x==0は初動の開拓地配置、x==1はゲーム本体の開拓地配置
   l = []
@@ -285,7 +285,7 @@ def draw_candidate_settlement(screen,player,Mapdata_Edge,Mapdata_Side,x): #配�
             Judge = False
             break
         if Judge:
-          draw_image(screen,"candidate.png",Mapdata_Edge[i][4][0],Mapdata_Edge[i][4][1])
+          draw_image(screen,"./picture/candidate.png",Mapdata_Edge[i][4][0],Mapdata_Edge[i][4][1])
           l.append(i)
     else:
       if Mapdata_Edge[i][0]==-1:
@@ -303,7 +303,7 @@ def draw_candidate_settlement(screen,player,Mapdata_Edge,Mapdata_Side,x): #配�
               break
 
           if Judge:
-            draw_image(screen,"candidate.png",Mapdata_Edge[i][4][0],Mapdata_Edge[i][4][1])
+            draw_image(screen,"./picture/candidate.png",Mapdata_Edge[i][4][0],Mapdata_Edge[i][4][1])
             l.append(i)
   return l
 
@@ -311,7 +311,7 @@ def draw_candidate_city(screen,player,Mapdata_Edge):
   l = []
   for i in range(54):
     if Mapdata_Edge[i][0] == player*2:
-      draw_image(screen,"candidate.png",Mapdata_Edge[i][4][0],Mapdata_Edge[i][4][1])
+      draw_image(screen,"./picture/candidate.png",Mapdata_Edge[i][4][0],Mapdata_Edge[i][4][1])
       l.append(i)
   return l
 
@@ -324,7 +324,7 @@ def draw_candidate_road(screen,player,Mapdata_Edge,Mapdata_Side):
         Judge = True
         break
     if Judge:
-      draw_image(screen,"candidate.png",Mapdata_Side[i][3][0],Mapdata_Side[i][3][1])
+      draw_image(screen,"./picture/candidate.png",Mapdata_Side[i][3][0],Mapdata_Side[i][3][1])
       l.append(i)
       continue
     for j in Mapdata_Side[i][2]:
@@ -332,14 +332,14 @@ def draw_candidate_road(screen,player,Mapdata_Edge,Mapdata_Side):
         Judge = True
         break
     if Judge:
-      draw_image(screen,"candidate.png",Mapdata_Side[i][3][0],Mapdata_Side[i][3][1])
+      draw_image(screen,"./picture/candidate.png",Mapdata_Side[i][3][0],Mapdata_Side[i][3][1])
       l.append(i)
   return l
 
 def draw_candidate_road_0(screen,Mapdata_Edge,Mapdata_Side,settlement):
   l = []
   for i in Mapdata_Edge[settlement][2]:
-    draw_image(screen,"candidate.png",Mapdata_Side[i][3][0],Mapdata_Side[i][3][1])
+    draw_image(screen,"./picture/candidate.png",Mapdata_Side[i][3][0],Mapdata_Side[i][3][1])
     l.append(i)
   return l
 
@@ -347,7 +347,7 @@ def draw_candidate_bandit(screen,Mapdata_Mass):
   l = []
   for i in range(19):
     if Mapdata_Mass[i][2]==0:
-      draw_image(screen,"candidate2.png",Mapdata_Mass[i][4][0],Mapdata_Mass[i][4][1])
+      draw_image(screen,"./picture/candidate2.png",Mapdata_Mass[i][4][0],Mapdata_Mass[i][4][1])
 
 
 def main(): #クライアント側
@@ -355,7 +355,7 @@ def main(): #クライアント側
   pygame.init()     #pygameを初期化
   pygame.display.set_mode((w,h),0,32)   #ディスプレイ設定
   screen = pygame.display.get_surface() #作成したディスプレイ情報をscreenが取得
-  bg = pygame.image.load("clstr.jpg").convert_alpha() #背景画像設定   
+  bg = pygame.image.load("./picture/Setting_Screen/clstr.jpg").convert_alpha() #背景画像設定   
   rect_bg = bg.get_rect() #背景画像の大きさを取得
   screen.blit(bg,rect_bg) #背景描画
   pygame.display.update() #ディスプレイ更新
@@ -377,7 +377,7 @@ def main(): #クライアント側
         x, y = event.pos
         if 145 <= x and x <= 460 and 350 <= y and y <= 510:
           running = False
-  bg = pygame.image.load("setting.jpg").convert_alpha() #背景画像設定
+  bg = pygame.image.load("./picture/Setting_Screen/setting.jpg").convert_alpha() #背景画像設定
   rect_bg = bg.get_rect() #背景画像の大きさを取得
   screen.blit(bg,rect_bg) #背景描画
   pygame.display.update() #ディスプレイ更新
@@ -447,25 +447,25 @@ def main(): #クライアント側
           print("connections,",connections)
           if backlog == 3:
             if connections == 0:
-              bg = pygame.image.load("0-3.jpg").convert_alpha() #背景画像設定
+              bg = pygame.image.load("./picture/Setting_Screen/0-3.jpg").convert_alpha() #背景画像設定
             elif connections == 1:
-              bg = pygame.image.load("1-3.jpg").convert_alpha() #背景画像設定
+              bg = pygame.image.load("./picture/Setting_Screen/1-3.jpg").convert_alpha() #背景画像設定
             elif connections == 2:
-              bg = pygame.image.load("2-3.jpg").convert_alpha() #背景画像設定
+              bg = pygame.image.load("./picture/Setting_Screen/2-3.jpg").convert_alpha() #背景画像設定
             else:
-              bg = pygame.image.load("3-3.jpg").convert_alpha() #背景画像設定
+              bg = pygame.image.load("./picture/Setting_Screen/3-3.jpg").convert_alpha() #背景画像設定
               running = False
           else:
             if connections == 0:
-              bg = pygame.image.load("0-4.jpg").convert_alpha() #背景画像設定
+              bg = pygame.image.load("./picture/Setting_Screen/0-4.jpg").convert_alpha() #背景画像設定
             elif connections == 1:
-              bg = pygame.image.load("1-4.jpg").convert_alpha() #背景画像設定
+              bg = pygame.image.load("./picture/Setting_Screen/1-4.jpg").convert_alpha() #背景画像設定
             elif connections == 2:
-              bg = pygame.image.load("2-4.jpg").convert_alpha() #背景画像設定
+              bg = pygame.image.load("./picture/Setting_Screen/2-4.jpg").convert_alpha() #背景画像設定
             elif connections == 3:
-              bg = pygame.image.load("3-4.jpg").convert_alpha() #背景画像設定
+              bg = pygame.image.load("./picture/Setting_Screen/3-4.jpg").convert_alpha() #背景画像設定
             else:
-              bg = pygame.image.load("4-4.jpg").convert_alpha() #背景画像設定
+              bg = pygame.image.load("./picture/Setting_Screen/4-4.jpg").convert_alpha() #背景画像設定
               running = False
           rect_bg = bg.get_rect() #背景画像の大きさを取得
           screen.blit(bg,rect_bg) #背景描画
@@ -481,9 +481,9 @@ def main(): #クライアント側
     print("startsign,",startsign)
     if startsign == "STRT":
       if backlog == 3:
-        bg = pygame.image.load("start3.jpg").convert_alpha() #背景画像設定
+        bg = pygame.image.load("./picture/Setting_Screen/start3.jpg").convert_alpha() #背景画像設定
       else:
-        bg = pygame.image.load("start4.jpg").convert_alpha() #背景画像設定
+        bg = pygame.image.load("./picture/Setting_Screen/start4.jpg").convert_alpha() #背景画像設定
     rect_bg = bg.get_rect() #背景画像の大きさを取得
     screen.blit(bg,rect_bg) #背景描画
     pygame.display.flip() #ディスプレイ更新
@@ -491,7 +491,7 @@ def main(): #クライアント側
     startmap = sock.recv(bufsize).decode('utf-8')
     print("startmap,",startmap)
     if startmap == "MAPSTART":
-      bg = pygame.image.load("catanmap.jpg").convert_alpha() #背景画像設定
+      bg = pygame.image.load("./picture/catanmap.jpg").convert_alpha() #背景画像設定
     rect_bg = bg.get_rect() #背景画像の大きさを取得
     screen.blit(bg,rect_bg) #背景描画
     pygame.display.flip() #ディスプレイ更新
@@ -502,12 +502,12 @@ def main(): #クライアント側
     for i in range(19): #初期マップデータ描画,サーバーと同じ
       xx = Mapdata_Mass[i][4][0]
       yy = Mapdata_Mass[i][4][1]
-      mapmas = pygame.image.load("desertmap.png").convert_alpha()
+      mapmas = pygame.image.load("./picture/Resource_Tile/desertmap.png").convert_alpha()
       mapmas_rect = mapmas.get_rect()
       mapmas_rect.center = (xx,yy)
       screen.blit(mapmas,mapmas_rect)
 
-      mapmasn = pygame.image.load("card0.png").convert_alpha()
+      mapmasn = pygame.image.load("./picture/Card_Number/card0.png").convert_alpha()
       mapmasn_rect = mapmasn.get_rect()
       mapmasn_rect.center = (xx,yy)
       screen.blit(mapmasn,mapmasn_rect)
@@ -607,42 +607,42 @@ def main(): #クライアント側
       l = land[i]
       n = landnumber[i]
       if l == 0:   #資源描画
-        mapmas = pygame.image.load("desertmap.png").convert_alpha()
+        mapmas = pygame.image.load("./picture/Resource_Tile/desertmap.png").convert_alpha()
       elif l == 1:
-        mapmas = pygame.image.load("woodmap.png").convert_alpha()
+        mapmas = pygame.image.load("./picture/Resource_Tile/woodmap.png").convert_alpha()
       elif l == 2:
-        mapmas = pygame.image.load("brickmap.png").convert_alpha()
+        mapmas = pygame.image.load("./picture/Resource_Tile/brickmap.png").convert_alpha()
       elif l == 3:
-        mapmas = pygame.image.load("sheepmap.png").convert_alpha()             
+        mapmas = pygame.image.load("./picture/Resource_Tile/sheepmap.png").convert_alpha()             
       elif l == 4:
-        mapmas = pygame.image.load("wheatmap.png").convert_alpha()
+        mapmas = pygame.image.load("./picture/Resource_Tile/wheatmap.png").convert_alpha()
       else:
-        mapmas = pygame.image.load("oremap.png").convert_alpha()
+        mapmas = pygame.image.load("./picture/Resource_Tile/oremap.png").convert_alpha()
       mapmas_rect = mapmas.get_rect()
       mapmas_rect.center = (xx,yy)
       screen.blit(mapmas,mapmas_rect)
       if n == 2:    #数字描画
-        mapmasn = pygame.image.load("mass2.png").convert_alpha()
+        mapmasn = pygame.image.load("./picture/Tile_Number/mass2.png").convert_alpha()
       elif n == 3:
-        mapmasn = pygame.image.load("mass3.png").convert_alpha()
+        mapmasn = pygame.image.load("./picture/Tile_Number/mass3.png").convert_alpha()
       elif n == 4:
-        mapmasn = pygame.image.load("mass4.png").convert_alpha()
+        mapmasn = pygame.image.load("./picture/Tile_Number/mass4.png").convert_alpha()
       elif n == 5:
-        mapmasn = pygame.image.load("mass5.png").convert_alpha()             
+        mapmasn = pygame.image.load("./picture/Tile_Number/mass5.png").convert_alpha()             
       elif n == 6:
-        mapmasn = pygame.image.load("mass6.png").convert_alpha()
+        mapmasn = pygame.image.load("./picture/Tile_Number/mass6.png").convert_alpha()
       elif n == 8:
-        mapmasn = pygame.image.load("mass8.png").convert_alpha()
+        mapmasn = pygame.image.load("./picture/Tile_Number/mass8.png").convert_alpha()
       elif n == 9:
-        mapmasn = pygame.image.load("mass9.png").convert_alpha()
+        mapmasn = pygame.image.load("./picture/Tile_Number/mass9.png").convert_alpha()
       elif n == 10:
-        mapmasn = pygame.image.load("mass10.png").convert_alpha()             
+        mapmasn = pygame.image.load("./picture/Tile_Number/mass10.png").convert_alpha()             
       elif n == 11:
-        mapmasn = pygame.image.load("mass11.png").convert_alpha()
+        mapmasn = pygame.image.load("./picture/Tile_Number/mass11.png").convert_alpha()
       elif n == 12:
-        mapmasn = pygame.image.load("mass12.png").convert_alpha()
+        mapmasn = pygame.image.load("./picture/Tile_Number/mass12.png").convert_alpha()
       else:
-        mapmasn = pygame.image.load("space5050.png").convert_alpha()
+        mapmasn = pygame.image.load("./picture/space5050.png").convert_alpha()
       mapmasn_rect = mapmasn.get_rect()
       mapmasn_rect.center = (xx,yy)
       screen.blit(mapmasn,mapmasn_rect)
