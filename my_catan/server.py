@@ -13,6 +13,32 @@ def draw_image(screen,image,x,y): #画像(image)を座標(x,y)に描画
   im_rect.center = (x,y)
   screen.blit(im,im_rect)
 
+def draw_Dice(screen,a,b):
+  if a == 1:
+    draw_image(screen,"./picture/Dice/Dice1.png",35,560)
+  if a == 2:
+    draw_image(screen,"./picture/Dice/Dice2.png",35,560)
+  if a == 3:
+    draw_image(screen,"./picture/Dice/Dice3.png",35,560)
+  if a == 4:
+    draw_image(screen,"./picture/Dice/Dice4.png",35,560)
+  if a == 5:
+    draw_image(screen,"./picture/Dice/Dice5.png",35,560)
+  if a == 6:
+    draw_image(screen,"./picture/Dice/Dice6.png",35,560)
+  if b == 1:
+    draw_image(screen,"./picture/Dice/Dice1.png",85,560)
+  if b == 2:
+    draw_image(screen,"./picture/Dice/Dice2.png",85,560)
+  if b == 3:
+    draw_image(screen,"./picture/Dice/Dice3.png",85,560)
+  if b == 4:
+    draw_image(screen,"./picture/Dice/Dice4.png",85,560)
+  if b == 5:
+    draw_image(screen,"./picture/Dice/Dice5.png",85,560)
+  if b == 6:
+    draw_image(screen,"./picture/Dice/Dice6.png",85,560)
+
 def select_num_image(x):  #数字　→　対応する画像
   if x == 0:
     return "./picture/Card_Number/card0.png"
@@ -774,7 +800,7 @@ def main(): #サーバー側
               sock.recv(bufsize)
             running = False
         
-  for sock in clients_socks: #開拓地と街道を置くフェーズの開始を全クライアントに通知
+  for sock in clients_socks: #開拓地と街道を置くフェーズの終了を全クライアントに通知
     sock.send("firstphaseend".encode('utf-8'))
     sock.recv(bufsize)
 
@@ -785,8 +811,15 @@ def main(): #サーバー側
   else:
     Turn = [0,1,2,3]
 
+  ###################################
+  ####  　　 ゲーム開始           ####
+  ###################################
+  draw_server(screen,Mapdata_Mass,Mapdata_Side,Mapdata_Edge,Player_Data,land,landnumber,backlog)
+
   while running: #ゲーム本体
     for i in Turn:
+      pygame.display.update()
+      pygame.time.wait(50)
 
       ################################################
       ###  ターン開始の合図をクライアントと送受信する  ###
@@ -797,11 +830,11 @@ def main(): #サーバー側
       Thisturn_player.recv(bufsize) #送信確認メッセージの受け取り
 
       for j in range(backlog):
-        if clients_socks[j]==Thisturn_player:
-          Thisturn_player.send("others".encode('utf-8')) #"others"を対象クライアントに対して送信
-          Thisturn_player.recv(bufsize) #送信確認メッセージの受け取り
-          Thisturn_player.send(str(i).encode('utf-8')) #誰のターンか、情報を現在ターンでないクライアントに対して一斉送信
-          Thisturn_player.recv(bufsize) #送信確認メッセージの受け取り
+        if clients_socks[j]!=Thisturn_player:
+          clients_socks[j].send("others".encode('utf-8')) #"others"を対象クライアントに対して送信
+          clients_socks[j].recv(bufsize) #送信確認メッセージの受け取り
+          clients_socks[j].send(str(i).encode('utf-8')) #誰のターンか、情報を現在ターンでないクライアントに対して一斉送信
+          clients_socks[j].recv(bufsize) #送信確認メッセージの受け取り
 
 
       ######################################################
@@ -812,8 +845,12 @@ def main(): #サーバー側
       ######################################################
       ###　サイコロの出目をクライアントから受け取るフェーズ  ###
       ######################################################
-      Dice = True
-      while Dice:
+      running1 = True
+      Dice7 = False
+      while running1:
+        
+        pygame.display.update()
+        pygame.time.wait(50)
         for event in pygame.event.get():  #キーボード操作　または　マウス操作
           if event.type == QUIT:
             for receiver in clients_socks:
@@ -856,51 +893,93 @@ def main(): #サーバー側
             Dice_msg += "/"
             Dice_msg += Dice2_str
             for receiver in clients_socks:
+              receiver.send("Dice".encode('utf-8'))
+              receiver.recv(bufsize)        
               receiver.send(Dice_msg.encode('utf-8'))
               receiver.recv(bufsize)
 
-              
+            if Dicesum != 7:     #7以外の出目の時
+              for i in range(19):
+                if Mapdata_Mass[i][0]!=0 and Mapdata_Mass[i][1]==Dicesum and Mapdata_Mass[i][2]==0:
+                  for x in Mapdata_Mass[i][3]:
+                    resouce_getter = Mapdata_Edge[x][0]
+                    if resouce_getter!=-1:
+                      a = resouce_getter/2
+                      a = int(a)
+                      b = resouce_getter%2
+                      b += 1
+                      Player_Data[a][1] += b
+                      Player_Data[a][2][Mapdata_Mass[i][0]-1] += b
+            else:
+              Dice7 = True
+            running1=False
+            draw_server(screen,Mapdata_Mass,Mapdata_Side,Mapdata_Edge,Player_Data,land,landnumber,backlog)
+            draw_image(screen,"./picture/Dice/Roll_of_Dice.png",60,540)
+            draw_Dice(screen,Dice1,Dice2)
+            pygame.display.update()
+            pygame.time.wait(50)
+     
       ##########################################################
       ###　サイコロの出目をクライアントから受け取るフェーズ(終了) ###
       ##########################################################
 
-      if Player_Data[i]==10:
-        running=False
 
-      pygame.display.update()
-      pygame.time.wait(50)
+      #######################
+      ###　7が出た時の処理 ###
+      #######################
 
-      for event in pygame.event.get():  #キーボード操作　または　マウス操作
-        if event.type == QUIT:
-          for receiver in clients_socks:
-            receiver.send("serverdown".encode('utf-8'))
-            receiver.recv(bufsize)
-          pygame.quit()
-          sys.exit()
-        if event.type == KEYDOWN:
-          if event.key == K_ESCAPE:
+      ############################
+      ###　7が出た時の処理(終了) ###
+      ############################
+
+      ##################
+      ###  本体処理  ###
+      ##################
+      running1=True
+      while running1:
+        pygame.display.update()
+        pygame.time.wait(50)
+        for event in pygame.event.get():  #キーボード操作　または　マウス操作
+          if event.type == QUIT:
             for receiver in clients_socks:
               receiver.send("serverdown".encode('utf-8'))
               receiver.recv(bufsize)
             pygame.quit()
-            sys.exit()  
+            sys.exit()
+          if event.type == KEYDOWN:
+            if event.key == K_ESCAPE:
+              for receiver in clients_socks:
+                receiver.send("serverdown".encode('utf-8'))
+                receiver.recv(bufsize)
+              pygame.quit()
+              sys.exit()  
+  
+        rready, wready, xready = select.select(readfds, [], [],0.05) #処理を可能な物から順に選択
+  
+        for sock in rready:                 #選択された処理を順次遂行
+          msg = sock.recv(bufsize).decode('utf-8')
+          sock.send("ok".encode('utf-8'))
+          print(msg)
+          if msg == "QUIT":
+            sock.close()
+            readfds.remove(sock)
+            clients_socks.remove(sock)
+            for receiver in clients_socks:
+              receiver.send("serverdown".encode('utf-8'))
+              msg = receiver.recv(bufsize).decode('utf-8')
+            pygame.quit()
+            sys.exit()
+          elif msg == "TurnEnd":
+            sock.recv(bufsize)
+            for receiver in clients_socks:
+              if receiver!=sock:
+                receiver.send("TurnEnd".encode('utf-8'))
+                receiver.recv(bufsize)
+            running1=False
 
-      rready, wready, xready = select.select(readfds, [], [],0.05) #処理を可能な物から順に選択
-
-      for sock in rready:                 #選択された処理を順次遂行
-        msg = sock.recv(bufsize).decode('utf-8')
-        sock.send("ok".encode('utf-8'))
-        print(msg)
-        if msg == "QUIT":
-          sock.close()
-          readfds.remove(sock)
-          clients_socks.remove(sock)
-          for receiver in clients_socks:
-            receiver.send("serverdown".encode('utf-8'))
-            msg = receiver.recv(bufsize).decode('utf-8')
-          pygame.quit()
-          sys.exit()
-
+      #######################
+      ###  本体処理(終了)  ###
+      #######################
 
   return
 

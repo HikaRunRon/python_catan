@@ -12,6 +12,33 @@ def draw_image(screen,image,x,y): #画像(image)を座標(x,y)に描画
   im_rect.center = (x,y)
   screen.blit(im,im_rect)
 
+def draw_Dice(screen,a,b):
+  if a == 1:
+    draw_image(screen,"./picture/Dice/Dice1.png",35,560)
+  if a == 2:
+    draw_image(screen,"./picture/Dice/Dice2.png",35,560)
+  if a == 3:
+    draw_image(screen,"./picture/Dice/Dice3.png",35,560)
+  if a == 4:
+    draw_image(screen,"./picture/Dice/Dice4.png",35,560)
+  if a == 5:
+    draw_image(screen,"./picture/Dice/Dice5.png",35,560)
+  if a == 6:
+    draw_image(screen,"./picture/Dice/Dice6.png",35,560)
+  if b == 1:
+    draw_image(screen,"./picture/Dice/Dice1.png",85,560)
+  if b == 2:
+    draw_image(screen,"./picture/Dice/Dice2.png",85,560)
+  if b == 3:
+    draw_image(screen,"./picture/Dice/Dice3.png",85,560)
+  if b == 4:
+    draw_image(screen,"./picture/Dice/Dice4.png",85,560)
+  if b == 5:
+    draw_image(screen,"./picture/Dice/Dice5.png",85,560)
+  if b == 6:
+    draw_image(screen,"./picture/Dice/Dice6.png",85,560)
+
+
 def select_num_image(x):  #数字　→　対応する画像
   if x == 0:
     return "./picture/Card_Number/card0.png"
@@ -382,7 +409,7 @@ def main(): #クライアント側
   screen.blit(bg,rect_bg) #背景描画
   pygame.display.update() #ディスプレイ更新
   pygame.time.wait(300)
-  host = "192.168.0.6" 
+  host = "192.168.11.3" 
   port = 55992         #ポート番号 今回は55992に設定
   bufsize = 4096      #デフォルト4096
 
@@ -857,9 +884,18 @@ def main(): #クライアント側
           Mapdata_Side[pos][0]=player #クライアント側のデータ更新完了
           draw_server(screen,Mapdata_Mass,Mapdata_Side,Mapdata_Edge,Player_Data,land,landnumber,backlog,yourturn,rightside,front,leftside) #データをもとに描画更新
 
+
+
+  ###################################
+  ####  　　 ゲーム開始           ####
+  ###################################
+
+
     running = True
 
     while running: #ゲーム本体
+      Dice1 = 0
+      Dice2 = 0
       pygame.display.update()
       pygame.time.wait(50)
       for event in pygame.event.get():
@@ -884,19 +920,35 @@ def main(): #クライアント側
         
         elif msg == "others":
           Playingnumber=sock.recv(bufsize).decode('utf-8')
+          Playingnumber = int(Playingnumber)
           sock.send("ok".encode('utf-8'))
+          draw_server(screen,Mapdata_Mass,Mapdata_Side,Mapdata_Edge,Player_Data,land,landnumber,backlog,yourturn,rightside,front,leftside)
+          if Playingnumber==0:
+            draw_image(screen,"./picture/Turn_display/WhiteTurn.png",300,300)
+          if Playingnumber==1:
+            draw_image(screen,"./picture/Turn_display/RedTurn.png",300,300)
+          if Playingnumber==2:
+            draw_image(screen,"./picture/Turn_display/BlueTurn.png",300,300)
+          if Playingnumber==3:
+            draw_image(screen,"./picture/Turn_display/OrangeTurn.png",300,300)
+          pygame.display.update()
+          pygame.time.wait(1500)
+          draw_server(screen,Mapdata_Mass,Mapdata_Side,Mapdata_Edge,Player_Data,land,landnumber,backlog,yourturn,rightside,front,leftside)
+          draw_image(screen,"./picture/Dice/Roll_of_Dice.png",60,540)
+          draw_image(screen,"./picture/frame.png",540,540)
 
-          ##########################
-          ## Start  others Myturn ##　
-          ##########################
-          
-          Dice_msg=sock.recv(bufsize).decode('utf-8')         
-          Dice_nums_str = Dice_msg.split("/")
-          Dice1 = int(Dice_nums_str[0])
-          Dice2 = int(Dice_nums_str[1])
+        ###################
+        ## Start  others ##　
+        ###################
+
+          #####################
+          ## サイコロフリフリ ##
+          #####################
 
           running1=True
+          Dice7 = False
           while running1:
+            pygame.display.update()
             pygame.time.wait(50) #20fps
             
             for event in pygame.event.get():
@@ -909,31 +961,121 @@ def main(): #クライアント側
                   sock.send("QUIT".encode('utf-8'))
                   pygame.quit()
                   sys.exit()
-              if event.type == MOUSEBUTTONDOWN and event.button == 1: #サイコロボタンのクリック
-                x, y = event.pos
-              if "??" <= x and x <= "??" and "??" <= y and y <= "??": #枠内左クリックでwhileを抜け、次のページへ
-                sock.send("Dice".encode('utf-8')) #サイコロを振る
-                sock.recv(bufsize)
-                sock.send("ok".encode(''))
-                running1=False #ループから抜ける
 
-          ##################################
-          ## Start  others Myturn (終了)  ##　
-          ##################################  
+            rready, wready, xready = select.select(readfds, [], [],0.05) #処理を可能な物から順に選択
+            for sock in rready:                                   #選択された処理を順次遂行
+              msg = sock.recv(bufsize).decode('utf-8')
+              print(msg)
+              sock.send("ok".encode('utf-8'))
+              if msg == "serverdown":
+                pygame.quit()
+                sys.exit()
+              elif msg == "Dice":
+                Dice_msg=sock.recv(bufsize).decode('utf-8')  
+                sock.send("ok".encode('utf-8'))
+                Dice_nums_str = Dice_msg.split("/")
+                Dice1 = int(Dice_nums_str[0])
+                Dice2 = int(Dice_nums_str[1])
+                Dicesum = Dice1+Dice2
+                if Dicesum != 7:     #7以外の出目の時
+                  for i in range(19):
+                    if Mapdata_Mass[i][0]!=0 and Mapdata_Mass[i][1]==Dicesum and Mapdata_Mass[i][2]==0:
+                      for x in Mapdata_Mass[i][3]:
+                        resouce_getter = Mapdata_Edge[x][0]
+                        if resouce_getter!=-1:
+                          a = resouce_getter/2
+                          a = int(a)
+                          b = resouce_getter%2
+                          b += 1
+                          Player_Data[a][1] += b
+                          Player_Data[a][2][Mapdata_Mass[i][0]-1] += b
+                else:
+                  Dice7 = True
+                running1=False
+                draw_server(screen,Mapdata_Mass,Mapdata_Side,Mapdata_Edge,Player_Data,land,landnumber,backlog,yourturn,rightside,front,leftside)
+                draw_image(screen,"./picture/Dice/Roll_of_Dice.png",60,540)
+                draw_Dice(screen,Dice1,Dice2)
+                draw_image(screen,"./picture/frame.png",540,540)
+                pygame.display.update()
+
+          ###########################
+          ## サイコロフリフリ(終了) ##
+          ###########################
+
+          #######################
+          ###　7が出た時の処理 ###
+          #######################
+    
+          ############################
+          ###　7が出た時の処理(終了) ###
+          ############################
+
+          ################
+          ### 本体処理　###
+          ################
+
+          draw_server(screen,Mapdata_Mass,Mapdata_Side,Mapdata_Edge,Player_Data,land,landnumber,backlog,yourturn,rightside,front,leftside)
+          draw_image(screen,"./picture/Dice/Roll_of_Dice.png",60,540)
+          draw_Dice(screen,Dice1,Dice2)
+          draw_image(screen,"./picture/frame.png",540,540)
+          running1 = True
+
+          while running1:
+            pygame.display.update()
+            pygame.time.wait(50) #20fps
+            
+            for event in pygame.event.get():
+              if event.type == QUIT:
+                sock.send("QUIT".encode('utf-8'))
+                pygame.quit()
+                sys.exit()
+              if event.type == KEYDOWN:
+                if event.key == K_ESCAPE:
+                  sock.send("QUIT".encode('utf-8'))
+                  pygame.quit()
+                  sys.exit()
+
+            rready, wready, xready = select.select(readfds, [], [],0.05) #処理を可能な物から順に選択
+            for sock in rready:                                   #選択された処理を順次遂行
+              msg = sock.recv(bufsize).decode('utf-8')
+              print(msg)
+              sock.send("ok".encode('utf-8'))
+              if msg == "serverdown":
+                pygame.quit()
+                sys.exit()
+              elif msg=="TurnEnd":
+                running1=False
+
+          ######################
+          ### 本体処理(終了)　###
+          ######################
+
+        ##########################
+        ## Start  others(終了)  ##　
+        ##########################
 
         elif msg == "Yourturn": ##ここからocchiiが書いてるよ💛💛★(⋈◍＞◡＜◍)。✧♡★✌
-          sock.send("ok".encode('utf-8'))
+          draw_server(screen,Mapdata_Mass,Mapdata_Side,Mapdata_Edge,Player_Data,land,landnumber,backlog,yourturn,rightside,front,leftside)
+          draw_image(screen,"./picture/Turn_display/YourTurn.png",300,300)
+          pygame.display.update()
+          pygame.time.wait(1500)
+          draw_server(screen,Mapdata_Mass,Mapdata_Side,Mapdata_Edge,Player_Data,land,landnumber,backlog,yourturn,rightside,front,leftside)
+          draw_image(screen,"./picture/Dice/Roll_of_Dice.png",60,540)
+          draw_image(screen,"./picture/frame.png",540,540)
+          draw_image(screen,"./picture/Dice/Dice_button.png",540,540)
 
-          ############
-          ## Myturn ##　
-          ############
-          
+        ############
+        ## Myturn ##　
+        ############
+
           #####################
           ## サイコロフリフリ ##
           #####################
           
           running1=True
+          Dice7=False
           while running1:
+            pygame.display.update()
             pygame.time.wait(50) #20fps
             
             for event in pygame.event.get():
@@ -948,11 +1090,11 @@ def main(): #クライアント側
                   sys.exit()
               if event.type == MOUSEBUTTONDOWN and event.button == 1: #サイコロボタンのクリック
                 x, y = event.pos
-              if "??" <= x and x <= "??" and "??" <= y and y <= "??": #枠内左クリックでwhileを抜け、次のページへ
-                sock.send("Dice".encode('utf-8')) #サイコロを振る
-                sock.recv(bufsize)
-                sock.send("ok".encode(''))
-                running1=False #ループから抜ける
+                if (x-540)*(x-540)+(y-540)*(y-540)<=2500: #枠内左クリックでwhileを抜け、次のページへ
+                  sock.send("Dice".encode('utf-8')) #サイコロを振る
+                  sock.recv(bufsize)
+                  sock.send("ok".encode('utf-8'))
+                  running1=False #ループから抜ける
             
             if running1 == False:  #サイコロフリフリメッセージ送信後は即ループ脱出
               break 
@@ -966,21 +1108,104 @@ def main(): #クライアント側
                 pygame.quit()
                 sys.exit()
 
-          ###########################
-          ## サイコロフリフリ(終了) ##
-          ###########################
           
           ##データの更新
-          Dice_msg=sock.recv(bufsize).decode('utf-8')  
+          pygame.display.update()
+          pygame.time.wait(50)
+          sock.recv(bufsize).decode('utf-8')
+          sock.send("ok".encode('utf-8'))
+          Dice_msg=sock.recv(bufsize).decode('utf-8')
+          sock.send("ok".encode('utf-8'))
+          print(Dice_msg)
           Dice_nums_str = Dice_msg.split("/")
           Dice1 = int(Dice_nums_str[0])
           Dice2 = int(Dice_nums_str[1])
+          Dicesum = Dice1+Dice2
+          if Dicesum != 7:     #7以外の出目の時
+            for i in range(19):
+              if Mapdata_Mass[i][0]!=0 and Mapdata_Mass[i][1]==Dicesum and Mapdata_Mass[i][2]==0:
+                for x in Mapdata_Mass[i][3]:
+                  resouce_getter = Mapdata_Edge[x][0]
+                  if resouce_getter!=-1:
+                    a = resouce_getter/2
+                    a = int(a)
+                    b = resouce_getter%2
+                    b += 1
+                    Player_Data[a][1] += b
+                    Player_Data[a][2][Mapdata_Mass[i][0]-1] += b
+
+          else:
+            Dice7 = True
+          draw_server(screen,Mapdata_Mass,Mapdata_Side,Mapdata_Edge,Player_Data,land,landnumber,backlog,yourturn,rightside,front,leftside)
+          draw_image(screen,"./picture/Dice/Roll_of_Dice.png",60,540)
+          draw_image(screen,"./picture/frame.png",540,540)
+          draw_Dice(screen,Dice1,Dice2)
 
 
+          ###########################
+          ## サイコロフリフリ(終了) ##
+          ###########################
 
-          ##################
-          ## Myturn(終了) ##　
-          ##################
+          #######################
+          ###　7が出た時の処理 ###
+          #######################
+    
+          ############################
+          ###　7が出た時の処理(終了) ###
+          ############################
+
+          ################
+          ### 本体処理　###
+          ################
+          running1=True
+          draw_server(screen,Mapdata_Mass,Mapdata_Side,Mapdata_Edge,Player_Data,land,landnumber,backlog,yourturn,rightside,front,leftside)
+          draw_image(screen,"./picture/Dice/Roll_of_Dice.png",60,540)
+          draw_image(screen,"./picture/frame.png",540,540)
+          draw_Dice(screen,Dice1,Dice2)
+          draw_image(screen,"./picture/Turnend_button.png",540,540)
+
+          while running1:
+            pygame.display.update()
+            pygame.time.wait(50) #20fps
+            
+            for event in pygame.event.get():
+              if event.type == QUIT:
+                sock.send("QUIT".encode('utf-8'))
+                pygame.quit()
+                sys.exit()
+              if event.type == KEYDOWN:
+                if event.key == K_ESCAPE:
+                  sock.send("QUIT".encode('utf-8'))
+                  pygame.quit()
+                  sys.exit()
+              if event.type == MOUSEBUTTONDOWN and event.button == 1: #サイコロボタンのクリック
+                x, y = event.pos
+                if (x-540)*(x-540)+(y-540)*(y-540)<=2500: #枠内左クリックでwhileを抜け、次のページへ
+                  sock.send("TurnEnd".encode('utf-8')) #ターンエンド
+                  sock.recv(bufsize)
+                  sock.send("ok".encode('utf-8'))
+                  running1=False #ループから抜ける
+            
+            if running1 == False:  #ターンエンドメッセージ送信後は即ループ脱出
+              break 
+
+            rready, wready, xready = select.select(readfds, [], [],0.05) #処理を可能な物から順に選択
+            for sock in rready:                                   #選択された処理を順次遂行
+              msg = sock.recv(bufsize).decode('utf-8')
+              print(msg)
+              sock.send("ok".encode('utf-8'))
+              if msg == "serverdown":
+                pygame.quit()
+                sys.exit()
+
+          ######################
+          ### 本体処理(終了)　###
+          ######################
+
+
+        ##################
+        ## Myturn(終了) ##　
+        ##################
           
           
           
