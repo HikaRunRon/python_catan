@@ -976,6 +976,60 @@ def main(): #サーバー側
                 receiver.send("TurnEnd".encode('utf-8'))
                 receiver.recv(bufsize)
             running1=False
+          
+          #################
+          ###  街道建設  ###
+          #################
+
+          elif msg == "Road":
+
+            msg1=sock.recv(bufsize).decode(('utf-8')) #操作しているクライアント側からの送信
+            sock.send("ok".encode('utf-8'))
+            msg2=sock.recv(bufsize).decode(('utf-8'))
+            sock.send("ok".encode('utf-8'))
+            msg3=sock.recv(bufsize).decode(('utf-8'))
+            sock.send("ok".encode('utf-8'))
+            sock.recv(bufsize).decode(('utf-8'))
+            sock.send("ok".encode('utf-8'))
+
+            for receiver in clients_socks:           #他のクライアントへ一斉送信
+              if sock!=receiver:
+                receiver.send("Road".encode('utf-8'))
+                receiver.recv(bufsize)        
+                receiver.send(msg1.encode('utf-8'))
+                receiver.recv(bufsize)
+                receiver.send(msg2.encode('utf-8'))
+                receiver.recv(bufsize)        
+                receiver.send(msg3.encode('utf-8'))
+                receiver.recv(bufsize)
+                receiver.send("MsgEnd".encode('utf-8'))
+                receiver.recv(bufsize)
+            
+            position = int(msg1)
+            player01 = int(msg2)
+            road_length = int(msg3)
+
+            Mapdata_Side[position][0]=player01
+            Player_Data[player01][8] = road_length
+            Player_Data[player01][1] -= 2
+            Player_Data[player01][2][0] -= 1
+            Player_Data[player01][2][1] -= 1
+            Player_Data[player01][7] -= 1
+            if Player_Data[player01][9]==0 and Player_Data[player01][8]>=5:
+              for j in range(4):
+                if j!=player01:
+                  if Player_Data[j][8]<Player_Data[player01][8]:
+                    Player_Data[player01][9]=1
+
+            draw_server(screen,Mapdata_Mass,Mapdata_Side,Mapdata_Edge,Player_Data,land,landnumber,backlog)
+            draw_image(screen,"./picture/Dice/Roll_of_Dice.png",60,540)
+            draw_Dice(screen,Dice1,Dice2)
+            draw_image(screen,"./picture/frame.png",540,540)
+            pygame.display.update()
+            
+          ######################
+          ###  街道建設(終了) ###
+          ######################
 
       #######################
       ###  本体処理(終了)  ###
