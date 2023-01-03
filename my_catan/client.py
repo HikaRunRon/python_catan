@@ -6,415 +6,7 @@ from pygame.locals import *
 import select
 from contextlib import closing
 import longest_road
-
-def draw_image(screen,image,x,y): #画像(image)を座標(x,y)に描画
-  im = pygame.image.load(image).convert_alpha()
-  im_rect = im.get_rect()
-  im_rect.center = (x,y)
-  screen.blit(im,im_rect)
-
-def draw_Dice(screen,a,b):
-  if a == 1:
-    draw_image(screen,"./picture/Dice/Dice1.png",35,560)
-  if a == 2:
-    draw_image(screen,"./picture/Dice/Dice2.png",35,560)
-  if a == 3:
-    draw_image(screen,"./picture/Dice/Dice3.png",35,560)
-  if a == 4:
-    draw_image(screen,"./picture/Dice/Dice4.png",35,560)
-  if a == 5:
-    draw_image(screen,"./picture/Dice/Dice5.png",35,560)
-  if a == 6:
-    draw_image(screen,"./picture/Dice/Dice6.png",35,560)
-  if b == 1:
-    draw_image(screen,"./picture/Dice/Dice1.png",85,560)
-  if b == 2:
-    draw_image(screen,"./picture/Dice/Dice2.png",85,560)
-  if b == 3:
-    draw_image(screen,"./picture/Dice/Dice3.png",85,560)
-  if b == 4:
-    draw_image(screen,"./picture/Dice/Dice4.png",85,560)
-  if b == 5:
-    draw_image(screen,"./picture/Dice/Dice5.png",85,560)
-  if b == 6:
-    draw_image(screen,"./picture/Dice/Dice6.png",85,560)
-
-
-def select_num_image(x):  #数字　→　対応する画像
-  if x == 0:
-    return "./picture/Card_Number/card0.png"
-  elif x == 1:
-    return "./picture/Card_Number/card1.png"
-  elif x == 2:
-    return "./picture/Card_Number/card2.png"
-  elif x == 3:
-    return "./picture/Card_Number/card3.png"
-  elif x == 4:
-    return "./picture/Card_Number/card4.png"
-  elif x == 5:
-    return "./picture/Card_Number/card5.png"
-  elif x == 6:
-    return "./picture/Card_Number/card6.png"
-  elif x == 7:
-    return "./picture/Card_Number/card7.png"
-  elif x == 8:
-    return "./picture/Card_Number/card8.png"
-  elif x == 9:
-    return "./picture/Card_Number/card9.png"
-  elif x == 10:
-    return "./picture/Card_Number/card10.png"
-  elif x == 11:
-    return "./picture/Card_Number/card11.png"
-  elif x == 12:
-    return "./picture/Card_Number/card12.png"
-  elif x == 13:
-    return "./picture/Card_Number/card13.png"
-  elif x == 14:
-    return "./picture/Card_Number/card14.png"
-  elif x == 15:
-    return "./picture/Card_Number/card15.png"
-  elif x == 16:
-    return "./picture/Card_Number/card16.png"
-  elif x == 17:
-    return "./picture/Card_Number/card17.png"
-  elif x == 18:
-    return "./picture/Card_Number/card18.png"
-  elif x == 19:
-    return "./picture/Card_Number/card19.png"
-  elif x == 20:
-    return "./picture/Card_Number/card20.png"
-  elif x == 21:
-    return "./picture/Card_Number/card21.png"
-  elif x == 22:
-    return "./picture/Card_Number/card22.png"
-  elif x == 23:
-    return "./picture/Card_Number/card23.png"
-  elif x == 24:
-    return "./picture/Card_Number/card24.png"
-  elif x == 25:
-    return "./picture/Card_Number/card25.png"
-  elif x >= 26:
-    return "./picture/Card_Number/card25+.png"
-  else:
-    return "./picture/space5050.png"
-
-def draw_server(screen,Mapdata_Mass,Mapdata_Side,Mapdata_Edge,Player_Data,land,landnumber,backlog,yourturn,rightside,front,leftside): #現在のマップ状況を全て表示する関数
-  bg = pygame.image.load("./picture/catanmap.jpg").convert_alpha() #背景画像設定   
-  rect_bg = bg.get_rect() #背景画像の大きさを取得
-  screen.blit(bg,rect_bg) #背景描画
-  pygame.display.update() #ディスプレイ更新
-  for i in range(19): #それぞれのマスに対して描画開始
-    xx = Mapdata_Mass[i][4][0]
-    yy = Mapdata_Mass[i][4][1]
-    l = land[i]
-    n = landnumber[i]
-    if l == 0: #資源描画
-      mapmas = pygame.image.load("./picture/Resource_Tile/desertmap.png").convert_alpha()
-    elif l == 1:
-      mapmas = pygame.image.load("./picture/Resource_Tile/woodmap.png").convert_alpha()
-    elif l == 2:
-      mapmas = pygame.image.load("./picture/Resource_Tile/brickmap.png").convert_alpha()
-    elif l == 3:
-      mapmas = pygame.image.load("./picture/Resource_Tile/sheepmap.png").convert_alpha()             
-    elif l == 4:
-      mapmas = pygame.image.load("./picture/Resource_Tile/wheatmap.png").convert_alpha()
-    else:
-      mapmas = pygame.image.load("./picture/Resource_Tile/oremap.png").convert_alpha()
-    mapmas_rect = mapmas.get_rect()
-    mapmas_rect.center = (xx,yy)
-    screen.blit(mapmas,mapmas_rect)
-    if n == 2: #数字描画
-      mapmasn = pygame.image.load("./picture/Tile_Number/mass2.png").convert_alpha()
-    elif n == 3:
-      mapmasn = pygame.image.load("./picture/Tile_Number/mass3.png").convert_alpha()
-    elif n == 4:
-      mapmasn = pygame.image.load("./picture/Tile_Number/mass4.png").convert_alpha()
-    elif n == 5:
-      mapmasn = pygame.image.load("./picture/Tile_Number/mass5.png").convert_alpha()             
-    elif n == 6:
-      mapmasn = pygame.image.load("./picture/Tile_Number/mass6.png").convert_alpha()
-    elif n == 8:
-      mapmasn = pygame.image.load("./picture/Tile_Number/mass8.png").convert_alpha()
-    elif n == 9:
-      mapmasn = pygame.image.load("./picture/Tile_Number/mass9.png").convert_alpha()
-    elif n == 10:
-      mapmasn = pygame.image.load("./picture/Tile_Number/mass10.png").convert_alpha()             
-    elif n == 11:
-      mapmasn = pygame.image.load("./picture/Tile_Number/mass11.png").convert_alpha()
-    elif n == 12:
-      mapmasn = pygame.image.load("./picture/Tile_Number/mass12.png").convert_alpha()
-    else:
-      mapmasn = pygame.image.load("./picture/space5050.png").convert_alpha()
-    mapmasn_rect = mapmasn.get_rect()
-    mapmasn_rect.center = (xx,yy)
-    screen.blit(mapmasn,mapmasn_rect)
-
-  if backlog == 3:
-    if yourturn == 0:
-      draw_image(screen,"./picture/Background/back_white.png",300,560)
-      draw_image(screen,"./picture/Background/back_red2.png",40,300)
-      draw_image(screen,"./picture/Background/back_blue2.png",560,300)
-    elif yourturn == 1:
-      draw_image(screen,"./picture/Background/back_red.png",300,560)
-      draw_image(screen,"./picture/Background/back_blue2.png",40,300)
-      draw_image(screen,"./picture/Background/back_white2.png",560,300)
-    elif yourturn == 2:
-      draw_image(screen,"./picture/Background/back_blue.png",300,560)
-      draw_image(screen,"./picture/Background/back_white2.png",40,300)
-      draw_image(screen,"./picture/Background/back_red2.png",560,300)
-  else:
-    if yourturn == 0:
-      draw_image(screen,"./picture/Background/back_white.png",300,560)
-      draw_image(screen,"./picture/Background/back_red2.png",40,300)
-      draw_image(screen,"./picture/Background/back_blue.png",300,40)
-      draw_image(screen,"./picture/Background/back_orange2.png",560,300)
-    elif yourturn == 1:
-      draw_image(screen,"./picture/Background/back_red.png",300,560)
-      draw_image(screen,"./picture/Background/back_blue2.png",40,300)
-      draw_image(screen,"./picture/Background/back_orange.png",300,40)
-      draw_image(screen,"./picture/Background/back_white2.png",560,300)
-    elif yourturn == 2:
-      draw_image(screen,"./picture/Background/back_blue.png",300,560)
-      draw_image(screen,"./picture/Background/back_orange2.png",40,300)
-      draw_image(screen,"./picture/Background/back_white.png",300,40)
-      draw_image(screen,"./picture/Background/back_red2.png",560,300)
-    elif yourturn == 3:
-      draw_image(screen,"./picture/Background/back_orange.png",300,560)
-      draw_image(screen,"./picture/Background/back_white2.png",40,300)
-      draw_image(screen,"./picture/Background/back_red.png",300,40)
-      draw_image(screen,"./picture/Background/back_blue2.png",560,300)
-
-  draw_image(screen,"./picture/Resource_Card/woodcard.png",150,560)
-  draw_image(screen,"./picture/Resource_Card/brickcard.png",210,560)
-  draw_image(screen,"./picture/Resource_Card/sheepcard.png",270,560)
-  draw_image(screen,"./picture/Resource_Card/wheatcard.png",330,560)
-  draw_image(screen,"./picture/Resource_Card/orecard.png",390,560)
-  draw_image(screen,"./picture/Resource_Card/secretcard.png",450,560)
-
-  draw_image(screen,"./picture/Resource_Card/woodcard2.png",40,150)
-  draw_image(screen,"./picture/Resource_Card/brickcard2.png",40,210)
-  draw_image(screen,"./picture/Resource_Card/sheepcard2.png",40,270)
-  draw_image(screen,"./picture/Resource_Card/wheatcard2.png",40,330)
-  draw_image(screen,"./picture/Resource_Card/orecard2.png",40,390)
-  draw_image(screen,"./picture/Resource_Card/secretcard2.png",40,450)
-
-  draw_image(screen,"./picture/Resource_Card/woodcard2.png",560,450)
-  draw_image(screen,"./picture/Resource_Card/brickcard2.png",560,390)
-  draw_image(screen,"./picture/Resource_Card/sheepcard2.png",560,330)
-  draw_image(screen,"./picture/Resource_Card/wheatcard2.png",560,270)
-  draw_image(screen,"./picture/Resource_Card/orecard2.png",560,210)
-  draw_image(screen,"./picture/Resource_Card/secretcard2.png",560,150)
-
-  if backlog == 4:
-    draw_image(screen,"./picture/Resource_Card/woodcard.png",450,40)
-    draw_image(screen,"./picture/Resource_Card/brickcard.png",390,40)
-    draw_image(screen,"./picture/Resource_Card/sheepcard.png",330,40)
-    draw_image(screen,"./picture/Resource_Card/wheatcard.png",270,40)
-    draw_image(screen,"./picture/Resource_Card/orecard.png",210,40)
-    draw_image(screen,"./picture/Resource_Card/secretcard.png",150,40)
-
-  draw_image(screen,select_num_image(Player_Data[yourturn][2][0]),150,560)
-  draw_image(screen,select_num_image(Player_Data[yourturn][2][1]),210,560)
-  draw_image(screen,select_num_image(Player_Data[yourturn][2][2]),270,560)
-  draw_image(screen,select_num_image(Player_Data[yourturn][2][3]),330,560)
-  draw_image(screen,select_num_image(Player_Data[yourturn][2][4]),390,560)
-  draw_image(screen,select_num_image(Player_Data[yourturn][3]),450,560)
-
-  draw_image(screen,select_num_image(Player_Data[leftside][2][0]),40,150)
-  draw_image(screen,select_num_image(Player_Data[leftside][2][1]),40,210)
-  draw_image(screen,select_num_image(Player_Data[leftside][2][2]),40,270)
-  draw_image(screen,select_num_image(Player_Data[leftside][2][3]),40,330)
-  draw_image(screen,select_num_image(Player_Data[leftside][2][4]),40,390)
-  draw_image(screen,select_num_image(Player_Data[leftside][3]),40,450)
-
-  if backlog == 3:
-    draw_image(screen,select_num_image(Player_Data[rightside][2][0]),560,450)
-    draw_image(screen,select_num_image(Player_Data[rightside][2][1]),560,390)
-    draw_image(screen,select_num_image(Player_Data[rightside][2][2]),560,330)
-    draw_image(screen,select_num_image(Player_Data[rightside][2][3]),560,270)
-    draw_image(screen,select_num_image(Player_Data[rightside][2][4]),560,210)
-    draw_image(screen,select_num_image(Player_Data[rightside][3]),560,150)
-  else:
-    draw_image(screen,select_num_image(Player_Data[front][2][0]),450,40)
-    draw_image(screen,select_num_image(Player_Data[front][2][1]),390,40)
-    draw_image(screen,select_num_image(Player_Data[front][2][2]),330,40)
-    draw_image(screen,select_num_image(Player_Data[front][2][3]),270,40)
-    draw_image(screen,select_num_image(Player_Data[front][2][4]),210,40)
-    draw_image(screen,select_num_image(Player_Data[front][3]),150,40)
-
-    draw_image(screen,select_num_image(Player_Data[rightside][2][0]),560,450)
-    draw_image(screen,select_num_image(Player_Data[rightside][2][1]),560,390)
-    draw_image(screen,select_num_image(Player_Data[rightside][2][2]),560,330)
-    draw_image(screen,select_num_image(Player_Data[rightside][2][3]),560,270)
-    draw_image(screen,select_num_image(Player_Data[rightside][2][4]),560,210)
-    draw_image(screen,select_num_image(Player_Data[rightside][3]),560,150)
-  for i in range(19):
-    if Mapdata_Mass[i][2]==1:
-      draw_image(screen,"./picture/Tile_Number/bandit.png",Mapdata_Mass[i][4][0],Mapdata_Mass[i][4][1])
-  for i in range(72):
-    if Mapdata_Side[i][0]==-1:
-      continue
-    elif Mapdata_Side[i][0]==0:
-      if Mapdata_Side[i][4]==0:
-        draw_image(screen,"./picture/Building/road_white_0.png",Mapdata_Side[i][3][0],Mapdata_Side[i][3][1])
-      elif Mapdata_Side[i][4]==1:
-        draw_image(screen,"./picture/Building/road_white_120.png",Mapdata_Side[i][3][0],Mapdata_Side[i][3][1])
-      else:
-        draw_image(screen,"./picture/Building/road_white_240.png",Mapdata_Side[i][3][0],Mapdata_Side[i][3][1])
-    elif Mapdata_Side[i][0]==1:
-      if Mapdata_Side[i][4]==0:
-        draw_image(screen,"./picture/Building/road_red_0.png",Mapdata_Side[i][3][0],Mapdata_Side[i][3][1])
-      elif Mapdata_Side[i][4]==1:
-        draw_image(screen,"./picture/Building/road_red_120.png",Mapdata_Side[i][3][0],Mapdata_Side[i][3][1])
-      else:
-        draw_image(screen,"./picture/Building/road_red_240.png",Mapdata_Side[i][3][0],Mapdata_Side[i][3][1])
-    elif Mapdata_Side[i][0]==2:
-      if Mapdata_Side[i][4]==0:
-        draw_image(screen,"./picture/Building/road_blue_0.png",Mapdata_Side[i][3][0],Mapdata_Side[i][3][1])
-      elif Mapdata_Side[i][4]==1:
-        draw_image(screen,"./picture/Building/road_blue_120.png",Mapdata_Side[i][3][0],Mapdata_Side[i][3][1])
-      else:
-        draw_image(screen,"./picture/Building/road_blue_240.png",Mapdata_Side[i][3][0],Mapdata_Side[i][3][1])
-    else:
-      if Mapdata_Side[i][4]==0:
-        draw_image(screen,"./picture/Building/road_orange_0.png",Mapdata_Side[i][3][0],Mapdata_Side[i][3][1])
-      elif Mapdata_Side[i][4]==1:
-        draw_image(screen,"./picture/Building/road_orange_120.png",Mapdata_Side[i][3][0],Mapdata_Side[i][3][1])
-      else:
-        draw_image(screen,"./picture/Building/road_orange_240.png",Mapdata_Side[i][3][0],Mapdata_Side[i][3][1])
-  for i in range(54):
-    if Mapdata_Edge[i][0]==-1:
-      continue
-    elif Mapdata_Edge[i][0]==0:
-      draw_image(screen,"./picture/Building/settlement_white.png",Mapdata_Edge[i][4][0],Mapdata_Edge[i][4][1])
-    elif Mapdata_Edge[i][0]==1:
-      draw_image(screen,"./picture/Building/city_white.png",Mapdata_Edge[i][4][0],Mapdata_Edge[i][4][1])
-    elif Mapdata_Edge[i][0]==2:
-      draw_image(screen,"./picture/Building/settlement_red.png",Mapdata_Edge[i][4][0],Mapdata_Edge[i][4][1])
-    elif Mapdata_Edge[i][0]==3:
-      draw_image(screen,"./picture/Building/city_red.png",Mapdata_Edge[i][4][0],Mapdata_Edge[i][4][1])
-    elif Mapdata_Edge[i][0]==4:
-      draw_image(screen,"./picture/Building/settlement_blue.png",Mapdata_Edge[i][4][0],Mapdata_Edge[i][4][1])
-    elif Mapdata_Edge[i][0]==5:
-      draw_image(screen,"./picture/Building/city_blue.png",Mapdata_Edge[i][4][0],Mapdata_Edge[i][4][1])
-    elif Mapdata_Edge[i][0]==6:
-      draw_image(screen,"./picture/Building/settlement_orange.png",Mapdata_Edge[i][4][0],Mapdata_Edge[i][4][1])
-    else:
-      draw_image(screen,"./picture/Building/city_orange.png",Mapdata_Edge[i][4][0],Mapdata_Edge[i][4][1])
-
-def burst_discard(screen,yourturn,Player_Data,Discard_Data):
-  draw_image(screen,"./picture/Discard.png",300,300)
-  draw_image(screen,"./picture/Resource_Card/woodcard.png",180,250)
-  draw_image(screen,"./picture/Resource_Card/brickcard.png",240,250)
-  draw_image(screen,"./picture/Resource_Card/sheepcard.png",300,250)
-  draw_image(screen,"./picture/Resource_Card/wheatcard.png",360,250)
-  draw_image(screen,"./picture/Resource_Card/orecard.png",420,250)
-  draw_image(screen,"./picture/Resource_Card/woodcard.png",180,350)
-  draw_image(screen,"./picture/Resource_Card/brickcard.png",240,350)
-  draw_image(screen,"./picture/Resource_Card/sheepcard.png",300,350)
-  draw_image(screen,"./picture/Resource_Card/wheatcard.png",360,350)
-  draw_image(screen,"./picture/Resource_Card/orecard.png",420,350)
-  draw_image(screen,select_num_image(Player_Data[yourturn][2][0]),180,350)
-  draw_image(screen,select_num_image(Player_Data[yourturn][2][1]),240,350)
-  draw_image(screen,select_num_image(Player_Data[yourturn][2][2]),300,350)
-  draw_image(screen,select_num_image(Player_Data[yourturn][2][3]),360,350)
-  draw_image(screen,select_num_image(Player_Data[yourturn][2][4]),420,350)
-  draw_image(screen,select_num_image(Discard_Data[0]),180,250)
-  draw_image(screen,select_num_image(Discard_Data[1]),240,250)
-  draw_image(screen,select_num_image(Discard_Data[2]),300,250)
-  draw_image(screen,select_num_image(Discard_Data[3]),360,250)
-  draw_image(screen,select_num_image(Discard_Data[4]),420,250)
-  
-
-def draw_candidate_settlement(screen,player,Mapdata_Edge,Mapdata_Side,x): #配置可能候補地を描写、x==0は初動の開拓地配置、x==1はゲーム本体の開拓地配置
-  l = []
-  for i in range(54):
-    if x == 0:
-      if Mapdata_Edge[i][0]==-1:
-        Judge = True
-        for j in Mapdata_Edge[i][3]:
-          if Mapdata_Edge[j][0]!=-1:
-            Judge = False
-            break
-        if Judge:
-          draw_image(screen,"./picture/candidate.png",Mapdata_Edge[i][4][0],Mapdata_Edge[i][4][1])
-          l.append(i)
-    else:
-      if Mapdata_Edge[i][0]==-1:
-        Judge = True
-        for j in Mapdata_Edge[i][3]: #隣接点探索,隣に開拓地や都市が無いことを確認
-          if Mapdata_Edge[j][0]!=-1:
-            Judge = False
-            break
-
-        if Judge:
-          Judge = False
-          for j in Mapdata_Edge[i][2]: #隣接辺探索、隣に道があることを確認
-            if Mapdata_Side[j][0] == player:
-              Judge = True
-              break
-
-          if Judge:
-            draw_image(screen,"./picture/candidate.png",Mapdata_Edge[i][4][0],Mapdata_Edge[i][4][1])
-            l.append(i)
-  return l
-
-def draw_candidate_city(screen,player,Mapdata_Edge):
-  l = []
-  for i in range(54):
-    if Mapdata_Edge[i][0] == player*2:
-      draw_image(screen,"./picture/candidate.png",Mapdata_Edge[i][4][0],Mapdata_Edge[i][4][1])
-      l.append(i)
-  return l
-
-def draw_candidate_road(screen,player,Mapdata_Edge,Mapdata_Side):
-  l = []
-  for i in range(72):
-    Judge = False
-    if Mapdata_Side[i][0]!=-1:
-      continue
-    for j in Mapdata_Side[i][1]:
-      if Mapdata_Edge[j][0]==player*2 or Mapdata_Edge[j][0]==player*2+1:
-        Judge = True
-        break
-    if Judge:
-      draw_image(screen,"./picture/candidate.png",Mapdata_Side[i][3][0],Mapdata_Side[i][3][1])
-      l.append(i)
-      continue
-    for j in Mapdata_Side[i][2]:
-      if Mapdata_Side[j][0]==player:
-        Judge = True
-        break
-    if Judge:
-      draw_image(screen,"./picture/candidate.png",Mapdata_Side[i][3][0],Mapdata_Side[i][3][1])
-      l.append(i)
-  return l
-
-def draw_candidate_road_0(screen,Mapdata_Edge,Mapdata_Side,settlement):
-  l = []
-  for i in Mapdata_Edge[settlement][2]:
-    draw_image(screen,"./picture/candidate.png",Mapdata_Side[i][3][0],Mapdata_Side[i][3][1])
-    l.append(i)
-  return l
-
-def draw_candidate_bandit(screen,Mapdata_Mass):
-  l = []
-  for i in range(19):
-    if Mapdata_Mass[i][2]==0:
-      draw_image(screen,"./picture/candidate2.png",Mapdata_Mass[i][4][0],Mapdata_Mass[i][4][1])
-      l.append(i)
-  return l
-
-def draw_candidate_rob(screen,Mapdata_Mass,Player_Data,Mapdata_Edge,pos):
-  l = []
-  for i in Mapdata_Mass[pos][3]:
-    if Mapdata_Edge[i][0]!=0:
-      x = Mapdata_Edge[i][0]/2
-      x = int(x)
-      if Player_Data[x][1]!=0:
-        draw_image(screen,"./picture/candidate.png",Mapdata_Edge[i][4][0],Mapdata_Edge[i][4][1])
-        l.appnd(i)
-  return l
+import client_draw as cld
 
 def main(): #クライアント側
   (w,h)=(600,600)   #ゲーム画面の大きさ(幅600px,高さ600px)
@@ -719,7 +311,7 @@ def main(): #クライアント側
       Mapdata_Mass[i][0]=land[i]
       Mapdata_Mass[i][1]=landnumber[i]
 
-    draw_server(screen,Mapdata_Mass,Mapdata_Side,Mapdata_Edge,Player_Data,land,landnumber,backlog,yourturn,rightside,front,leftside)
+    cld.draw_server(screen,Mapdata_Mass,Mapdata_Side,Mapdata_Edge,Player_Data,land,landnumber,backlog,yourturn,rightside,front,leftside)
     pygame.display.update()
 
     msg = sock.recv(bufsize).decode('utf-8')
@@ -778,7 +370,7 @@ def main(): #クライアント側
                     Player_Data[player][2][x-1] += 1
                     Player_Data[player][1] += 1
             once[player]=1
-            draw_server(screen,Mapdata_Mass,Mapdata_Side,Mapdata_Edge,Player_Data,land,landnumber,backlog,yourturn,rightside,front,leftside) #データをもとに描画更新
+            cld.draw_server(screen,Mapdata_Mass,Mapdata_Side,Mapdata_Edge,Player_Data,land,landnumber,backlog,yourturn,rightside,front,leftside) #データをもとに描画更新
           elif msg1 == "road":
             msg2 = sock.recv(bufsize).decode('utf-8')
             sock.send("ok".encode('utf-8'))
@@ -787,7 +379,7 @@ def main(): #クライアント側
             pos = int(msg2)
             player = int(msg3)
             Mapdata_Side[pos][0]=player #クライアント側のデータ更新完了
-            draw_server(screen,Mapdata_Mass,Mapdata_Side,Mapdata_Edge,Player_Data,land,landnumber,backlog,yourturn,rightside,front,leftside) #データをもとに描画更新
+            cld.draw_server(screen,Mapdata_Mass,Mapdata_Side,Mapdata_Edge,Player_Data,land,landnumber,backlog,yourturn,rightside,front,leftside) #データをもとに描画更新
         elif msg == "firstphaseend":
           running = False
 
@@ -800,7 +392,7 @@ def main(): #クライアント側
       print(yourturn)
 
       settlement = -1
-      settlement_candidates = draw_candidate_settlement(screen,yourturn,Mapdata_Edge,Mapdata_Side,0)
+      settlement_candidates = cld.draw_candidate_settlement(screen,yourturn,Mapdata_Edge,Mapdata_Side,0)
 
       while myturn: #開拓地を置く
         pygame.display.update()
@@ -864,8 +456,8 @@ def main(): #クライアント側
                   Player_Data[player][2][x-1] += 1
                   Player_Data[player][1] += 1
           once[player]=1
-          draw_server(screen,Mapdata_Mass,Mapdata_Side,Mapdata_Edge,Player_Data,land,landnumber,backlog,yourturn,rightside,front,leftside) #データをもとに描画更新
-      road_candidates = draw_candidate_road_0(screen,Mapdata_Edge,Mapdata_Side,settlement)
+          cld.draw_server(screen,Mapdata_Mass,Mapdata_Side,Mapdata_Edge,Player_Data,land,landnumber,backlog,yourturn,rightside,front,leftside) #データをもとに描画更新
+      road_candidates = cld.draw_candidate_road_0(screen,Mapdata_Edge,Mapdata_Side,settlement)
       myturn = True
 
       while myturn: #街道を置く
@@ -921,7 +513,7 @@ def main(): #クライアント側
           print(pos)
           player = int(msg3)
           Mapdata_Side[pos][0]=player #クライアント側のデータ更新完了
-          draw_server(screen,Mapdata_Mass,Mapdata_Side,Mapdata_Edge,Player_Data,land,landnumber,backlog,yourturn,rightside,front,leftside) #データをもとに描画更新
+          cld.draw_server(screen,Mapdata_Mass,Mapdata_Side,Mapdata_Edge,Player_Data,land,landnumber,backlog,yourturn,rightside,front,leftside) #データをもとに描画更新
 
 
 
@@ -961,20 +553,20 @@ def main(): #クライアント側
           Playingnumber=sock.recv(bufsize).decode('utf-8')
           Playingnumber = int(Playingnumber)
           sock.send("ok".encode('utf-8'))
-          draw_server(screen,Mapdata_Mass,Mapdata_Side,Mapdata_Edge,Player_Data,land,landnumber,backlog,yourturn,rightside,front,leftside)
+          cld.draw_server(screen,Mapdata_Mass,Mapdata_Side,Mapdata_Edge,Player_Data,land,landnumber,backlog,yourturn,rightside,front,leftside)
           if Playingnumber==0:
-            draw_image(screen,"./picture/Turn_display/WhiteTurn.png",300,300)
+            cld.draw_image(screen,"./picture/Turn_display/WhiteTurn.png",300,300)
           if Playingnumber==1:
-            draw_image(screen,"./picture/Turn_display/RedTurn.png",300,300)
+            cld.draw_image(screen,"./picture/Turn_display/RedTurn.png",300,300)
           if Playingnumber==2:
-            draw_image(screen,"./picture/Turn_display/BlueTurn.png",300,300)
+            cld.draw_image(screen,"./picture/Turn_display/BlueTurn.png",300,300)
           if Playingnumber==3:
-            draw_image(screen,"./picture/Turn_display/OrangeTurn.png",300,300)
+            cld.draw_image(screen,"./picture/Turn_display/OrangeTurn.png",300,300)
           pygame.display.update()
           pygame.time.wait(1500)
-          draw_server(screen,Mapdata_Mass,Mapdata_Side,Mapdata_Edge,Player_Data,land,landnumber,backlog,yourturn,rightside,front,leftside)
-          draw_image(screen,"./picture/Dice/Roll_of_Dice.png",60,540)
-          draw_image(screen,"./picture/frame.png",540,540)
+          cld.draw_server(screen,Mapdata_Mass,Mapdata_Side,Mapdata_Edge,Player_Data,land,landnumber,backlog,yourturn,rightside,front,leftside)
+          cld.draw_image(screen,"./picture/Dice/Roll_of_Dice.png",60,540)
+          cld.draw_image(screen,"./picture/frame.png",540,540)
 
         ###################
         ## Start  others ##　
@@ -1032,10 +624,10 @@ def main(): #クライアント側
                   Dice7 = True
                 running1=False
                 if Dice7:
-                  draw_server(screen,Mapdata_Mass,Mapdata_Side,Mapdata_Edge,Player_Data,land,landnumber,backlog,yourturn,rightside,front,leftside)
-                  draw_image(screen,"./picture/Dice/Roll_of_Dice.png",60,540)
-                  draw_Dice(screen,Dice1,Dice2)
-                  draw_image(screen,"./picture/frame.png",540,540)
+                  cld.draw_server(screen,Mapdata_Mass,Mapdata_Side,Mapdata_Edge,Player_Data,land,landnumber,backlog,yourturn,rightside,front,leftside)
+                  cld.draw_image(screen,"./picture/Dice/Roll_of_Dice.png",60,540)
+                  cld.draw_Dice(screen,Dice1,Dice2)
+                  cld.draw_image(screen,"./picture/frame.png",540,540)
                   pygame.display.update()
 
           ###########################
@@ -1066,11 +658,11 @@ def main(): #クライアント側
             else:
               burst_num = (Player_Data[yourturn][1]+1)/2
             Discard_Data=[0,0,0,0,0]
-            draw_server(screen,Mapdata_Mass,Mapdata_Side,Mapdata_Edge,Player_Data,land,landnumber,backlog,yourturn,rightside,front,leftside)
-            draw_image(screen,"./picture/Dice/Roll_of_Dice.png",60,540)
-            draw_image(screen,"./picture/frame.png",540,540)
-            draw_Dice(screen,Dice1,Dice2)
-            burst_discard(screen,yourturn,Player_Data,Discard_Data)
+            cld.draw_server(screen,Mapdata_Mass,Mapdata_Side,Mapdata_Edge,Player_Data,land,landnumber,backlog,yourturn,rightside,front,leftside)
+            cld.draw_image(screen,"./picture/Dice/Roll_of_Dice.png",60,540)
+            cld.draw_image(screen,"./picture/frame.png",540,540)
+            cld.draw_Dice(screen,Dice1,Dice2)
+            cld.burst_discard(screen,yourturn,Player_Data,Discard_Data)
             pygame.display.update()
             
           while burst:
@@ -1129,7 +721,7 @@ def main(): #クライアント側
                   Discard_Data[4] += 1
                   Player_Data[yourturn][1] -= 1
                   Player_Data[yourturn][2][4] -= 1
-                burst_discard(screen,yourturn,Player_Data,Discard_Data)
+                cld.burst_discard(screen,yourturn,Player_Data,Discard_Data)
                 pygame.display.update()
                 x = Discard_Data[0]+Discard_Data[1]+Discard_Data[2]+Discard_Data[3]+Discard_Data[4]
                 if x == burst_num:
@@ -1163,10 +755,10 @@ def main(): #クライアント側
                 pygame.quit()
                 sys.exit()
           if waiting:
-            draw_server(screen,Mapdata_Mass,Mapdata_Side,Mapdata_Edge,Player_Data,land,landnumber,backlog,yourturn,rightside,front,leftside)
-            draw_image(screen,"./picture/Dice/Roll_of_Dice.png",60,540)
-            draw_image(screen,"./picture/frame.png",540,540)
-            draw_Dice(screen,Dice1,Dice2)
+            cld.draw_server(screen,Mapdata_Mass,Mapdata_Side,Mapdata_Edge,Player_Data,land,landnumber,backlog,yourturn,rightside,front,leftside)
+            cld.draw_image(screen,"./picture/Dice/Roll_of_Dice.png",60,540)
+            cld.draw_image(screen,"./picture/frame.png",540,540)
+            cld.draw_Dice(screen,Dice1,Dice2)
 
           while waiting:
             pygame.display.update()
@@ -1210,10 +802,10 @@ def main(): #クライアント側
               Player_Data[j][2][3] = int(msg_split[3])
               Player_Data[j][2][4] = int(msg_split[4])
               Player_Data[j][1] = Player_Data[j][2][0]+Player_Data[j][2][1]+Player_Data[j][2][2]+Player_Data[j][2][3]+Player_Data[j][2][4]
-            draw_server(screen,Mapdata_Mass,Mapdata_Side,Mapdata_Edge,Player_Data,land,landnumber,backlog,yourturn,rightside,front,leftside)
-            draw_image(screen,"./picture/Dice/Roll_of_Dice.png",60,540)
-            draw_image(screen,"./picture/frame.png",540,540)
-            draw_Dice(screen,Dice1,Dice2)
+            cld.draw_server(screen,Mapdata_Mass,Mapdata_Side,Mapdata_Edge,Player_Data,land,landnumber,backlog,yourturn,rightside,front,leftside)
+            cld.draw_image(screen,"./picture/Dice/Roll_of_Dice.png",60,540)
+            cld.draw_image(screen,"./picture/frame.png",540,540)
+            cld.draw_Dice(screen,Dice1,Dice2)
           #####################################
           ###　7が出た時の処理(バースト)(終了) ###
           #####################################
@@ -1230,10 +822,10 @@ def main(): #クライアント側
           ### 本体処理　###
           ################
 
-          draw_server(screen,Mapdata_Mass,Mapdata_Side,Mapdata_Edge,Player_Data,land,landnumber,backlog,yourturn,rightside,front,leftside)
-          draw_image(screen,"./picture/Dice/Roll_of_Dice.png",60,540)
-          draw_Dice(screen,Dice1,Dice2)
-          draw_image(screen,"./picture/frame.png",540,540)
+          cld.draw_server(screen,Mapdata_Mass,Mapdata_Side,Mapdata_Edge,Player_Data,land,landnumber,backlog,yourturn,rightside,front,leftside)
+          cld.draw_image(screen,"./picture/Dice/Roll_of_Dice.png",60,540)
+          cld.draw_Dice(screen,Dice1,Dice2)
+          cld.draw_image(screen,"./picture/frame.png",540,540)
           running1 = True
 
           while running1:
@@ -1292,10 +884,10 @@ def main(): #クライアント側
                     if j!=player01:
                       if Player_Data[j][8]<Player_Data[player01][8]:
                         Player_Data[player01][9]=1
-                draw_server(screen,Mapdata_Mass,Mapdata_Side,Mapdata_Edge,Player_Data,land,landnumber,backlog,yourturn,rightside,front,leftside)
-                draw_image(screen,"./picture/Dice/Roll_of_Dice.png",60,540)
-                draw_Dice(screen,Dice1,Dice2)
-                draw_image(screen,"./picture/frame.png",540,540)
+                cld.draw_server(screen,Mapdata_Mass,Mapdata_Side,Mapdata_Edge,Player_Data,land,landnumber,backlog,yourturn,rightside,front,leftside)
+                cld.draw_image(screen,"./picture/Dice/Roll_of_Dice.png",60,540)
+                cld.draw_Dice(screen,Dice1,Dice2)
+                cld.draw_image(screen,"./picture/frame.png",540,540)
                 pygame.display.update()
 
                 ######################
@@ -1311,14 +903,14 @@ def main(): #クライアント側
         ##########################
 
         elif msg == "Yourturn": ##ここからocchiiが書いてるよ💛💛★(⋈◍＞◡＜◍)。✧♡★✌
-          draw_server(screen,Mapdata_Mass,Mapdata_Side,Mapdata_Edge,Player_Data,land,landnumber,backlog,yourturn,rightside,front,leftside)
-          draw_image(screen,"./picture/Turn_display/YourTurn.png",300,300)
+          cld.draw_server(screen,Mapdata_Mass,Mapdata_Side,Mapdata_Edge,Player_Data,land,landnumber,backlog,yourturn,rightside,front,leftside)
+          cld.draw_image(screen,"./picture/Turn_display/YourTurn.png",300,300)
           pygame.display.update()
           pygame.time.wait(1500)
-          draw_server(screen,Mapdata_Mass,Mapdata_Side,Mapdata_Edge,Player_Data,land,landnumber,backlog,yourturn,rightside,front,leftside)
-          draw_image(screen,"./picture/Dice/Roll_of_Dice.png",60,540)
-          draw_image(screen,"./picture/frame.png",540,540)
-          draw_image(screen,"./picture/Dice/Dice_button.png",540,540)
+          cld.draw_server(screen,Mapdata_Mass,Mapdata_Side,Mapdata_Edge,Player_Data,land,landnumber,backlog,yourturn,rightside,front,leftside)
+          cld.draw_image(screen,"./picture/Dice/Roll_of_Dice.png",60,540)
+          cld.draw_image(screen,"./picture/frame.png",540,540)
+          cld.draw_image(screen,"./picture/Dice/Dice_button.png",540,540)
           
 
         ############
@@ -1394,10 +986,10 @@ def main(): #クライアント側
           else:
             Dice7 = True
           if Dice7:
-            draw_server(screen,Mapdata_Mass,Mapdata_Side,Mapdata_Edge,Player_Data,land,landnumber,backlog,yourturn,rightside,front,leftside)
-            draw_image(screen,"./picture/Dice/Roll_of_Dice.png",60,540)
-            draw_image(screen,"./picture/frame.png",540,540)
-            draw_Dice(screen,Dice1,Dice2)
+            cld.draw_server(screen,Mapdata_Mass,Mapdata_Side,Mapdata_Edge,Player_Data,land,landnumber,backlog,yourturn,rightside,front,leftside)
+            cld.draw_image(screen,"./picture/Dice/Roll_of_Dice.png",60,540)
+            cld.draw_image(screen,"./picture/frame.png",540,540)
+            cld.draw_Dice(screen,Dice1,Dice2)
             pygame.display.update()
 
 
@@ -1429,11 +1021,11 @@ def main(): #クライアント側
             else:
               burst_num = (Player_Data[yourturn][1]+1)/2
             Discard_Data=[0,0,0,0,0]
-            draw_server(screen,Mapdata_Mass,Mapdata_Side,Mapdata_Edge,Player_Data,land,landnumber,backlog,yourturn,rightside,front,leftside)
-            draw_image(screen,"./picture/Dice/Roll_of_Dice.png",60,540)
-            draw_image(screen,"./picture/frame.png",540,540)
-            draw_Dice(screen,Dice1,Dice2)
-            burst_discard(screen,yourturn,Player_Data,Discard_Data)
+            cld.draw_server(screen,Mapdata_Mass,Mapdata_Side,Mapdata_Edge,Player_Data,land,landnumber,backlog,yourturn,rightside,front,leftside)
+            cld.draw_image(screen,"./picture/Dice/Roll_of_Dice.png",60,540)
+            cld.draw_image(screen,"./picture/frame.png",540,540)
+            cld.draw_Dice(screen,Dice1,Dice2)
+            cld.burst_discard(screen,yourturn,Player_Data,Discard_Data)
             pygame.display.update()
             
           while burst:
@@ -1492,7 +1084,7 @@ def main(): #クライアント側
                   Discard_Data[4] += 1
                   Player_Data[yourturn][1] -= 1
                   Player_Data[yourturn][2][4] -= 1
-                burst_discard(screen,yourturn,Player_Data,Discard_Data)
+                cld.burst_discard(screen,yourturn,Player_Data,Discard_Data)
                 pygame.display.update()
                 x = Discard_Data[0]+Discard_Data[1]+Discard_Data[2]+Discard_Data[3]+Discard_Data[4]
                 if x == burst_num:
@@ -1526,10 +1118,10 @@ def main(): #クライアント側
                 pygame.quit()
                 sys.exit()
           if waiting:
-            draw_server(screen,Mapdata_Mass,Mapdata_Side,Mapdata_Edge,Player_Data,land,landnumber,backlog,yourturn,rightside,front,leftside)
-            draw_image(screen,"./picture/Dice/Roll_of_Dice.png",60,540)
-            draw_image(screen,"./picture/frame.png",540,540)
-            draw_Dice(screen,Dice1,Dice2)
+            cld.draw_server(screen,Mapdata_Mass,Mapdata_Side,Mapdata_Edge,Player_Data,land,landnumber,backlog,yourturn,rightside,front,leftside)
+            cld.draw_image(screen,"./picture/Dice/Roll_of_Dice.png",60,540)
+            cld.draw_image(screen,"./picture/frame.png",540,540)
+            cld.draw_Dice(screen,Dice1,Dice2)
 
           while waiting:
             pygame.display.update()
@@ -1573,11 +1165,11 @@ def main(): #クライアント側
               Player_Data[j][2][3] = int(msg_split[3])
               Player_Data[j][2][4] = int(msg_split[4])
               Player_Data[j][1] = Player_Data[j][2][0]+Player_Data[j][2][1]+Player_Data[j][2][2]+Player_Data[j][2][3]+Player_Data[j][2][4]
-            draw_server(screen,Mapdata_Mass,Mapdata_Side,Mapdata_Edge,Player_Data,land,landnumber,backlog,yourturn,rightside,front,leftside)
-            draw_image(screen,"./picture/Dice/Roll_of_Dice.png",60,540)
-            draw_image(screen,"./picture/frame.png",540,540)
-            draw_Dice(screen,Dice1,Dice2)
-            bandit_list = draw_candidate_bandit(screen,Mapdata_Mass)
+            cld.draw_server(screen,Mapdata_Mass,Mapdata_Side,Mapdata_Edge,Player_Data,land,landnumber,backlog,yourturn,rightside,front,leftside)
+            cld.draw_image(screen,"./picture/Dice/Roll_of_Dice.png",60,540)
+            cld.draw_image(screen,"./picture/frame.png",540,540)
+            cld.draw_Dice(screen,Dice1,Dice2)
+            bandit_list = cld.draw_candidate_bandit(screen,Mapdata_Mass)
 
           #####################################
           ###　7が出た時の処理(バースト)(終了) ###
@@ -1596,12 +1188,12 @@ def main(): #クライアント側
           ### 本体処理　###
           ################
           running1=True
-          draw_server(screen,Mapdata_Mass,Mapdata_Side,Mapdata_Edge,Player_Data,land,landnumber,backlog,yourturn,rightside,front,leftside)
-          draw_image(screen,"./picture/Dice/Roll_of_Dice.png",60,540)
-          draw_image(screen,"./picture/frame.png",540,540)
-          draw_Dice(screen,Dice1,Dice2)
-          draw_image(screen,"./picture/Turnend_button.png",540,540)
-          draw_image(screen,"./picture/Action.png",540,60)
+          cld.draw_server(screen,Mapdata_Mass,Mapdata_Side,Mapdata_Edge,Player_Data,land,landnumber,backlog,yourturn,rightside,front,leftside)
+          cld.draw_image(screen,"./picture/Dice/Roll_of_Dice.png",60,540)
+          cld.draw_image(screen,"./picture/frame.png",540,540)
+          cld.draw_Dice(screen,Dice1,Dice2)
+          cld.draw_image(screen,"./picture/Turnend_button.png",540,540)
+          cld.draw_image(screen,"./picture/Action.png",540,60)
 
           while running1:
             pygame.display.update()
@@ -1632,13 +1224,13 @@ def main(): #クライアント側
                 if 481<=x and x<=540 and 1<=y and y<=60 and Player_Data[yourturn][2][0]>=1 and Player_Data[yourturn][2][1]>=1 and Player_Data[yourturn][7]>=1: #街道建設
 
                   road_running = True
-                  draw_server(screen,Mapdata_Mass,Mapdata_Side,Mapdata_Edge,Player_Data,land,landnumber,backlog,yourturn,rightside,front,leftside)
-                  draw_image(screen,"./picture/Dice/Roll_of_Dice.png",60,540)
-                  draw_image(screen,"./picture/frame.png",540,540)
-                  draw_Dice(screen,Dice1,Dice2)
-                  draw_image(screen,"./picture/Turnend_button.png",540,540)
-                  draw_image(screen,"./picture/Action.png",540,60)
-                  road_candidate = draw_candidate_road(screen,yourturn,Mapdata_Edge,Mapdata_Side)
+                  cld.draw_server(screen,Mapdata_Mass,Mapdata_Side,Mapdata_Edge,Player_Data,land,landnumber,backlog,yourturn,rightside,front,leftside)
+                  cld.draw_image(screen,"./picture/Dice/Roll_of_Dice.png",60,540)
+                  cld.draw_image(screen,"./picture/frame.png",540,540)
+                  cld.draw_Dice(screen,Dice1,Dice2)
+                  cld.draw_image(screen,"./picture/Turnend_button.png",540,540)
+                  cld.draw_image(screen,"./picture/Action.png",540,60)
+                  road_candidate = cld.draw_candidate_road(screen,yourturn,Mapdata_Edge,Mapdata_Side)
 
 
                   while road_running:
@@ -1690,12 +1282,12 @@ def main(): #クライアント側
                               break
 
                         if road_running==False:
-                          draw_server(screen,Mapdata_Mass,Mapdata_Side,Mapdata_Edge,Player_Data,land,landnumber,backlog,yourturn,rightside,front,leftside)
-                          draw_image(screen,"./picture/Dice/Roll_of_Dice.png",60,540)
-                          draw_image(screen,"./picture/frame.png",540,540)
-                          draw_Dice(screen,Dice1,Dice2)
-                          draw_image(screen,"./picture/Turnend_button.png",540,540)
-                          draw_image(screen,"./picture/Action.png",540,60)
+                          cld.draw_server(screen,Mapdata_Mass,Mapdata_Side,Mapdata_Edge,Player_Data,land,landnumber,backlog,yourturn,rightside,front,leftside)
+                          cld.draw_image(screen,"./picture/Dice/Roll_of_Dice.png",60,540)
+                          cld.draw_image(screen,"./picture/frame.png",540,540)
+                          cld.draw_Dice(screen,Dice1,Dice2)
+                          cld.draw_image(screen,"./picture/Turnend_button.png",540,540)
+                          cld.draw_image(screen,"./picture/Action.png",540,60)
                           pygame.display.update()
 
                     if road_running == False:  #サイコロフリフリメッセージ送信後は即ループ脱出
