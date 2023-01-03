@@ -302,6 +302,30 @@ def draw_server(screen,Mapdata_Mass,Mapdata_Side,Mapdata_Edge,Player_Data,land,l
     else:
       draw_image(screen,"./picture/Building/city_orange.png",Mapdata_Edge[i][4][0],Mapdata_Edge[i][4][1])
 
+def burst_discard(screen,yourturn,Player_Data,Discard_Data):
+  draw_image(screen,"./picture/Discard.png",300,300)
+  draw_image(screen,"./picture/Resource_Card/woodcard.png",180,250)
+  draw_image(screen,"./picture/Resource_Card/brickcard.png",240,250)
+  draw_image(screen,"./picture/Resource_Card/sheepcard.png",300,250)
+  draw_image(screen,"./picture/Resource_Card/wheatcard.png",360,250)
+  draw_image(screen,"./picture/Resource_Card/orecard.png",420,250)
+  draw_image(screen,"./picture/Resource_Card/woodcard.png",180,350)
+  draw_image(screen,"./picture/Resource_Card/brickcard.png",240,350)
+  draw_image(screen,"./picture/Resource_Card/sheepcard.png",300,350)
+  draw_image(screen,"./picture/Resource_Card/wheatcard.png",360,350)
+  draw_image(screen,"./picture/Resource_Card/orecard.png",420,350)
+  draw_image(screen,select_num_image(Player_Data[yourturn][2][0]),180,350)
+  draw_image(screen,select_num_image(Player_Data[yourturn][2][1]),240,350)
+  draw_image(screen,select_num_image(Player_Data[yourturn][2][2]),300,350)
+  draw_image(screen,select_num_image(Player_Data[yourturn][2][3]),360,350)
+  draw_image(screen,select_num_image(Player_Data[yourturn][2][4]),420,350)
+  draw_image(screen,select_num_image(Discard_Data[0]),180,250)
+  draw_image(screen,select_num_image(Discard_Data[1]),240,250)
+  draw_image(screen,select_num_image(Discard_Data[2]),300,250)
+  draw_image(screen,select_num_image(Discard_Data[3]),360,250)
+  draw_image(screen,select_num_image(Discard_Data[4]),420,250)
+  
+
 def draw_candidate_settlement(screen,player,Mapdata_Edge,Mapdata_Side,x): #配置可能候補地を描写、x==0は初動の開拓地配置、x==1はゲーム本体の開拓地配置
   l = []
   for i in range(54):
@@ -378,7 +402,19 @@ def draw_candidate_bandit(screen,Mapdata_Mass):
   for i in range(19):
     if Mapdata_Mass[i][2]==0:
       draw_image(screen,"./picture/candidate2.png",Mapdata_Mass[i][4][0],Mapdata_Mass[i][4][1])
+      l.append(i)
+  return l
 
+def draw_candidate_rob(screen,Mapdata_Mass,Player_Data,Mapdata_Edge,pos):
+  l = []
+  for i in Mapdata_Mass[pos][3]:
+    if Mapdata_Edge[i][0]!=0:
+      x = Mapdata_Edge[i][0]/2
+      x = int(x)
+      if Player_Data[x][1]!=0:
+        draw_image(screen,"./picture/candidate.png",Mapdata_Edge[i][4][0],Mapdata_Edge[i][4][1])
+        l.appnd(i)
+  return l
 
 def main(): #クライアント側
   (w,h)=(600,600)   #ゲーム画面の大きさ(幅600px,高さ600px)
@@ -995,23 +1031,200 @@ def main(): #クライアント側
                 else:
                   Dice7 = True
                 running1=False
-                draw_server(screen,Mapdata_Mass,Mapdata_Side,Mapdata_Edge,Player_Data,land,landnumber,backlog,yourturn,rightside,front,leftside)
-                draw_image(screen,"./picture/Dice/Roll_of_Dice.png",60,540)
-                draw_Dice(screen,Dice1,Dice2)
-                draw_image(screen,"./picture/frame.png",540,540)
-                pygame.display.update()
+                if Dice7:
+                  draw_server(screen,Mapdata_Mass,Mapdata_Side,Mapdata_Edge,Player_Data,land,landnumber,backlog,yourturn,rightside,front,leftside)
+                  draw_image(screen,"./picture/Dice/Roll_of_Dice.png",60,540)
+                  draw_Dice(screen,Dice1,Dice2)
+                  draw_image(screen,"./picture/frame.png",540,540)
+                  pygame.display.update()
 
           ###########################
           ## サイコロフリフリ(終了) ##
           ###########################
 
-          #######################
-          ###　7が出た時の処理 ###
-          #######################
+          ################################
+          ###　7が出た時の処理(バースト) ###
+          ################################
+          burst=False
+          waiting=False
+          if Dice7:
+            msg = sock.recv(bufsize).decode('utf-8')
+            if msg == "Burst":
+              sock.send("ok".encode('utf-8'))
+
+          if Dice7:
+            if Player_Data[yourturn][1]>=8:
+              burst = True
+              waiting = False
+            else:
+              waiting = True
+          
+          if burst:
+            before_num = Player_Data[yourturn][1]
+            if before_num%2==0:
+              burst_num = Player_Data[yourturn][1]/2
+            else:
+              burst_num = (Player_Data[yourturn][1]+1)/2
+            Discard_Data=[0,0,0,0,0]
+            draw_server(screen,Mapdata_Mass,Mapdata_Side,Mapdata_Edge,Player_Data,land,landnumber,backlog,yourturn,rightside,front,leftside)
+            draw_image(screen,"./picture/Dice/Roll_of_Dice.png",60,540)
+            draw_image(screen,"./picture/frame.png",540,540)
+            draw_Dice(screen,Dice1,Dice2)
+            burst_discard(screen,yourturn,Player_Data,Discard_Data)
+            pygame.display.update()
+            
+          while burst:
+            pygame.display.update()
+            pygame.time.wait(50) #20fps
+            
+            for event in pygame.event.get():
+              if event.type == QUIT:
+                sock.send("QUIT".encode('utf-8'))
+                pygame.quit()
+                sys.exit()
+              if event.type == KEYDOWN:
+                if event.key == K_ESCAPE:
+                  sock.send("QUIT".encode('utf-8'))
+                  pygame.quit()
+                  sys.exit()
+              if event.type == MOUSEBUTTONDOWN and event.button == 1:
+                x, y = event.pos
+                if 160<=x and x<=200 and 220<=y and y<=280 and Discard_Data[0]>=1:
+                  Discard_Data[0] -= 1
+                  Player_Data[yourturn][1] += 1
+                  Player_Data[yourturn][2][0] += 1
+                if 220<=x and x<=260 and 220<=y and y<=280 and Discard_Data[1]>=1:
+                  Discard_Data[1] -= 1
+                  Player_Data[yourturn][1] += 1
+                  Player_Data[yourturn][2][1] += 1
+                if 280<=x and x<=320 and 220<=y and y<=280 and Discard_Data[2]>=1:
+                  Discard_Data[2] -= 1
+                  Player_Data[yourturn][1] += 1
+                  Player_Data[yourturn][2][2] += 1
+                if 340<=x and x<=380 and 220<=y and y<=280 and Discard_Data[3]>=1:
+                  Discard_Data[3] -= 1
+                  Player_Data[yourturn][1] += 1
+                  Player_Data[yourturn][2][3] += 1
+                if 400<=x and x<=440 and 220<=y and y<=280 and Discard_Data[4]>=1:
+                  Discard_Data[4] -= 1
+                  Player_Data[yourturn][1] += 1
+                  Player_Data[yourturn][2][4] += 1
+                if 160<=x and x<=200 and 320<=y and y<=380 and Player_Data[yourturn][2][0]>=1:
+                  Discard_Data[0] += 1
+                  Player_Data[yourturn][1] -= 1
+                  Player_Data[yourturn][2][0] -= 1
+                if 220<=x and x<=260 and 320<=y and y<=380 and Player_Data[yourturn][2][1]>=1:
+                  Discard_Data[1] += 1
+                  Player_Data[yourturn][1] -= 1
+                  Player_Data[yourturn][2][1] -= 1
+                if 280<=x and x<=320 and 320<=y and y<=380 and Player_Data[yourturn][2][2]>=1:
+                  Discard_Data[2] += 1
+                  Player_Data[yourturn][1] -= 1
+                  Player_Data[yourturn][2][2] -= 1
+                if 340<=x and x<=380 and 320<=y and y<=380 and Player_Data[yourturn][2][3]>=1:
+                  Discard_Data[3] += 1
+                  Player_Data[yourturn][1] -= 1
+                  Player_Data[yourturn][2][3] -= 1
+                if 400<=x and x<=440 and 320<=y and y<=380 and Player_Data[yourturn][2][4]>=1:
+                  Discard_Data[4] += 1
+                  Player_Data[yourturn][1] -= 1
+                  Player_Data[yourturn][2][4] -= 1
+                burst_discard(screen,yourturn,Player_Data,Discard_Data)
+                pygame.display.update()
+                x = Discard_Data[0]+Discard_Data[1]+Discard_Data[2]+Discard_Data[3]+Discard_Data[4]
+                if x == burst_num:
+                  msg1 = ""
+                  msg1 += str(Player_Data[yourturn][2][0])
+                  msg1 += "/"
+                  msg1 += str(Player_Data[yourturn][2][1])
+                  msg1 += "/"     
+                  msg1 += str(Player_Data[yourturn][2][2])
+                  msg1 += "/"
+                  msg1 += str(Player_Data[yourturn][2][3])
+                  msg1 += "/"
+                  msg1 += str(Player_Data[yourturn][2][4])
+                  sock.send("Discard".encode('utf-8'))
+                  sock.recv(bufsize).decode('utf-8')
+                  sock.send(str(yourturn).encode('utf-8'))
+                  sock.recv(bufsize).decode('utf-8')
+                  sock.send(msg1.encode('utf-8'))
+
+                  burst = False
+                  waiting = True
+            
+            if burst == False:
+              break
+            rready, wready, xready = select.select(readfds, [], [],0.05) #処理を可能な物から順に選択
+            for sock in rready:                                   #選択された処理を順次遂行
+              msg = sock.recv(bufsize).decode('utf-8')
+              print(msg)
+              sock.send("ok".encode('utf-8'))
+              if msg == "serverdown":
+                pygame.quit()
+                sys.exit()
+          if waiting:
+            draw_server(screen,Mapdata_Mass,Mapdata_Side,Mapdata_Edge,Player_Data,land,landnumber,backlog,yourturn,rightside,front,leftside)
+            draw_image(screen,"./picture/Dice/Roll_of_Dice.png",60,540)
+            draw_image(screen,"./picture/frame.png",540,540)
+            draw_Dice(screen,Dice1,Dice2)
+
+          while waiting:
+            pygame.display.update()
+            pygame.time.wait(50) #20fps
+            
+            for event in pygame.event.get():
+              if event.type == QUIT:
+                sock.send("QUIT".encode('utf-8'))
+                pygame.quit()
+                sys.exit()
+              if event.type == KEYDOWN:
+                if event.key == K_ESCAPE:
+                  sock.send("QUIT".encode('utf-8'))
+                  pygame.quit()
+                  sys.exit()
+
+            rready, wready, xready = select.select(readfds, [], [],0.05) #処理を可能な物から順に選択
+            for sock in rready:                                   #選択された処理を順次遂行
+              msg = sock.recv(bufsize).decode('utf-8')
+              print(msg)
+              sock.send("ok".encode('utf-8'))
+              if msg == "serverdown":
+                pygame.quit()
+                sys.exit()
+              if msg == "BurstEnd":
+                waiting = False
+                Dice7 = True
+                waiting = False
+              if msg == "NoBurst":
+                Dice7 = False
+                waiting = False
+          
+          if Dice7:
+            for j in range(4):
+              msg = sock.recv(bufsize).decode('utf-8')
+              sock.send("ok".encode('utf-8'))
+              msg_split=msg.split("/")
+              Player_Data[j][2][0] = int(msg_split[0])
+              Player_Data[j][2][1] = int(msg_split[1])
+              Player_Data[j][2][2] = int(msg_split[2])
+              Player_Data[j][2][3] = int(msg_split[3])
+              Player_Data[j][2][4] = int(msg_split[4])
+              Player_Data[j][1] = Player_Data[j][2][0]+Player_Data[j][2][1]+Player_Data[j][2][2]+Player_Data[j][2][3]+Player_Data[j][2][4]
+            draw_server(screen,Mapdata_Mass,Mapdata_Side,Mapdata_Edge,Player_Data,land,landnumber,backlog,yourturn,rightside,front,leftside)
+            draw_image(screen,"./picture/Dice/Roll_of_Dice.png",60,540)
+            draw_image(screen,"./picture/frame.png",540,540)
+            draw_Dice(screen,Dice1,Dice2)
+          #####################################
+          ###　7が出た時の処理(バースト)(終了) ###
+          #####################################
+
+          ################################
+          ###　7が出た時の処理(蛮族移動) ###
+          ################################
     
-          ############################
-          ###　7が出た時の処理(終了) ###
-          ############################
+          #####################################
+          ###　7が出た時の処理(蛮族移動)(終了) ###
+          #####################################
 
           ################
           ### 本体処理　###
@@ -1180,23 +1393,204 @@ def main(): #クライアント側
 
           else:
             Dice7 = True
-          draw_server(screen,Mapdata_Mass,Mapdata_Side,Mapdata_Edge,Player_Data,land,landnumber,backlog,yourturn,rightside,front,leftside)
-          draw_image(screen,"./picture/Dice/Roll_of_Dice.png",60,540)
-          draw_image(screen,"./picture/frame.png",540,540)
-          draw_Dice(screen,Dice1,Dice2)
+          if Dice7:
+            draw_server(screen,Mapdata_Mass,Mapdata_Side,Mapdata_Edge,Player_Data,land,landnumber,backlog,yourturn,rightside,front,leftside)
+            draw_image(screen,"./picture/Dice/Roll_of_Dice.png",60,540)
+            draw_image(screen,"./picture/frame.png",540,540)
+            draw_Dice(screen,Dice1,Dice2)
+            pygame.display.update()
 
 
           ###########################
           ## サイコロフリフリ(終了) ##
           ###########################
 
-          #######################
-          ###　7が出た時の処理 ###
-          #######################
-    
-          ############################
-          ###　7が出た時の処理(終了) ###
-          ############################
+          ################################
+          ###　7が出た時の処理(バースト) ###
+          ################################
+          burst=False
+          waiting=False
+          if Dice7:
+            msg = sock.recv(bufsize).decode('utf-8')
+            if msg == "Burst":
+              sock.send("ok".encode('utf-8'))
+
+          if Dice7:
+            if Player_Data[yourturn][1]>=8:
+              burst = True
+              waiting = False
+            else:
+              waiting = True
+          
+          if burst:
+            before_num = Player_Data[yourturn][1]
+            if before_num%2==0:
+              burst_num = Player_Data[yourturn][1]/2
+            else:
+              burst_num = (Player_Data[yourturn][1]+1)/2
+            Discard_Data=[0,0,0,0,0]
+            draw_server(screen,Mapdata_Mass,Mapdata_Side,Mapdata_Edge,Player_Data,land,landnumber,backlog,yourturn,rightside,front,leftside)
+            draw_image(screen,"./picture/Dice/Roll_of_Dice.png",60,540)
+            draw_image(screen,"./picture/frame.png",540,540)
+            draw_Dice(screen,Dice1,Dice2)
+            burst_discard(screen,yourturn,Player_Data,Discard_Data)
+            pygame.display.update()
+            
+          while burst:
+            pygame.display.update()
+            pygame.time.wait(50) #20fps
+            
+            for event in pygame.event.get():
+              if event.type == QUIT:
+                sock.send("QUIT".encode('utf-8'))
+                pygame.quit()
+                sys.exit()
+              if event.type == KEYDOWN:
+                if event.key == K_ESCAPE:
+                  sock.send("QUIT".encode('utf-8'))
+                  pygame.quit()
+                  sys.exit()
+              if event.type == MOUSEBUTTONDOWN and event.button == 1:
+                x, y = event.pos
+                if 160<=x and x<=200 and 220<=y and y<=280 and Discard_Data[0]>=1:
+                  Discard_Data[0] -= 1
+                  Player_Data[yourturn][1] += 1
+                  Player_Data[yourturn][2][0] += 1
+                if 220<=x and x<=260 and 220<=y and y<=280 and Discard_Data[1]>=1:
+                  Discard_Data[1] -= 1
+                  Player_Data[yourturn][1] += 1
+                  Player_Data[yourturn][2][1] += 1
+                if 280<=x and x<=320 and 220<=y and y<=280 and Discard_Data[2]>=1:
+                  Discard_Data[2] -= 1
+                  Player_Data[yourturn][1] += 1
+                  Player_Data[yourturn][2][2] += 1
+                if 340<=x and x<=380 and 220<=y and y<=280 and Discard_Data[3]>=1:
+                  Discard_Data[3] -= 1
+                  Player_Data[yourturn][1] += 1
+                  Player_Data[yourturn][2][3] += 1
+                if 400<=x and x<=440 and 220<=y and y<=280 and Discard_Data[4]>=1:
+                  Discard_Data[4] -= 1
+                  Player_Data[yourturn][1] += 1
+                  Player_Data[yourturn][2][4] += 1
+                if 160<=x and x<=200 and 320<=y and y<=380 and Player_Data[yourturn][2][0]>=1:
+                  Discard_Data[0] += 1
+                  Player_Data[yourturn][1] -= 1
+                  Player_Data[yourturn][2][0] -= 1
+                if 220<=x and x<=260 and 320<=y and y<=380 and Player_Data[yourturn][2][1]>=1:
+                  Discard_Data[1] += 1
+                  Player_Data[yourturn][1] -= 1
+                  Player_Data[yourturn][2][1] -= 1
+                if 280<=x and x<=320 and 320<=y and y<=380 and Player_Data[yourturn][2][2]>=1:
+                  Discard_Data[2] += 1
+                  Player_Data[yourturn][1] -= 1
+                  Player_Data[yourturn][2][2] -= 1
+                if 340<=x and x<=380 and 320<=y and y<=380 and Player_Data[yourturn][2][3]>=1:
+                  Discard_Data[3] += 1
+                  Player_Data[yourturn][1] -= 1
+                  Player_Data[yourturn][2][3] -= 1
+                if 400<=x and x<=440 and 320<=y and y<=380 and Player_Data[yourturn][2][4]>=1:
+                  Discard_Data[4] += 1
+                  Player_Data[yourturn][1] -= 1
+                  Player_Data[yourturn][2][4] -= 1
+                burst_discard(screen,yourturn,Player_Data,Discard_Data)
+                pygame.display.update()
+                x = Discard_Data[0]+Discard_Data[1]+Discard_Data[2]+Discard_Data[3]+Discard_Data[4]
+                if x == burst_num:
+                  msg1 = ""
+                  msg1 += str(Player_Data[yourturn][2][0])
+                  msg1 += "/"
+                  msg1 += str(Player_Data[yourturn][2][1])
+                  msg1 += "/"     
+                  msg1 += str(Player_Data[yourturn][2][2])
+                  msg1 += "/"
+                  msg1 += str(Player_Data[yourturn][2][3])
+                  msg1 += "/"
+                  msg1 += str(Player_Data[yourturn][2][4])
+                  sock.send("Discard".encode('utf-8'))
+                  sock.recv(bufsize).decode('utf-8')
+                  sock.send(str(yourturn).encode('utf-8'))
+                  sock.recv(bufsize).decode('utf-8')
+                  sock.send(msg1.encode('utf-8'))
+
+                  burst = False
+                  waiting = True
+            
+            if burst == False:
+              break
+            rready, wready, xready = select.select(readfds, [], [],0.05) #処理を可能な物から順に選択
+            for sock in rready:                                   #選択された処理を順次遂行
+              msg = sock.recv(bufsize).decode('utf-8')
+              print(msg)
+              sock.send("ok".encode('utf-8'))
+              if msg == "serverdown":
+                pygame.quit()
+                sys.exit()
+          if waiting:
+            draw_server(screen,Mapdata_Mass,Mapdata_Side,Mapdata_Edge,Player_Data,land,landnumber,backlog,yourturn,rightside,front,leftside)
+            draw_image(screen,"./picture/Dice/Roll_of_Dice.png",60,540)
+            draw_image(screen,"./picture/frame.png",540,540)
+            draw_Dice(screen,Dice1,Dice2)
+
+          while waiting:
+            pygame.display.update()
+            pygame.time.wait(50) #20fps
+            
+            for event in pygame.event.get():
+              if event.type == QUIT:
+                sock.send("QUIT".encode('utf-8'))
+                pygame.quit()
+                sys.exit()
+              if event.type == KEYDOWN:
+                if event.key == K_ESCAPE:
+                  sock.send("QUIT".encode('utf-8'))
+                  pygame.quit()
+                  sys.exit()
+
+            rready, wready, xready = select.select(readfds, [], [],0.05) #処理を可能な物から順に選択
+            for sock in rready:                                   #選択された処理を順次遂行
+              msg = sock.recv(bufsize).decode('utf-8')
+              print(msg)
+              sock.send("ok".encode('utf-8'))
+              if msg == "serverdown":
+                pygame.quit()
+                sys.exit()
+              if msg == "BurstEnd":
+                waiting = False
+                Dice7 = True
+                waiting = False
+              if msg == "NoBurst":
+                Dice7 = False
+                waiting = False
+          
+          if Dice7:
+            for j in range(4):
+              msg = sock.recv(bufsize).decode('utf-8')
+              sock.send("ok".encode('utf-8'))
+              msg_split=msg.split("/")
+              Player_Data[j][2][0] = int(msg_split[0])
+              Player_Data[j][2][1] = int(msg_split[1])
+              Player_Data[j][2][2] = int(msg_split[2])
+              Player_Data[j][2][3] = int(msg_split[3])
+              Player_Data[j][2][4] = int(msg_split[4])
+              Player_Data[j][1] = Player_Data[j][2][0]+Player_Data[j][2][1]+Player_Data[j][2][2]+Player_Data[j][2][3]+Player_Data[j][2][4]
+            draw_server(screen,Mapdata_Mass,Mapdata_Side,Mapdata_Edge,Player_Data,land,landnumber,backlog,yourturn,rightside,front,leftside)
+            draw_image(screen,"./picture/Dice/Roll_of_Dice.png",60,540)
+            draw_image(screen,"./picture/frame.png",540,540)
+            draw_Dice(screen,Dice1,Dice2)
+            bandit_list = draw_candidate_bandit(screen,Mapdata_Mass)
+
+          #####################################
+          ###　7が出た時の処理(バースト)(終了) ###
+          #####################################
+
+          ################################
+          ###　7が出た時の処理(蛮族移動) ###
+          ################################
+
+  
+          #####################################
+          ###　7が出た時の処理(蛮族移動)(終了) ###
+          #####################################
 
           ################
           ### 本体処理　###

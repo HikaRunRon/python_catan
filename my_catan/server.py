@@ -917,20 +917,113 @@ def main(): #サーバー側
             draw_image(screen,"./picture/Dice/Roll_of_Dice.png",60,540)
             draw_Dice(screen,Dice1,Dice2)
             pygame.display.update()
-            pygame.time.wait(50)
      
       ##########################################################
       ###　サイコロの出目をクライアントから受け取るフェーズ(終了) ###
       ##########################################################
 
+      ################################
+      ###　7が出た時の処理(バースト) ###
+      ################################
+      Dice7_2=False
+      burst_player_num = 0
+      if Dice7:
+        for receiver in clients_socks: #バースト処理の開始をクライアントに通知
+          receiver.send("Burst".encode('utf-8'))
+          receiver.recv(bufsize)
 
-      #######################
-      ###　7が出た時の処理 ###
-      #######################
+      if Dice7:
+        Dice7_2 = True
+        for i in range(4):
+          if Player_Data[i][1]>=8:
+            burst_player_num += 1
+      
+      if burst_player_num==0:
+        Dice7=False
+        Dice7_2=False
+        for receiver in clients_socks: #バースト処理の開始をクライアントに通知
+          receiver.send("NoBurst".encode('utf-8'))
+          receiver.recv(bufsize)
 
-      ############################
-      ###　7が出た時の処理(終了) ###
-      ############################
+      while Dice7:
+        
+        pygame.display.update()
+        pygame.time.wait(50)
+        for event in pygame.event.get():  #キーボード操作　または　マウス操作
+          if event.type == QUIT:
+            for receiver in clients_socks:
+              receiver.send("serverdown".encode('utf-8'))
+              receiver.recv(bufsize)
+            pygame.quit()
+            sys.exit()
+          if event.type == KEYDOWN:
+            if event.key == K_ESCAPE:
+              for receiver in clients_socks:
+                receiver.send("serverdown".encode('utf-8'))
+                receiver.recv(bufsize)
+              pygame.quit()
+              sys.exit()  
+
+        rready, wready, xready = select.select(readfds, [], [],0.05) #処理を可能な物から順に選択
+
+        for sock in rready:                 #選択された処理を順次遂行
+          msg = sock.recv(bufsize).decode('utf-8')
+          sock.send("ok".encode('utf-8'))
+          print(msg)
+          if msg == "QUIT":
+            sock.close()
+            readfds.remove(sock)
+            clients_socks.remove(sock)
+            for receiver in clients_socks:
+              receiver.send("serverdown".encode('utf-8'))
+              msg = receiver.recv(bufsize).decode('utf-8')
+            pygame.quit()
+            sys.exit()
+          if msg == "Discard":
+            msg1 = sock.recv(bufsize).decode('utf-8')
+            sock.send("ok".encode('utf-8'))
+            msg2 = sock.recv(bufsize).decode('utf-8')
+            msg2_split = msg2.split("/")
+            Player02 = int(msg1)
+            Player_Data[Player02][2][0] = int(msg2_split[0])
+            Player_Data[Player02][2][1] = int(msg2_split[1])
+            Player_Data[Player02][2][2] = int(msg2_split[2])
+            Player_Data[Player02][2][3] = int(msg2_split[3])
+            Player_Data[Player02][2][4] = int(msg2_split[4])
+            Player_Data[Player02][1] = Player_Data[Player02][2][0]+Player_Data[Player02][2][1]+Player_Data[Player02][2][2]+Player_Data[Player02][2][3]+Player_Data[Player02][2][4]
+            burst_player_num -= 1
+            if burst_player_num == 0:
+              Dice7 = False
+      
+      if Dice7_2:
+        for receiver in clients_socks:
+          receiver.send("BurstEnd".encode('utf-8'))
+          receiver.recv(bufsize).decode('utf-8')
+        msg0 = str(Player_Data[0][2][0])+"/"+str(Player_Data[0][2][1])+"/"+str(Player_Data[0][2][2])+"/"+str(Player_Data[0][2][3])+"/"+str(Player_Data[0][2][4])
+        msg1 = str(Player_Data[1][2][0])+"/"+str(Player_Data[1][2][1])+"/"+str(Player_Data[1][2][2])+"/"+str(Player_Data[1][2][3])+"/"+str(Player_Data[1][2][4])
+        msg2 = str(Player_Data[2][2][0])+"/"+str(Player_Data[2][2][1])+"/"+str(Player_Data[2][2][2])+"/"+str(Player_Data[2][2][3])+"/"+str(Player_Data[2][2][4])
+        msg3 = str(Player_Data[3][2][0])+"/"+str(Player_Data[3][2][1])+"/"+str(Player_Data[3][2][2])+"/"+str(Player_Data[3][2][3])+"/"+str(Player_Data[3][2][4])
+        for receiver in clients_socks:
+          receiver.send(msg0.encode('utf-8'))
+          receiver.recv(bufsize).decode('utf-8')
+          receiver.send(msg1.encode('utf-8'))
+          receiver.recv(bufsize).decode('utf-8')
+          receiver.send(msg2.encode('utf-8'))
+          receiver.recv(bufsize).decode('utf-8')
+          receiver.send(msg3.encode('utf-8'))
+          receiver.recv(bufsize).decode('utf-8')
+
+
+      #####################################
+      ###　7が出た時の処理(バースト)(終了) ###
+      ####################################
+      ################################
+      ###　7が出た時の処理(蛮族移動) ###
+      ################################
+
+      #####################################
+      ###　7が出た時の処理(蛮族移動)(終了) ###
+      #####################################
 
       ##################
       ###  本体処理  ###
