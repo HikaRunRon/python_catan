@@ -583,6 +583,7 @@ def main(): #サーバー側
       ######################################################
       running1 = True
       Dice7 = False
+      bandit = False
       while running1:
         
         pygame.display.update()
@@ -648,6 +649,7 @@ def main(): #サーバー側
                       Player_Data[a][2][Mapdata_Mass[i][0]-1] += b
             else:
               Dice7 = True
+              bandit = True
             running1=False
             svd.draw_server(screen,Mapdata_Mass,Mapdata_Side,Mapdata_Edge,Player_Data,land,landnumber,backlog)
             svd.draw_image(screen,"./picture/Dice/Roll_of_Dice.png",60,540)
@@ -758,8 +760,8 @@ def main(): #サーバー側
       ###　7が出た時の処理(蛮族移動) ###
       ################################
 
-      if Dice7:
-        while Dice7:
+      if bandit:
+        while bandit:
           pygame.display.update()
           pygame.time.wait(50)
           for event in pygame.event.get():  #キーボード操作　または　マウス操作
@@ -813,9 +815,74 @@ def main(): #サーバー側
               svd.draw_image(screen,"./picture/frame.png",540,540)
               svd.draw_Dice(screen,Dice1,Dice2) 
               pygame.display.update()
-              Dice7=False
-        Dice7=True
-        
+              bandit=False
+        bandit=True
+        while bandit:
+          pygame.display.update()
+          pygame.time.wait(50)
+          for event in pygame.event.get():  #キーボード操作　または　マウス操作
+            if event.type == QUIT:
+              for receiver in clients_socks:
+                receiver.send("serverdown".encode('utf-8'))
+                receiver.recv(bufsize)
+              pygame.quit()
+              sys.exit()
+            if event.type == KEYDOWN:
+              if event.key == K_ESCAPE:
+                for receiver in clients_socks:
+                  receiver.send("serverdown".encode('utf-8'))
+                  receiver.recv(bufsize)
+                pygame.quit()
+                sys.exit()  
+  
+          rready, wready, xready = select.select(readfds, [], [],0.05) #処理を可能な物から順に選択
+  
+          for sock in rready:                 #選択された処理を順次遂行
+            msg = sock.recv(bufsize).decode('utf-8')
+            sock.send("ok".encode('utf-8'))
+            print("rob:",msg)
+            if msg == "QUIT":
+              sock.close()
+              readfds.remove(sock)
+              clients_socks.remove(sock)
+              for receiver in clients_socks:
+                receiver.send("serverdown".encode('utf-8'))
+                msg = receiver.recv(bufsize).decode('utf-8')
+              pygame.quit()
+              sys.exit()
+            if msg == "Rob":
+              msg1 = sock.recv(bufsize).decode('utf-8')
+              sock.send("ok".encode('utf-8'))
+              msg2 = sock.recv(bufsize).decode('utf-8')
+              sock.send("ok".encode('utf-8'))
+              msg3 = sock.recv(bufsize).decode('utf-8')
+              sock.send("ok".encode('utf-8'))
+              for receiver in clients_socks:
+                if receiver!=sock:
+                  receiver.send(msg.encode('utf-8'))
+                  receiver.recv(bufsize).decode('utf-8')
+                  receiver.send(msg1.encode('utf-8'))
+                  receiver.recv(bufsize).decode('utf-8')
+                  receiver.send(msg2.encode('utf-8'))
+                  receiver.recv(bufsize).decode('utf-8')
+                  receiver.send(msg3.encode('utf-8'))
+                  receiver.recv(bufsize).decode('utf-8')
+              player03 = int(msg1)
+              player04 = int(msg2)
+              card_num = int(msg3)
+              Player_Data[player03][1]-=1
+              Player_Data[player03][2][card_num]-=1
+              Player_Data[player04][1]+=1
+              Player_Data[player04][2][card_num]+=1
+              bandit=False
+            if msg == "NoRob":
+              for receiver in clients_socks:
+                if receiver!=sock:
+                  receiver.send(msg.encode('utf-8'))
+                  receiver.recv(bufsize).decode('utf-8')
+              bandit=False
+                
+
       #####################################
       ###　7が出た時の処理(蛮族移動)(終了) ###
       #####################################
@@ -823,6 +890,11 @@ def main(): #サーバー側
       ##################
       ###  本体処理  ###
       ##################
+      svd.draw_server(screen,Mapdata_Mass,Mapdata_Side,Mapdata_Edge,Player_Data,land,landnumber,backlog)
+      svd.draw_image(screen,"./picture/Dice/Roll_of_Dice.png",60,540)
+      svd.draw_image(screen,"./picture/frame.png",540,540)
+      svd.draw_Dice(screen,Dice1,Dice2) 
+      pygame.display.update()
       running1=True
       while running1:
         pygame.display.update()
@@ -847,7 +919,7 @@ def main(): #サーバー側
         for sock in rready:                 #選択された処理を順次遂行
           msg = sock.recv(bufsize).decode('utf-8')
           sock.send("ok".encode('utf-8'))
-          print(msg)
+          print("main:",msg)
           if msg == "QUIT":
             sock.close()
             readfds.remove(sock)

@@ -405,13 +405,15 @@ def draw_candidate_bandit(screen,Mapdata_Mass):
       l.append(i)
   return l
 
-def draw_candidate_rob(screen,Mapdata_Mass,Player_Data,Mapdata_Edge,pos):
+def draw_candidate_rob(screen,Mapdata_Mass,Player_Data,Mapdata_Edge,pos,yourturn):
   l = []
   for i in Mapdata_Mass[pos][3]:
-    if Mapdata_Edge[i][0]!=0:
+    if Mapdata_Edge[i][0]!=-1:
       x = Mapdata_Edge[i][0]/2
       x = int(x)
+      if x==yourturn:
+        continue
       if Player_Data[x][1]!=0:
         draw_image(screen,"./picture/candidate.png",Mapdata_Edge[i][4][0],Mapdata_Edge[i][4][1])
-        l.appnd(i)
+        l.append(i)
   return l
