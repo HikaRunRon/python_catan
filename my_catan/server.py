@@ -247,6 +247,7 @@ def main(): #サーバー側
   #所持ポイント、所持資源カード合計枚数、所持資源カード枚数内訳(木、レンガ、羊、小麦、石)、所持発展カード合計枚数,その内訳(騎士、街道建設、発見、独占、大聖堂、図書館、市場、議会、大学),残り建設可能開拓地数、残り建設可能都市数、残り建設可能街道数、交易路の長さ、騎士力,優位トレード所持(1(wood2-1),2(brick2-1),3(sheep2-1),4(wheat2-1),5(ore2-1),0(3-1))(所持しているときは1(デフォルト0))
 
   secretcard=[0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,1,2,2,3,3,4,5,6,7,8] #発展カード順番決め(騎士14、街道建設2、発見2、独占2、大聖堂1、図書館1、市場1、議会1、大学1)
+  bandit_pos = [-1]
   random.shuffle(secretcard)
 
   random.shuffle(clients_socks) #ここでシャッフルされたものがそのままプレイヤーの順番になる。
@@ -382,6 +383,7 @@ def main(): #サーバー側
   for i in range(19):
     if land[i]==0:
       Mapdata_Mass[i][2] = 1
+      bandit_pos[0]=i
     Mapdata_Mass[i][0]=land[i]
     Mapdata_Mass[i][1]=landnumber[i]
 
@@ -730,6 +732,7 @@ def main(): #サーバー側
               Dice7 = False
       
       if Dice7_2:
+        Dice7 = True
         for receiver in clients_socks:
           receiver.send("BurstEnd".encode('utf-8'))
           receiver.recv(bufsize).decode('utf-8')
@@ -755,6 +758,64 @@ def main(): #サーバー側
       ###　7が出た時の処理(蛮族移動) ###
       ################################
 
+      if Dice7:
+        while Dice7:
+          pygame.display.update()
+          pygame.time.wait(50)
+          for event in pygame.event.get():  #キーボード操作　または　マウス操作
+            if event.type == QUIT:
+              for receiver in clients_socks:
+                receiver.send("serverdown".encode('utf-8'))
+                receiver.recv(bufsize)
+              pygame.quit()
+              sys.exit()
+            if event.type == KEYDOWN:
+              if event.key == K_ESCAPE:
+                for receiver in clients_socks:
+                  receiver.send("serverdown".encode('utf-8'))
+                  receiver.recv(bufsize)
+                pygame.quit()
+                sys.exit()  
+  
+          rready, wready, xready = select.select(readfds, [], [],0.05) #処理を可能な物から順に選択
+  
+          for sock in rready:                 #選択された処理を順次遂行
+            msg = sock.recv(bufsize).decode('utf-8')
+            sock.send("ok".encode('utf-8'))
+            print(msg)
+            if msg == "QUIT":
+              sock.close()
+              readfds.remove(sock)
+              clients_socks.remove(sock)
+              for receiver in clients_socks:
+                receiver.send("serverdown".encode('utf-8'))
+                msg = receiver.recv(bufsize).decode('utf-8')
+              pygame.quit()
+              sys.exit()
+            if msg == "Bandit":
+              msg1 = sock.recv(bufsize).decode('utf-8')
+              sock.send("ok".encode('utf-8'))
+              msg2 = sock.recv(bufsize).decode('utf-8')
+              sock.send("ok".encode('utf-8'))
+              for receiver in clients_socks:
+                if receiver!=sock:
+                  receiver.send(msg.encode('utf-8'))
+                  receiver.recv(bufsize).decode('utf-8')
+                  receiver.send(msg1.encode('utf-8'))
+                  receiver.recv(bufsize).decode('utf-8')
+                  receiver.send(msg2.encode('utf-8'))
+                  receiver.recv(bufsize).decode('utf-8')
+              Mapdata_Mass[bandit_pos[0]][2]=0
+              Mapdata_Mass[int(msg2)][2]=1
+              bandit_pos[0]=int(msg2)
+              svd.draw_server(screen,Mapdata_Mass,Mapdata_Side,Mapdata_Edge,Player_Data,land,landnumber,backlog)
+              svd.draw_image(screen,"./picture/Dice/Roll_of_Dice.png",60,540)
+              svd.draw_image(screen,"./picture/frame.png",540,540)
+              svd.draw_Dice(screen,Dice1,Dice2) 
+              pygame.display.update()
+              Dice7=False
+        Dice7=True
+        
       #####################################
       ###　7が出た時の処理(蛮族移動)(終了) ###
       #####################################
