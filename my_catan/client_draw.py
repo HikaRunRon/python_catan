@@ -190,6 +190,8 @@ def draw_server(screen,Mapdata_Mass,Mapdata_Side,Mapdata_Edge,Player_Data,land,l
   draw_image(screen,"./picture/Resource_Card/wheatcard.png",330,560)
   draw_image(screen,"./picture/Resource_Card/orecard.png",390,560)
   draw_image(screen,"./picture/Resource_Card/secretcard.png",450,560)
+  draw_image(screen,"./picture/Army.png",450,450)
+  draw_image(screen,"./picture/Road.png",450,500)
 
   draw_image(screen,"./picture/Resource_Card/woodcard2.png",40,150)
   draw_image(screen,"./picture/Resource_Card/brickcard2.png",40,210)
@@ -197,6 +199,8 @@ def draw_server(screen,Mapdata_Mass,Mapdata_Side,Mapdata_Edge,Player_Data,land,l
   draw_image(screen,"./picture/Resource_Card/wheatcard2.png",40,330)
   draw_image(screen,"./picture/Resource_Card/orecard2.png",40,390)
   draw_image(screen,"./picture/Resource_Card/secretcard2.png",40,450)
+  draw_image(screen,"./picture/Army.png",150,450)
+  draw_image(screen,"./picture/Road.png",100,450)
 
   draw_image(screen,"./picture/Resource_Card/woodcard2.png",560,450)
   draw_image(screen,"./picture/Resource_Card/brickcard2.png",560,390)
@@ -204,6 +208,8 @@ def draw_server(screen,Mapdata_Mass,Mapdata_Side,Mapdata_Edge,Player_Data,land,l
   draw_image(screen,"./picture/Resource_Card/wheatcard2.png",560,270)
   draw_image(screen,"./picture/Resource_Card/orecard2.png",560,210)
   draw_image(screen,"./picture/Resource_Card/secretcard2.png",560,150)
+  draw_image(screen,"./picture/Army.png",450,150)
+  draw_image(screen,"./picture/Road.png",500,150)
 
   if backlog == 4:
     draw_image(screen,"./picture/Resource_Card/woodcard.png",450,40)
@@ -212,6 +218,8 @@ def draw_server(screen,Mapdata_Mass,Mapdata_Side,Mapdata_Edge,Player_Data,land,l
     draw_image(screen,"./picture/Resource_Card/wheatcard.png",270,40)
     draw_image(screen,"./picture/Resource_Card/orecard.png",210,40)
     draw_image(screen,"./picture/Resource_Card/secretcard.png",150,40)
+    draw_image(screen,"./picture/Army.png",150,150)
+    draw_image(screen,"./picture/Road.png",150,100)
 
   draw_image(screen,select_num_image(Player_Data[yourturn][2][0]),150,560)
   draw_image(screen,select_num_image(Player_Data[yourturn][2][1]),210,560)
@@ -219,6 +227,13 @@ def draw_server(screen,Mapdata_Mass,Mapdata_Side,Mapdata_Edge,Player_Data,land,l
   draw_image(screen,select_num_image(Player_Data[yourturn][2][3]),330,560)
   draw_image(screen,select_num_image(Player_Data[yourturn][2][4]),390,560)
   draw_image(screen,select_num_image(Player_Data[yourturn][3]),450,560)
+  if Player_Data[yourturn][11]==1:
+    draw_image(screen,"./picture/Largest_Army.png",450,450)
+  if Player_Data[yourturn][9]==1:
+    draw_image(screen,"./picture/Longest_Road.png",450,500)
+  draw_image(screen,select_num_image(Player_Data[yourturn][10]),450,450)
+  draw_image(screen,select_num_image(Player_Data[yourturn][8]),450,500)
+  
 
   draw_image(screen,select_num_image(Player_Data[leftside][2][0]),40,150)
   draw_image(screen,select_num_image(Player_Data[leftside][2][1]),40,210)
@@ -226,6 +241,12 @@ def draw_server(screen,Mapdata_Mass,Mapdata_Side,Mapdata_Edge,Player_Data,land,l
   draw_image(screen,select_num_image(Player_Data[leftside][2][3]),40,330)
   draw_image(screen,select_num_image(Player_Data[leftside][2][4]),40,390)
   draw_image(screen,select_num_image(Player_Data[leftside][3]),40,450)
+  if Player_Data[leftside][11]==1:
+    draw_image(screen,"./picture/Largest_Army.png",150,450)
+  if Player_Data[leftside][9]==1:
+    draw_image(screen,"./picture/Longest_Road.png",100,450)
+  draw_image(screen,select_num_image(Player_Data[leftside][10]),150,450)
+  draw_image(screen,select_num_image(Player_Data[leftside][8]),100,450)
 
   if backlog == 3:
     draw_image(screen,select_num_image(Player_Data[rightside][2][0]),560,450)
@@ -234,6 +255,12 @@ def draw_server(screen,Mapdata_Mass,Mapdata_Side,Mapdata_Edge,Player_Data,land,l
     draw_image(screen,select_num_image(Player_Data[rightside][2][3]),560,270)
     draw_image(screen,select_num_image(Player_Data[rightside][2][4]),560,210)
     draw_image(screen,select_num_image(Player_Data[rightside][3]),560,150)
+    if Player_Data[rightside][11]==1:
+      draw_image(screen,"./picture/Largest_Army.png",450,150)
+    if Player_Data[rightside][9]==1:
+      draw_image(screen,"./picture/Longest_Road.png",500,150)
+    draw_image(screen,select_num_image(Player_Data[rightside][10]),450,150)
+    draw_image(screen,select_num_image(Player_Data[rightside][8]),500,150)
   else:
     draw_image(screen,select_num_image(Player_Data[front][2][0]),450,40)
     draw_image(screen,select_num_image(Player_Data[front][2][1]),390,40)
@@ -241,6 +268,12 @@ def draw_server(screen,Mapdata_Mass,Mapdata_Side,Mapdata_Edge,Player_Data,land,l
     draw_image(screen,select_num_image(Player_Data[front][2][3]),270,40)
     draw_image(screen,select_num_image(Player_Data[front][2][4]),210,40)
     draw_image(screen,select_num_image(Player_Data[front][3]),150,40)
+    if Player_Data[front][11]==1:
+      draw_image(screen,"./picture/Largest_Army.png",150,150)
+    if Player_Data[front][9]==1:
+      draw_image(screen,"./picture/Longest_Road.png",150,100)
+    draw_image(screen,select_num_image(Player_Data[front][10]),150,150)
+    draw_image(screen,select_num_image(Player_Data[front][8]),150,100)
 
     draw_image(screen,select_num_image(Player_Data[rightside][2][0]),560,450)
     draw_image(screen,select_num_image(Player_Data[rightside][2][1]),560,390)
@@ -248,6 +281,12 @@ def draw_server(screen,Mapdata_Mass,Mapdata_Side,Mapdata_Edge,Player_Data,land,l
     draw_image(screen,select_num_image(Player_Data[rightside][2][3]),560,270)
     draw_image(screen,select_num_image(Player_Data[rightside][2][4]),560,210)
     draw_image(screen,select_num_image(Player_Data[rightside][3]),560,150)
+    if Player_Data[rightside][11]==1:
+      draw_image(screen,"./picture/Largest_Army.png",450,150)
+    if Player_Data[rightside][9]==1:
+      draw_image(screen,"./picture/Longest_Road.png",500,150)
+    draw_image(screen,select_num_image(Player_Data[rightside][10]),450,150)
+    draw_image(screen,select_num_image(Player_Data[rightside][8]),500,150)
   for i in range(19):
     if Mapdata_Mass[i][2]==1:
       draw_image(screen,"./picture/Tile_Number/bandit.png",Mapdata_Mass[i][4][0],Mapdata_Mass[i][4][1])

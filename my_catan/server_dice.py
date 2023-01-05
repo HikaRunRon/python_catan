@@ -99,7 +99,7 @@ def server_dice(running1,clients_socks,bufsize,readfds,Dice1,Dice2,Mapdata_Mass,
       if Player_Data[i][1]>=8:
         burst_player_num += 1
       
-  if burst_player_num==0:
+  if burst_player_num==0 and Dice7[0]:
     Dice7[0]=False
     Dice7_2[0]=False
     for receiver in clients_socks: #バースト処理の開始をクライアントに通知

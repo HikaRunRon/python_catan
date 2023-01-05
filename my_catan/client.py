@@ -83,6 +83,7 @@ def main(): #クライアント側
   #所持ポイント、所持資源カード合計枚数、所持資源カード枚数内訳(木、レンガ、羊、小麦、石)、所持発展カード合計枚数,その内訳(騎士、街道建設、発見、独占、大聖堂、図書館、市場、議会、大学),残り建設可能開拓地数、残り建設可能都市数、残り建設可能街道数、交易路の長さ、最長交易路の有無、騎士力,最大騎士力の有無、優位トレード所持(1(wood2-1),2(brick2-1),3(sheep2-1),4(wheat2-1),5(ore2-1),0(3-1))(所持しているときは1(デフォルト0))
 
   yourturn = -1 #プレイヤーのターン、後々サーバーから通知が来る。
+  secretcard_pos=[0]
 
   with closing(sock):
     running = True
@@ -367,10 +368,13 @@ def main(): #クライアント側
                 Player_Data[player01][2][1] -= 1
                 Player_Data[player01][7] -= 1
                 if Player_Data[player01][9]==0 and Player_Data[player01][8]>=5:
+                  longest_judge = True
                   for j in range(4):
                     if j!=player01:
-                      if Player_Data[j][8]<Player_Data[player01][8]:
-                        Player_Data[player01][9]=1
+                      if Player_Data[j][8]>=Player_Data[player01][8]:
+                        longest_judge = False
+                  if longest_judge:
+                    Player_Data[player01][9]=1
                 cld.draw_server(screen,Mapdata_Mass,Mapdata_Side,Mapdata_Edge,Player_Data,land,landnumber,backlog,yourturn,rightside,front,leftside)
                 cld.draw_image(screen,"./picture/Dice/Roll_of_Dice.png",60,540)
                 cld.draw_Dice(screen,Dice1[0],Dice2[0])
@@ -545,10 +549,14 @@ def main(): #クライアント側
                               Player_Data[yourturn][2][1] -= 1
                               Player_Data[yourturn][7] -= 1
                               if Player_Data[yourturn][9]==0 and Player_Data[yourturn][8]>=5:
+                                longest_judge = True
                                 for j in range(4):
                                   if j!=yourturn:
-                                    if Player_Data[j][8]<Player_Data[yourturn][8]:
-                                      Player_Data[yourturn][9]=1
+                                    if Player_Data[j][8]>=Player_Data[yourturn][8]:
+                                      longest_judge = False
+                                if longest_judge:
+                                  Player_Data[yourturn][9]=1
+                                      
                               player_str = str(yourturn)
                               road_length_str = str(road_length)
                               sock.send("Road".encode('utf-8')) #道の情報を送信する

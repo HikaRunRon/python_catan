@@ -61,6 +61,7 @@ def client_first_phase(running,myturn,sock,readfds,bufsize,Mapdata_Edge,once,Map
           pos = int(msg2)
           player = int(msg3)
           Mapdata_Side[pos][0]=player #クライアント側のデータ更新完了
+          Player_Data[player][8] = longest_road.longestroad(Mapdata_Side,player)
           cld.draw_server(screen,Mapdata_Mass,Mapdata_Side,Mapdata_Edge,Player_Data,land,landnumber,backlog,yourturn,rightside,front,leftside) #データをもとに描画更新
       elif msg == "firstphaseend":
         running = False  
@@ -187,4 +188,5 @@ def client_first_phase(running,myturn,sock,readfds,bufsize,Mapdata_Edge,once,Map
         print(pos)
         player = int(msg3)
         Mapdata_Side[pos][0]=player #クライアント側のデータ更新完了
+        Player_Data[player][8] = longest_road.longestroad(Mapdata_Side,player)
         cld.draw_server(screen,Mapdata_Mass,Mapdata_Side,Mapdata_Edge,Player_Data,land,landnumber,backlog,yourturn,rightside,front,leftside) #データをもとに描画更新
