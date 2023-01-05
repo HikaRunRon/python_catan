@@ -79,7 +79,7 @@ def main(): #クライアント側
   [-1,3,[47,48,53],[35,37,46],[349,469]],[-1,-1,[38,48],[26,36],[325,510]],[-1,5,[49,54],[28,39],[398,132]],[-1,-1,[54,55,62],[38,40,47],[423,173]],[-1,-1,[50,55,56],[30,39,41],[398,216]],[-1,-1,[56,57,63],[40,42,49],[423,258]],[-1,-1,[51,57,58],[32,41,43],[398,300]],[-1,-1,[58,59,64],[42,44,51],[423,342]],[-1,-1,[52,59,60],[34,43,45],[398,384]],
   [-1,-1,[60,61,65],[44,46,53],[423,427]],[-1,3,[53,61],[36,45],[398,469]],[-1,0,[62,66],[39,48],[472,173]],[-1,0,[66,67],[47,49],[496,216]],[-1,-1,[63,67,68],[41,48,50],[472,258]],[-1,2,[68,69],[49,51],[496,300]],[-1,2,[64,69,70],[43,50,52],[472,342]],[-1,0,[70,71],[51,53],[496,384]],[-1,0,[65,71],[45,52],[472,427]]]
 
-  Player_Data = [[0,0,[0,0,0,0,0],0,[0,0,0,0,0,0,0,0,0],5,4,15,0,0,0,0,[0,0,0,0,0,0]],[0,0,[0,0,0,0,0],0,[0,0,0,0,0,0,0,0,0],5,4,15,0,0,0,0,[0,0,0,0,0,0]],[0,0,[0,0,0,0,0],0,[0,0,0,0,0,0,0,0,0],5,4,15,0,0,0,0,[0,0,0,0,0,0]],[0,0,[0,0,0,0,0],0,[0,0,0,0,0,0,0,0,0],5,4,15,0,0,0,0,[0,0,0,0,0,0]]]
+  Player_Data = [[0,0,[0,0,0,0,0],0,[0,0,0,0,0,0,0,0,0],3,4,13,0,0,0,0,[0,0,0,0,0,0]],[0,0,[0,0,0,0,0],0,[0,0,0,0,0,0,0,0,0],3,4,13,0,0,0,0,[0,0,0,0,0,0]],[0,0,[0,0,0,0,0],0,[0,0,0,0,0,0,0,0,0],3,4,13,0,0,0,0,[0,0,0,0,0,0]],[0,0,[0,0,0,0,0],0,[0,0,0,0,0,0,0,0,0],3,4,13,0,0,0,0,[0,0,0,0,0,0]]]
   #所持ポイント、所持資源カード合計枚数、所持資源カード枚数内訳(木、レンガ、羊、小麦、石)、所持発展カード合計枚数,その内訳(騎士、街道建設、発見、独占、大聖堂、図書館、市場、議会、大学),残り建設可能開拓地数、残り建設可能都市数、残り建設可能街道数、交易路の長さ、最長交易路の有無、騎士力,最大騎士力の有無、優位トレード所持(1(wood2-1),2(brick2-1),3(sheep2-1),4(wheat2-1),5(ore2-1),0(3-1))(所持しているときは1(デフォルト0))
 
   yourturn = -1 #プレイヤーのターン、後々サーバーから通知が来る。
@@ -341,12 +341,11 @@ def main(): #クライアント側
                 sys.exit()
               elif msg=="TurnEnd":
                 running1[0]=False
-
+        
+              #################
+              ###  街道建設  ###
+              #################
               elif msg == "Road":
-
-                #################
-                ###  街道建設  ###
-                #################
     
                 msg1=sock.recv(bufsize).decode(('utf-8')) #操作しているクライアント側からの送信
                 sock.send("ok".encode('utf-8'))
@@ -378,9 +377,66 @@ def main(): #クライアント側
                 cld.draw_image(screen,"./picture/frame.png",540,540)
                 pygame.display.update()
 
-                ######################
-                ###  街道建設(終了) ###
-                ######################
+              ######################
+              ###  街道建設(終了) ###
+              ######################
+        
+              ###################
+              ###  開拓地建設  ###
+              ###################
+              elif msg == "Settlement":
+    
+                msg1=sock.recv(bufsize).decode(('utf-8')) #操作しているクライアント側からの送信
+                sock.send("ok".encode('utf-8'))
+                msg2=sock.recv(bufsize).decode(('utf-8'))
+                sock.send("ok".encode('utf-8'))
+    
+                position = int(msg1)
+                player01 = int(msg2)
+    
+                Mapdata_Edge[position][0]=player01*2
+                Player_Data[player01][1] -= 4
+                Player_Data[player01][2][0] -= 1
+                Player_Data[player01][2][1] -= 1
+                Player_Data[player01][2][2] -= 1
+                Player_Data[player01][2][3] -= 1
+                Player_Data[player01][5] -= 1
+                cld.draw_server(screen,Mapdata_Mass,Mapdata_Side,Mapdata_Edge,Player_Data,land,landnumber,backlog,yourturn,rightside,front,leftside)
+                cld.draw_image(screen,"./picture/Dice/Roll_of_Dice.png",60,540)
+                cld.draw_Dice(screen,Dice1[0],Dice2[0])
+                cld.draw_image(screen,"./picture/frame.png",540,540)
+                pygame.display.update()
+              ########################
+              ###  開拓地建設(終了)  ###
+              ########################
+
+              #################
+              ###  都市建設  ###
+              #################
+              elif msg == "City":
+    
+                msg1=sock.recv(bufsize).decode(('utf-8')) #操作しているクライアント側からの送信
+                sock.send("ok".encode('utf-8'))
+                msg2=sock.recv(bufsize).decode(('utf-8'))
+                sock.send("ok".encode('utf-8'))
+    
+                position = int(msg1)
+                player01 = int(msg2)
+    
+                Mapdata_Edge[position][0]=player01*2+1
+                Player_Data[player01][1] -= 5
+                Player_Data[player01][2][3] -= 2
+                Player_Data[player01][2][4] -= 3
+                Player_Data[player01][5] += 1
+                Player_Data[player01][6] -= 1
+                cld.draw_server(screen,Mapdata_Mass,Mapdata_Side,Mapdata_Edge,Player_Data,land,landnumber,backlog,yourturn,rightside,front,leftside)
+                cld.draw_image(screen,"./picture/Dice/Roll_of_Dice.png",60,540)
+                cld.draw_Dice(screen,Dice1[0],Dice2[0])
+                cld.draw_image(screen,"./picture/frame.png",540,540)
+                pygame.display.update()
+              #######################
+              ###  都市建設(終了)  ###
+              #######################
 
           ######################
           ### 本体処理(終了)　###
@@ -400,7 +456,6 @@ def main(): #クライアント側
           cld.draw_image(screen,"./picture/frame.png",540,540)
           cld.draw_image(screen,"./picture/Dice/Dice_button.png",540,540)
           
-
         ############
         ## Myturn ##　
         ############
@@ -447,13 +502,11 @@ def main(): #クライアント側
                   sock.send("ok".encode('utf-8'))
                   running1[0]=False #ループから抜ける
 
-                #################
-                ###  街道建設  ###
-                #################
-
                 if 481<=x and x<=540 and 1<=y and y<=60 and Player_Data[yourturn][2][0]>=1 and Player_Data[yourturn][2][1]>=1 and Player_Data[yourturn][7]>=1: #街道建設
-
                   road_running = [True]
+                  #################
+                  ###  街道建設  ###
+                  #################
                   cld.draw_server(screen,Mapdata_Mass,Mapdata_Side,Mapdata_Edge,Player_Data,land,landnumber,backlog,yourturn,rightside,front,leftside)
                   cld.draw_image(screen,"./picture/Dice/Roll_of_Dice.png",60,540)
                   cld.draw_image(screen,"./picture/frame.png",540,540)
@@ -461,7 +514,6 @@ def main(): #クライアント側
                   cld.draw_image(screen,"./picture/Turnend_button.png",540,540)
                   cld.draw_image(screen,"./picture/Action.png",540,60)
                   road_candidate = cld.draw_candidate_road(screen,yourturn,Mapdata_Edge,Mapdata_Side)
-
 
                   while road_running[0]:
                     pygame.display.update()
@@ -533,16 +585,165 @@ def main(): #クライアント側
                         pygame.quit()
                         sys.exit()
 
-                ######################
-                ###  街道建設(終了) ###
-                ######################
+                  ######################
+                  ###  街道建設(終了) ###
+                  ######################
 
-                if 541<=x and x<=600 and 1<=y and y<=60: #開拓地建設
-                  settlement_running = True
-                if 481<=x and x<=540 and 61<=y and y<=120: #都市建設
-                  city_running = True
+                if 541<=x and x<=600 and 1<=y and y<=60 and Player_Data[yourturn][2][0]>=1 and Player_Data[yourturn][2][1]>=1 and Player_Data[yourturn][2][2]>=1 and Player_Data[yourturn][2][3]>=1 and Player_Data[yourturn][5]>=1: #開拓地建設
+                  settlement_running = [True]
+                  ###################
+                  ###  開拓地建築  ###
+                  ###################
+                  cld.draw_server(screen,Mapdata_Mass,Mapdata_Side,Mapdata_Edge,Player_Data,land,landnumber,backlog,yourturn,rightside,front,leftside)
+                  cld.draw_image(screen,"./picture/Dice/Roll_of_Dice.png",60,540)
+                  cld.draw_image(screen,"./picture/frame.png",540,540)
+                  cld.draw_Dice(screen,Dice1[0],Dice2[0])
+                  cld.draw_image(screen,"./picture/Turnend_button.png",540,540)
+                  cld.draw_image(screen,"./picture/Action.png",540,60)
+                  settlement_candidate = cld.draw_candidate_settlement(screen,yourturn,Mapdata_Edge,Mapdata_Side,1)
+                  while settlement_running[0]:
+                    pygame.display.update()
+                    pygame.time.wait(50) #20fps
+                    
+                    for event in pygame.event.get():
+                      if event.type == QUIT:
+                        sock.send("QUIT".encode('utf-8'))
+                        pygame.quit()
+                        sys.exit()
+                      if event.type == KEYDOWN:
+                        if event.key == K_ESCAPE:
+                          sock.send("QUIT".encode('utf-8'))
+                          pygame.quit()
+                          sys.exit()
+                      if event.type == MOUSEBUTTONDOWN and event.button == 1: #サイコロボタンのクリック
+                        x, y = event.pos
+                        if 541<=x and x<=600 and 1<=y and y<=60: #枠内左クリックでwhileを抜け、次のページへ
+                          settlement_running[0]=False #ループから抜ける
+                        else:
+                          for i in settlement_candidate:
+                            if (Mapdata_Edge[i][4][0]-x)*(Mapdata_Edge[i][4][0]-x)+(Mapdata_Edge[i][4][1]-y)*(Mapdata_Edge[i][4][1]-y)<=500:
+                              i_str = str(i)
+                              Mapdata_Edge[i][0]=yourturn*2
+                              Player_Data[yourturn][1] -= 4
+                              Player_Data[yourturn][2][0] -= 1
+                              Player_Data[yourturn][2][1] -= 1
+                              Player_Data[yourturn][2][2] -= 1
+                              Player_Data[yourturn][2][3] -= 1
+                              Player_Data[yourturn][5] -= 1
+                              player_str = str(yourturn)
+                              sock.send("Settlement".encode('utf-8')) #開拓地の情報を送信する
+                              sock.recv(bufsize)
+                              sock.send(i_str.encode('utf-8')) #どこに開拓地を置くのか
+                              sock.recv(bufsize)
+                              sock.send(player_str.encode('utf-8')) #誰が開拓地を置くのか
+                              sock.recv(bufsize)           
+                              settlement_running[0]=False
+                              break
+
+                        if settlement_running[0]==False:
+                          cld.draw_server(screen,Mapdata_Mass,Mapdata_Side,Mapdata_Edge,Player_Data,land,landnumber,backlog,yourturn,rightside,front,leftside)
+                          cld.draw_image(screen,"./picture/Dice/Roll_of_Dice.png",60,540)
+                          cld.draw_image(screen,"./picture/frame.png",540,540)
+                          cld.draw_Dice(screen,Dice1[0],Dice2[0])
+                          cld.draw_image(screen,"./picture/Turnend_button.png",540,540)
+                          cld.draw_image(screen,"./picture/Action.png",540,60)
+                          pygame.display.update()
+
+                    if settlement_running[0] == False: 
+                      break 
+        
+                    rready, wready, xready = select.select(readfds, [], [],0.05) #処理を可能な物から順に選択
+                    for sock in rready:                                   #選択された処理を順次遂行
+                      msg = sock.recv(bufsize).decode('utf-8')
+                      print(msg)
+                      sock.send("ok".encode('utf-8'))
+                      if msg == "serverdown":
+                        pygame.quit()
+                        sys.exit()
+                  ########################
+                  ###  開拓地建設(終了) ###
+                  ########################
+                if 481<=x and x<=540 and 61<=y and y<=120 and Player_Data[yourturn][2][3]>=2 and Player_Data[yourturn][2][4]>=3 and Player_Data[yourturn][6]>=1 and Player_Data[yourturn][5]<=4: #都市建設
+                  city_running = [True]
+                  #################
+                  ###  都市建築  ###
+                  #################
+                  cld.draw_server(screen,Mapdata_Mass,Mapdata_Side,Mapdata_Edge,Player_Data,land,landnumber,backlog,yourturn,rightside,front,leftside)
+                  cld.draw_image(screen,"./picture/Dice/Roll_of_Dice.png",60,540)
+                  cld.draw_image(screen,"./picture/frame.png",540,540)
+                  cld.draw_Dice(screen,Dice1[0],Dice2[0])
+                  cld.draw_image(screen,"./picture/Turnend_button.png",540,540)
+                  cld.draw_image(screen,"./picture/Action.png",540,60)
+                  city_candidate = cld.draw_candidate_city(screen,yourturn,Mapdata_Edge)
+                  while city_running[0]:
+                    pygame.display.update()
+                    pygame.time.wait(50) #20fps
+                    
+                    for event in pygame.event.get():
+                      if event.type == QUIT:
+                        sock.send("QUIT".encode('utf-8'))
+                        pygame.quit()
+                        sys.exit()
+                      if event.type == KEYDOWN:
+                        if event.key == K_ESCAPE:
+                          sock.send("QUIT".encode('utf-8'))
+                          pygame.quit()
+                          sys.exit()
+                      if event.type == MOUSEBUTTONDOWN and event.button == 1:
+                        x, y = event.pos
+                        if 481<=x and x<=540 and 61<=y and y<=120: #枠内左クリックでwhileを抜け、次のページへ
+                          city_running[0]=False #ループから抜ける
+                        else:
+                          for i in city_candidate:
+                            if (Mapdata_Edge[i][4][0]-x)*(Mapdata_Edge[i][4][0]-x)+(Mapdata_Edge[i][4][1]-y)*(Mapdata_Edge[i][4][1]-y)<=500:
+                              i_str = str(i)
+                              Mapdata_Edge[i][0]=yourturn*2+1
+                              Player_Data[yourturn][1] -= 5
+                              Player_Data[yourturn][2][3] -= 2
+                              Player_Data[yourturn][2][4] -= 3
+                              Player_Data[yourturn][5] += 1
+                              Player_Data[yourturn][6] -= 1
+                              player_str = str(yourturn)
+                              sock.send("City".encode('utf-8')) #都市の情報を送信する
+                              sock.recv(bufsize)
+                              sock.send(i_str.encode('utf-8')) #どこに都市を置くのか
+                              sock.recv(bufsize)
+                              sock.send(player_str.encode('utf-8')) #誰が都市を置くのか
+                              sock.recv(bufsize)           
+                              city_running[0]=False
+                              break
+
+                        if city_running[0]==False:
+                          cld.draw_server(screen,Mapdata_Mass,Mapdata_Side,Mapdata_Edge,Player_Data,land,landnumber,backlog,yourturn,rightside,front,leftside)
+                          cld.draw_image(screen,"./picture/Dice/Roll_of_Dice.png",60,540)
+                          cld.draw_image(screen,"./picture/frame.png",540,540)
+                          cld.draw_Dice(screen,Dice1[0],Dice2[0])
+                          cld.draw_image(screen,"./picture/Turnend_button.png",540,540)
+                          cld.draw_image(screen,"./picture/Action.png",540,60)
+                          pygame.display.update()
+
+                    if city_running[0] == False:  #サイコロフリフリメッセージ送信後は即ループ脱出
+                      break 
+        
+                    rready, wready, xready = select.select(readfds, [], [],0.05) #処理を可能な物から順に選択
+                    for sock in rready:                                   #選択された処理を順次遂行
+                      msg = sock.recv(bufsize).decode('utf-8')
+                      print(msg)
+                      sock.send("ok".encode('utf-8'))
+                      if msg == "serverdown":
+                        pygame.quit()
+                        sys.exit()
+                  ######################
+                  ###  都市建設(終了) ###
+                  ######################
                 if 541<=x and x<=600 and 61<=y and y<=120: #発展
-                  development_running = True
+                  development_running = [True]
+                  ##############
+                  ###  発展  ###
+                  ##############
+                  ##################
+                  ###  発展(終了) ###
+                  ##################
 
             if running1[0] == False:  #ターンエンドメッセージ送信後は即ループ脱出
               break 
