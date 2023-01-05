@@ -374,6 +374,8 @@ def main(): #クライアント側
                       if Player_Data[j][8]>=Player_Data[player01][8]:
                         longest_judge = False
                   if longest_judge:
+                    for j in range(4):
+                      Player_Data[j][9]=0
                     Player_Data[player01][9]=1
                 cld.draw_server(screen,Mapdata_Mass,Mapdata_Side,Mapdata_Edge,Player_Data,land,landnumber,backlog,yourturn,rightside,front,leftside)
                 cld.draw_image(screen,"./picture/Dice/Roll_of_Dice.png",60,540)
@@ -555,6 +557,8 @@ def main(): #クライアント側
                                     if Player_Data[j][8]>=Player_Data[yourturn][8]:
                                       longest_judge = False
                                 if longest_judge:
+                                  for j in range(4):
+                                    Player_Data[j][9]=0
                                   Player_Data[yourturn][9]=1
                                       
                               player_str = str(yourturn)
