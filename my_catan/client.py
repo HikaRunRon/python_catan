@@ -85,7 +85,7 @@ def main(): #クライアント側
   [-1,3,[47,48,53],[35,37,46],[349,469]],[-1,-1,[38,48],[26,36],[325,510]],[-1,5,[49,54],[28,39],[398,132]],[-1,-1,[54,55,62],[38,40,47],[423,173]],[-1,-1,[50,55,56],[30,39,41],[398,216]],[-1,-1,[56,57,63],[40,42,49],[423,258]],[-1,-1,[51,57,58],[32,41,43],[398,300]],[-1,-1,[58,59,64],[42,44,51],[423,342]],[-1,-1,[52,59,60],[34,43,45],[398,384]],
   [-1,-1,[60,61,65],[44,46,53],[423,427]],[-1,3,[53,61],[36,45],[398,469]],[-1,0,[62,66],[39,48],[472,173]],[-1,0,[66,67],[47,49],[496,216]],[-1,-1,[63,67,68],[41,48,50],[472,258]],[-1,2,[68,69],[49,51],[496,300]],[-1,2,[64,69,70],[43,50,52],[472,342]],[-1,0,[70,71],[51,53],[496,384]],[-1,0,[65,71],[45,52],[472,427]]]
 
-  Player_Data = [[0,0,[0,0,0,0,0],1,[0,0,1,0,0,0,0,0,0],3,4,13,0,0,0,0,[0,0,0,0,0,0]],[0,0,[0,0,0,0,0],0,[0,0,0,0,0,0,0,0,0],3,4,13,0,0,0,0,[0,0,0,0,0,0]],[0,0,[0,0,0,0,0],0,[0,0,0,0,0,0,0,0,0],3,4,13,0,0,0,0,[0,0,0,0,0,0]],[0,0,[0,0,0,0,0],0,[0,0,0,0,0,0,0,0,0],3,4,13,0,0,0,0,[0,0,0,0,0,0]]]
+  Player_Data = [[0,0,[0,0,0,0,0],1,[0,0,0,1,0,0,0,0,0],3,4,13,0,0,0,0,[0,0,0,0,0,0]],[0,0,[0,0,0,0,0],0,[0,0,0,0,0,0,0,0,0],3,4,13,0,0,0,0,[0,0,0,0,0,0]],[0,0,[0,0,0,0,0],0,[0,0,0,0,0,0,0,0,0],3,4,13,0,0,0,0,[0,0,0,0,0,0]],[0,0,[0,0,0,0,0],0,[0,0,0,0,0,0,0,0,0],3,4,13,0,0,0,0,[0,0,0,0,0,0]]]
   #所持ポイント、所持資源カード合計枚数、所持資源カード枚数内訳(木、レンガ、羊、小麦、石)、所持発展カード合計枚数,その内訳(騎士、街道建設、発見、独占、大聖堂、図書館、市場、議会、大学),残り建設可能開拓地数、残り建設可能都市数、残り建設可能街道数、交易路の長さ、最長交易路の有無、騎士力,最大騎士力の有無、優位トレード所持(1(wood2-1),2(brick2-1),3(sheep2-1),4(wheat2-1),5(ore2-1),0(3-1))(所持しているときは1(デフォルト0))
 
   yourturn = -1 #プレイヤーのターン、後々サーバーから通知が来る。
@@ -620,6 +620,40 @@ def main(): #クライアント側
               #################
               ### 発見(終了) ###
               #################
+              ############
+              ### 独占 ###
+              ############
+              elif msg == "Monopoly":
+                msg1=sock.recv(bufsize).decode(('utf-8')) #操作しているクライアント側からの送信
+                sock.send("ok".encode('utf-8'))
+                msg2=sock.recv(bufsize).decode(('utf-8'))
+                sock.send("ok".encode('utf-8'))
+                
+                player08 = int(msg1)
+                resource = int(msg2) 
+                sum = Player_Data[0][2][resource]+Player_Data[1][2][resource]+Player_Data[2][2][resource]+Player_Data[3][2][resource]
+                Player_Data[0][1] -= Player_Data[0][2][resource]
+                Player_Data[1][1] -= Player_Data[1][2][resource]
+                Player_Data[2][1] -= Player_Data[2][2][resource]
+                Player_Data[3][1] -= Player_Data[3][2][resource]
+                   
+                Player_Data[0][2][resource] = 0
+                Player_Data[1][2][resource] = 0
+                Player_Data[2][2][resource] = 0
+                Player_Data[3][2][resource] = 0
+                Player_Data[player08][1] += sum
+                Player_Data[player08][2][resource] = sum
+
+                Player_Data[player08][3] -= 1
+
+                cld.draw_server(screen,Mapdata_Mass,Mapdata_Side,Mapdata_Edge,Player_Data,land,landnumber,backlog,yourturn,rightside,front,leftside)
+                cld.draw_image(screen,"./picture/Dice/Roll_of_Dice.png",60,540)
+                cld.draw_Dice(screen,Dice1[0],Dice2[0])
+                cld.draw_image(screen,"./picture/frame.png",540,540)
+                pygame.display.update()
+              #################
+              ### 独占(終了) ###
+              #################
             
           ######################
           ### 本体処理(終了)　###
@@ -948,6 +982,72 @@ def main(): #クライアント側
                         if 355<=x and x<=395 and 300<=y and y<=360 and Player_Data[yourturn][4][3]>=1 and Thiturn_development[0]==False:
                           Monopoly = [True]
                           Thiturn_development[0]=True
+                          Player_Data[yourturn][3] -= 1
+                          Player_Data[yourturn][4][3] -= 1
+                          cld.draw_server(screen,Mapdata_Mass,Mapdata_Side,Mapdata_Edge,Player_Data,land,landnumber,backlog,yourturn,rightside,front,leftside)
+                          cld.draw_image(screen,"./picture/Dice/Roll_of_Dice.png",60,540)
+                          cld.draw_image(screen,"./picture/frame.png",540,540)
+                          cld.draw_Dice(screen,Dice1[0],Dice2[0])
+                          Monopoly_list = cld.draw_candidate_choose(screen)
+                          while Monopoly[0]:
+                            pygame.display.update()
+                            pygame.time.wait(50) #20fps
+                                    
+                            for event in pygame.event.get():
+                              if event.type == QUIT:
+                                sock.send("QUIT".encode('utf-8'))
+                                pygame.quit()
+                                sys.exit()
+                              if event.type == KEYDOWN:
+                                if event.key == K_ESCAPE:
+                                  sock.send("QUIT".encode('utf-8'))
+                                  pygame.quit()
+                                  sys.exit()
+                              if event.type == MOUSEBUTTONDOWN and event.button == 1: #蛮族の場所を選択
+                                x, y = event.pos
+                                for i in range(5):
+                                  if (Monopoly_list[i][0]-x)*(Monopoly_list[i][0]-x)+(Monopoly_list[i][1]-y)*(Monopoly_list[i][1]-y)<=400:
+                                    sum = Player_Data[0][2][i]+Player_Data[1][2][i]+Player_Data[2][2][i]+Player_Data[3][2][i]
+                                    Player_Data[0][1] -= Player_Data[0][2][i]
+                                    Player_Data[1][1] -= Player_Data[1][2][i]
+                                    Player_Data[2][1] -= Player_Data[2][2][i]
+                                    Player_Data[3][1] -= Player_Data[3][2][i]
+                                       
+                                    Player_Data[0][2][i] = 0
+                                    Player_Data[1][2][i] = 0
+                                    Player_Data[2][2][i] = 0
+                                    Player_Data[3][2][i] = 0
+                                    Player_Data[yourturn][1] += sum
+                                    Player_Data[yourturn][2][i] = sum
+
+                                    sock.send("Monopoly".encode('utf-8'))
+                                    sock.recv(bufsize)
+                                    sock.send(str(yourturn).encode('utf-8'))
+                                    sock.recv(bufsize)
+                                    sock.send(str(i).encode('utf-8'))
+                                    sock.recv(bufsize)
+
+                                    cld.draw_server(screen,Mapdata_Mass,Mapdata_Side,Mapdata_Edge,Player_Data,land,landnumber,backlog,yourturn,rightside,front,leftside)
+                                    cld.draw_image(screen,"./picture/Dice/Roll_of_Dice.png",60,540)
+                                    cld.draw_image(screen,"./picture/frame.png",540,540)
+                                    cld.draw_Dice(screen,Dice1[0],Dice2[0])
+                                    cld.draw_image(screen,"./picture/Turnend_button.png",540,540)
+                                    cld.draw_image(screen,"./picture/Action.png",540,60)
+                                    cld.draw_client_development(screen,Player_Data,yourturn,Thisturn_draw)
+                                    pygame.display.update()
+
+                                    Monopoly[0]=False
+                                    break
+                            if [0]==False:
+                              break
+                            rready, wready, xready = select.select(readfds, [], [],0.05) #処理を可能な物から順に選択
+                            for sock in rready:                                   #選択された処理を順次遂行
+                              msg = sock.recv(bufsize).decode('utf-8')
+                              print(msg)
+                              sock.send("ok".encode('utf-8'))
+                              if msg == "serverdown":
+                                pygame.quit()
+                                sys.exit()     
                         #################
                         ### 独占(終了) ###
                         #################
