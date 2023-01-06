@@ -535,6 +535,8 @@ def main(): #サーバー側
   ###################################
   svd.draw_server(screen,Mapdata_Mass,Mapdata_Side,Mapdata_Edge,Player_Data,land,landnumber,backlog)
 
+  Winner = [-1]
+
   while running[0]: #ゲーム本体
     for i in Turn:
       pygame.display.update()
@@ -620,7 +622,22 @@ def main(): #サーバー側
                 receiver.send("TurnEnd".encode('utf-8'))
                 receiver.recv(bufsize)
             running1[0]=False
-          
+
+          elif msg == "Win": #げーむせっと
+            msg1 = sock.recv(bufsize).decode('utf-8')
+            sock.send("ok".encode('utf-8'))
+            winner = int(msg1)
+            Winner[0] = winner
+
+            for receiver in clients_socks:
+              if receiver != sock:
+                receiver.send("Gameset".encode('utf-8'))
+                receiver.recv(bufsize)
+                receiver.send(msg1.encode('utf-8'))
+                receiver.recv(bufsize)
+            running1[0]=False
+            running[0]=False
+    
           #################
           ###  街道建設  ###
           #################
@@ -751,10 +768,86 @@ def main(): #サーバー側
           #######################
           ###  都市建設(終了)  ###
           #######################
+
+          #####################
+          ###  カードドロー  ###
+          #####################
+          elif msg == "Card_Draw":
+            msg1 = sock.recv(bufsize).decode('utf-8')
+            sock.send("ok".encode('utf-8'))
+            sock.recv(bufsize).decode('utf-8')
+
+            for receiver in clients_socks:
+              receiver.send("Card_Draw".encode('utf-8'))
+              receiver.recv(bufsize).decode('utf-8')
+              receiver.send(msg1.encode('utf-8'))
+              receiver.recv(bufsize).decode('utf-8')
+              receiver.send(str(secretcard[secretcard_pos[0]]).encode('utf-8'))
+              receiver.recv(bufsize).decode('utf-8')
+            
+            card_num = secretcard[secretcard_pos[0]]
+            secretcard_pos[0] += 1
+            player02 = int(msg1)
+            Player_Data[player02][3] += 1
+            Player_Data[player02][4][card_num] += 1
+            Player_Data[player02][1] -= 3
+            Player_Data[player02][2][2] -= 1
+            Player_Data[player02][2][3] -= 1
+            Player_Data[player02][2][4] -= 1
+            svd.draw_server(screen,Mapdata_Mass,Mapdata_Side,Mapdata_Edge,Player_Data,land,landnumber,backlog)
+            svd.draw_image(screen,"./picture/Dice/Roll_of_Dice.png",60,540)
+            svd.draw_Dice(screen,Dice1[0],Dice2[0])
+            svd.draw_image(screen,"./picture/frame.png",540,540)
+            pygame.display.update()
+
+          ###########################
+          ###  カードドロー(終了)  ###
+          ###########################
       #######################
       ###  本体処理(終了)  ###
       #######################
+      if running[0]==False:
+        break
+  
+  svd.draw_server(screen,Mapdata_Mass,Mapdata_Side,Mapdata_Edge,Player_Data,land,landnumber,backlog)
+  svd.draw_image(screen,"./picture/Gameset/gameset.png",300,300)
+  pygame.display.update()
+  pygame.time.wait(2000)
+  svd.draw_server(screen,Mapdata_Mass,Mapdata_Side,Mapdata_Edge,Player_Data,land,landnumber,backlog)
 
+  running[0]=True
+
+  while running[0]: #終了処理
+    pygame.display.update()
+    pygame.time.wait(50)
+    for event in pygame.event.get():
+      if event.type == QUIT:
+        for receiver in clients_socks:
+          receiver.send("serverdown".encode('utf-8'))
+          receiver.recv(bufsize)
+        pygame.quit()
+        sys.exit()
+      if event.type == KEYDOWN:
+        if event.key == K_ESCAPE:
+          for receiver in clients_socks:
+            receiver.send("serverdown".encode('utf-8'))
+            receiver.recv(bufsize)
+          pygame.quit()
+          sys.exit()
+    rready, wready, xready = select.select(readfds, [], [],0.05) #処理を可能な物から順に選択
+    for sock in rready:                                   #選択された処理を順次遂行
+      msg = sock.recv(bufsize).decode('utf-8')
+      sock.send("ok".encode('utf-8'))
+      print(msg)
+      if msg == "QUIT":
+        sock.close()
+        readfds.remove(sock)
+        clients_socks.remove(sock)
+        for receiver in clients_socks:
+          receiver.send("serverdown".encode('utf-8'))
+          msg = receiver.recv(bufsize).decode('utf-8')
+        pygame.quit()
+        sys.exit()
   return
 
 if __name__ == '__main__':

@@ -9,7 +9,7 @@ import longest_road
 import client_draw as cld
 
 def client_first_phase(running,myturn,sock,readfds,bufsize,Mapdata_Edge,once,Mapdata_Mass,Player_Data,screen,Mapdata_Side,land,landnumber,backlog,yourturn,rightside,leftside,front):
-  while running: #初動、開拓地&街道建設フェーズ
+  while running[0]: #初動、開拓地&街道建設フェーズ
     pygame.display.update()
     pygame.time.wait(50)
     for event in pygame.event.get():
@@ -32,7 +32,7 @@ def client_first_phase(running,myturn,sock,readfds,bufsize,Mapdata_Edge,once,Map
         sys.exit()
       elif msg == "Yourturn": #ターン通知を受け取った時、自分のターンを開始する。
         print("ok")
-        myturn = True
+        myturn[0] = True
       elif msg == "Mapdata":
         msg1 = sock.recv(bufsize).decode('utf-8')
         sock.send("ok".encode('utf-8'))
@@ -64,8 +64,8 @@ def client_first_phase(running,myturn,sock,readfds,bufsize,Mapdata_Edge,once,Map
           Player_Data[player][8] = longest_road.longestroad(Mapdata_Side,player)
           cld.draw_server(screen,Mapdata_Mass,Mapdata_Side,Mapdata_Edge,Player_Data,land,landnumber,backlog,yourturn,rightside,front,leftside) #データをもとに描画更新
       elif msg == "firstphaseend":
-        running = False  
-    if myturn == False:
+        running[0] = False  
+    if myturn[0] == False:
       continue  
     player_str = str(yourturn)
 
@@ -99,9 +99,9 @@ def client_first_phase(running,myturn,sock,readfds,bufsize,Mapdata_Edge,once,Map
               sock.recv(bufsize)
               sock.send(player_str.encode('utf-8'))
               sock.recv(bufsize)
-              myturn = False
+              myturn[0] = False
               break
-      if myturn == False:
+      if myturn[0] == False:
         break
       rready, wready, xready = select.select(readfds, [], [],0.05) #処理を可能な物から順に選択
       for sock in rready:                                   #選択された処理を順次遂行
@@ -135,8 +135,8 @@ def client_first_phase(running,myturn,sock,readfds,bufsize,Mapdata_Edge,once,Map
         once[player]=1
         cld.draw_server(screen,Mapdata_Mass,Mapdata_Side,Mapdata_Edge,Player_Data,land,landnumber,backlog,yourturn,rightside,front,leftside) #データをもとに描画更新
     road_candidates = cld.draw_candidate_road_0(screen,Mapdata_Edge,Mapdata_Side,settlement)
-    myturn = True
-    while myturn: #街道を置く
+    myturn[0] = True
+    while myturn[0]: #街道を置く
       pygame.display.update()
       pygame.time.wait(50)
       for event in pygame.event.get():
@@ -162,9 +162,9 @@ def client_first_phase(running,myturn,sock,readfds,bufsize,Mapdata_Edge,once,Map
               sock.recv(bufsize)
               sock.send(player_str.encode('utf-8'))
               sock.recv(bufsize)
-              myturn = False
+              myturn[0] = False
               break
-      if myturn == False:
+      if myturn[0] == False:
         break
       rready, wready, xready = select.select(readfds, [], [],0.05) #処理を可能な物から順に選択
       for sock in rready:                                   #選択された処理を順次遂行

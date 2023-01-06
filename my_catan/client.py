@@ -13,6 +13,7 @@ import client_first_phase
 import random
 import client_myturn_dice
 import client_others_dice
+import point_calculation as pc
 
 def main(): #クライアント側
   (w,h)=(600,600)   #ゲーム画面の大きさ(幅600px,高さ600px)
@@ -229,9 +230,9 @@ def main(): #クライアント側
     if msg == "firstphasestart":
       sock.send("ok".encode('utf-8'))
 
-    running = True
+    running = [True]
 
-    myturn = False
+    myturn = [False]
 
     if backlog == 3:
       once = [0,0,0]
@@ -245,11 +246,12 @@ def main(): #クライアント側
   ###################################
 
 
-    running = True
-    turn = 0
+    running = [True]
+    turn = [0]
+    Winner = [-1]
 
-    while running: #ゲーム本体
-      turn += 1
+    while running[0]: #ゲーム本体
+      turn[0] += 1
       print(turn)
       Dice1 = [0]
       Dice2 = [0]
@@ -342,7 +344,14 @@ def main(): #クライアント側
                 sys.exit()
               elif msg=="TurnEnd":
                 running1[0]=False
-        
+              elif msg=="Gameset":
+                msg1=sock.recv(bufsize).decode(('utf-8'))
+                sock.send("ok".encode('utf-8'))
+                winner = int(msg1)
+                Winner[0] = winner
+                running1[0]=False
+                running[0]=False
+
               #################
               ###  街道建設  ###
               #################
@@ -444,6 +453,34 @@ def main(): #クライアント側
               ###  都市建設(終了)  ###
               #######################
 
+              ###################
+              ### カードドロー ###
+              ###################
+              elif msg == "Card_Draw":
+                msg1 = sock.recv(bufsize).decode('utf-8') #誰が
+                sock.send("ok".encode('utf-8'))
+                msg2 = sock.recv(bufsize).decode('utf-8') #なんのカードを引いたか
+                sock.send("ok".encode('utf-8'))
+    
+                secretcard_pos[0] += 1
+                player02 = int(msg1)
+                Player_Data[player02][3] += 1
+                Player_Data[player02][1] -= 3
+                Player_Data[player02][2][2] -= 1
+                Player_Data[player02][2][3] -= 1
+                Player_Data[player02][2][4] -= 1
+
+                cld.draw_server(screen,Mapdata_Mass,Mapdata_Side,Mapdata_Edge,Player_Data,land,landnumber,backlog,yourturn,rightside,front,leftside)
+                cld.draw_image(screen,"./picture/Dice/Roll_of_Dice.png",60,540)
+                cld.draw_image(screen,"./picture/frame.png",540,540)
+                cld.draw_Dice(screen,Dice1[0],Dice2[0])
+                cld.draw_image(screen,"./picture/Action.png",540,60)
+                pygame.display.update()
+
+              #########################
+              ### カードドロー(終了) ###
+              #########################
+
           ######################
           ### 本体処理(終了)　###
           ######################
@@ -479,6 +516,8 @@ def main(): #クライアント側
           ### 本体処理　###
           ################
           running1[0]=True
+          Thisturn_draw=[0,0,0,0]
+          Thiturn_development=[False]
           cld.draw_server(screen,Mapdata_Mass,Mapdata_Side,Mapdata_Edge,Player_Data,land,landnumber,backlog,yourturn,rightside,front,leftside)
           cld.draw_image(screen,"./picture/Dice/Roll_of_Dice.png",60,540)
           cld.draw_image(screen,"./picture/frame.png",540,540)
@@ -574,6 +613,14 @@ def main(): #クライアント側
                               sock.send("MsgEnd".encode('utf-8')) #情報のやり取りを終了
                               sock.recv(bufsize)                          
                               road_running[0]=False
+                              if pc.pointget(Player_Data,yourturn)>=10:
+                                sock.send("Win".encode('utf-8'))
+                                sock.recv(bufsize)
+                                sock.send(str(yourturn).encode('utf-8'))
+                                sock.recv(bufsize)
+                                Winner[0]=yourturn
+                                running1[0]=False
+                                running[0]=False
                               break
 
                         if road_running[0]==False:
@@ -650,6 +697,14 @@ def main(): #クライアント側
                               sock.send(player_str.encode('utf-8')) #誰が開拓地を置くのか
                               sock.recv(bufsize)           
                               settlement_running[0]=False
+                              if pc.pointget(Player_Data,yourturn)>=10:
+                                sock.send("Win".encode('utf-8'))
+                                sock.recv(bufsize)
+                                sock.send(str(yourturn).encode('utf-8'))
+                                sock.recv(bufsize)
+                                Winner[0]=yourturn
+                                running1[0]=False
+                                running[0]=False
                               break
 
                         if settlement_running[0]==False:
@@ -723,6 +778,14 @@ def main(): #クライアント側
                               sock.send(player_str.encode('utf-8')) #誰が都市を置くのか
                               sock.recv(bufsize)           
                               city_running[0]=False
+                              if pc.pointget(Player_Data,yourturn)>=10:
+                                sock.send("Win".encode('utf-8'))
+                                sock.recv(bufsize)
+                                sock.send(str(yourturn).encode('utf-8'))
+                                sock.recv(bufsize)
+                                Winner[0]=yourturn
+                                running1[0]=False
+                                running[0]=False
                               break
 
                         if city_running[0]==False:
@@ -753,11 +816,146 @@ def main(): #クライアント側
                   ##############
                   ###  発展  ###
                   ##############
+
+                  cld.draw_server(screen,Mapdata_Mass,Mapdata_Side,Mapdata_Edge,Player_Data,land,landnumber,backlog,yourturn,rightside,front,leftside)
+                  cld.draw_image(screen,"./picture/Dice/Roll_of_Dice.png",60,540)
+                  cld.draw_image(screen,"./picture/frame.png",540,540)
+                  cld.draw_Dice(screen,Dice1[0],Dice2[0])
+                  cld.draw_image(screen,"./picture/Turnend_button.png",540,540)
+                  cld.draw_image(screen,"./picture/Action.png",540,60)
+                  cld.draw_client_development(screen,Player_Data,yourturn,Thisturn_draw)
+                  pygame.display.update()
+
+                  while development_running[0]:
+                    pygame.display.update()
+                    pygame.time.wait(50) #20fps
+                    
+                    for event in pygame.event.get():
+                      if event.type == QUIT:
+                        sock.send("QUIT".encode('utf-8'))
+                        pygame.quit()
+                        sys.exit()
+                      if event.type == KEYDOWN:
+                        if event.key == K_ESCAPE:
+                          sock.send("QUIT".encode('utf-8'))
+                          pygame.quit()
+                          sys.exit()
+                      if event.type == MOUSEBUTTONDOWN and event.button == 1:
+                        x, y = event.pos
+                        if 541<=x and x<=600 and 61<=y and y<=120: #枠内左クリックでwhileを抜け、次のページへ
+                          development_running[0]=False #ループから抜ける
+                        ###################
+                        ### カードドロー ###
+                        ###################
+                        if (x-175)*(x-175)+(y-175)*(y-175) <= 5625 and secretcard_pos[0]<=24 and Player_Data[yourturn][2][2]>=1 and Player_Data[yourturn][2][3]>=1 and Player_Data[yourturn][2][4]>=1:
+                          sock.send("Card_Draw".encode('utf-8'))
+                          sock.recv(bufsize).decode('utf-8')
+                          sock.send(str(yourturn).encode('utf-8'))
+                          sock.recv(bufsize).decode('utf-8')
+                          sock.send("ok".encode('utf-8'))
+
+                          msg = sock.recv(bufsize).decode('utf-8')
+                          sock.send("ok".encode('utf-8'))
+                          if msg == "Card_Draw":
+                            msg1 = sock.recv(bufsize).decode('utf-8') #誰が
+                            sock.send("ok".encode('utf-8'))
+                            msg2 = sock.recv(bufsize).decode('utf-8') #なんのカードを引いたか
+                            sock.send("ok".encode('utf-8'))
+                
+                            secretcard_pos[0] += 1
+                            player02 = int(msg1)
+                            card_num = int(msg2)
+                            Player_Data[player02][3] += 1
+                            if card_num >= 4:
+                              Player_Data[player02][4][card_num] += 1
+                            else:
+                              Thisturn_draw[card_num] += 1
+                            Player_Data[player02][1] -= 3
+                            Player_Data[player02][2][2] -= 1
+                            Player_Data[player02][2][3] -= 1
+                            Player_Data[player02][2][4] -= 1
+                            if pc.pointget(Player_Data,yourturn)>=10:
+                              sock.send("Win".encode('utf-8'))
+                              sock.recv(bufsize)
+                              sock.send(str(yourturn).encode('utf-8'))
+                              sock.recv(bufsize)
+                              Winner[0]=yourturn
+                              running1[0]=False
+                              running[0]=False
+
+                          cld.draw_server(screen,Mapdata_Mass,Mapdata_Side,Mapdata_Edge,Player_Data,land,landnumber,backlog,yourturn,rightside,front,leftside)
+                          cld.draw_image(screen,"./picture/Dice/Roll_of_Dice.png",60,540)
+                          cld.draw_image(screen,"./picture/frame.png",540,540)
+                          cld.draw_Dice(screen,Dice1[0],Dice2[0])
+                          cld.draw_image(screen,"./picture/Turnend_button.png",540,540)
+                          cld.draw_image(screen,"./picture/Action.png",540,60)
+                          cld.draw_client_development(screen,Player_Data,yourturn,Thisturn_draw)
+                          pygame.display.update()
+                        ########################
+                        ### カードドロー(終了) ###
+                        ########################
+
+                        ############
+                        ### 騎士 ###
+                        ############
+                        if 205<=x and x<=245 and 300<=y and y<=360 and Player_Data[yourturn][4][0]>=1 and Thiturn_development[0]==False:
+                          Knight = [True]
+                        #################
+                        ### 騎士(終了) ###
+                        #################
+                        if 255<=x and x<=295 and 300<=y and y<=360 and Player_Data[yourturn][4][1]>=1 and Thiturn_development[0]==False:
+                          Road_building = [True]
+                        ################
+                        ### 街道建設 ###
+                        ################
+                        if 255<=x and x<=295 and 300<=y and y<=360 and Player_Data[yourturn][4][1]>=1 and Thiturn_development[0]==False:
+                          Road_building = [True]
+                        #####################
+                        ### 街道建設(終了) ###
+                        #####################
+
+                        ############
+                        ### 発見 ###
+                        ############
+                        if 305<=x and x<=345 and 300<=y and y<=360 and Player_Data[yourturn][4][2]>=1 and Thiturn_development[0]==False:
+                          Discovery = [True]
+                        #################
+                        ### 発見(終了) ###
+                        #################
+
+                        ############
+                        ### 独占 ###
+                        ############
+                        if 355<=x and x<=395 and 300<=y and y<=360 and Player_Data[yourturn][4][3]>=1 and Thiturn_development[0]==False:
+                          Monopoly = [True]
+                        #################
+                        ### 独占(終了) ###
+                        #################
+                    if development_running[0] == False:  #サイコロフリフリメッセージ送信後は即ループ脱出
+                      cld.draw_server(screen,Mapdata_Mass,Mapdata_Side,Mapdata_Edge,Player_Data,land,landnumber,backlog,yourturn,rightside,front,leftside)
+                      cld.draw_image(screen,"./picture/Dice/Roll_of_Dice.png",60,540)
+                      cld.draw_image(screen,"./picture/frame.png",540,540)
+                      cld.draw_Dice(screen,Dice1[0],Dice2[0])
+                      cld.draw_image(screen,"./picture/Turnend_button.png",540,540)
+                      cld.draw_image(screen,"./picture/Action.png",540,60)
+                      pygame.display.update()
+                      break 
+        
+                    rready, wready, xready = select.select(readfds, [], [],0.05) #処理を可能な物から順に選択
+                    for sock in rready:                                   #選択された処理を順次遂行
+                      msg = sock.recv(bufsize).decode('utf-8')
+                      print(msg)
+                      sock.send("ok".encode('utf-8'))
+                      if msg == "serverdown":
+                        pygame.quit()
+                        sys.exit()
                   ##################
                   ###  発展(終了) ###
                   ##################
 
             if running1[0] == False:  #ターンエンドメッセージ送信後は即ループ脱出
+              for j in range(4):
+                Player_Data[yourturn][4][j] += Thisturn_draw[j]
               break 
 
             rready, wready, xready = select.select(readfds, [], [],0.05) #処理を可能な物から順に選択
@@ -777,10 +975,47 @@ def main(): #クライアント側
         ##################
         ## Myturn(終了) ##　
         ##################
-          
-          
-          
-  return
+    #################
+    ### ゲーム終了 ###
+    #################
+
+    ###############
+    ### 終了処理 ###
+    ###############
+    cld.draw_server(screen,Mapdata_Mass,Mapdata_Side,Mapdata_Edge,Player_Data,land,landnumber,backlog,yourturn,rightside,front,leftside)
+
+    if Winner[0]==yourturn:
+      cld.draw_image(screen,"./picture/Gameset/win.png",300,300)
+    else:
+      cld.draw_image(screen,"./picture/Gameset/lose.png",300,300)
+    
+    pygame.display.update()
+    pygame.time.wait(2000)
+    cld.draw_server(screen,Mapdata_Mass,Mapdata_Side,Mapdata_Edge,Player_Data,land,landnumber,backlog,yourturn,rightside,front,leftside)
+    
+    running[0]=True
+    while running[0]: #ゲーム終了
+      pygame.display.update()
+      pygame.time.wait(50)
+      for event in pygame.event.get():
+        if event.type == QUIT:
+          sock.send("QUIT".encode('utf-8'))
+          pygame.quit()
+          sys.exit()
+        if event.type == KEYDOWN:
+          if event.key == K_ESCAPE:
+            sock.send("QUIT".encode('utf-8'))
+            pygame.quit()
+            sys.exit()
+
+      rready, wready, xready = select.select(readfds, [], [],0.05) #処理を可能な物から順に選択
+      for sock in rready:                                   #選択された処理を順次遂行
+        msg = sock.recv(bufsize).decode('utf-8')
+        print(msg)
+        sock.send("ok".encode('utf-8'))
+        if msg == "serverdown":
+          pygame.quit()
+          sys.exit()
 
 if __name__ == '__main__':
   main()

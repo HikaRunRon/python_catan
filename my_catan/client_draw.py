@@ -456,3 +456,32 @@ def draw_candidate_rob(screen,Mapdata_Mass,Player_Data,Mapdata_Edge,pos,yourturn
         draw_image(screen,"./picture/candidate.png",Mapdata_Edge[i][4][0],Mapdata_Edge[i][4][1])
         l.append(i)
   return l
+
+def draw_client_development(screen,Player_Data,yourturn,Thisturn_Draw):
+  draw_image(screen,"./picture/Development.png",300,300)
+
+  if Player_Data[yourturn][4][4]==1:
+    draw_image(screen,"./picture/Resource_Card/Chapel_card.png",280,200)
+  if Player_Data[yourturn][4][5]==1:
+    draw_image(screen,"./picture/Resource_Card/Library_card.png",330,200)
+  if Player_Data[yourturn][4][6]==1:
+    draw_image(screen,"./picture/Resource_Card/Market_card.png",380,200)
+  if Player_Data[yourturn][4][7]==1:
+    draw_image(screen,"./picture/Resource_Card/Hall_card.png",430,200)
+  if Player_Data[yourturn][4][8]==1:
+    draw_image(screen,"./picture/Resource_Card/University_card.png",480,200)
+  
+  draw_image(screen,select_num_image(Player_Data[yourturn][4][0]),225,330)
+  draw_image(screen,select_num_image(Player_Data[yourturn][4][1]),275,330)
+  draw_image(screen,select_num_image(Player_Data[yourturn][4][2]),325,330)
+  draw_image(screen,select_num_image(Player_Data[yourturn][4][3]),375,330)
+
+  draw_image(screen,select_num_image(Thisturn_Draw[0]),225,450)
+  draw_image(screen,select_num_image(Thisturn_Draw[1]),275,450)
+  draw_image(screen,select_num_image(Thisturn_Draw[2]),325,450)
+  draw_image(screen,select_num_image(Thisturn_Draw[3]),375,450)
+
+
+  
+
+
