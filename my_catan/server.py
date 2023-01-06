@@ -803,6 +803,101 @@ def main(): #サーバー側
           ###########################
           ###  カードドロー(終了)  ###
           ###########################
+
+          ############
+          ### 騎士 ###
+          ############
+          elif msg == "Bandit":
+            msg1 = sock.recv(bufsize).decode('utf-8')
+            sock.send("ok".encode('utf-8'))
+            msg2 = sock.recv(bufsize).decode('utf-8')
+            sock.send("ok".encode('utf-8'))
+            for receiver in clients_socks:
+              if receiver!=sock:
+                receiver.send(msg.encode('utf-8'))
+                receiver.recv(bufsize).decode('utf-8')
+                receiver.send(msg1.encode('utf-8'))
+                receiver.recv(bufsize).decode('utf-8')
+                receiver.send(msg2.encode('utf-8'))
+                receiver.recv(bufsize).decode('utf-8')
+            Mapdata_Mass[bandit_pos[0]][2]=0
+            Mapdata_Mass[int(msg2)][2]=1
+            bandit_pos[0]=int(msg2)
+            svd.draw_server(screen,Mapdata_Mass,Mapdata_Side,Mapdata_Edge,Player_Data,land,landnumber,backlog)
+            svd.draw_image(screen,"./picture/Dice/Roll_of_Dice.png",60,540)
+            svd.draw_image(screen,"./picture/frame.png",540,540)
+            svd.draw_Dice(screen,Dice1[0],Dice2[0]) 
+            pygame.display.update()
+
+          elif msg == "Rob":
+            msg1 = sock.recv(bufsize).decode('utf-8')
+            sock.send("ok".encode('utf-8'))
+            msg2 = sock.recv(bufsize).decode('utf-8')
+            sock.send("ok".encode('utf-8'))
+            msg3 = sock.recv(bufsize).decode('utf-8')
+            sock.send("ok".encode('utf-8'))
+            for receiver in clients_socks:
+              if receiver!=sock:
+                receiver.send(msg.encode('utf-8'))
+                receiver.recv(bufsize).decode('utf-8')
+                receiver.send(msg1.encode('utf-8'))
+                receiver.recv(bufsize).decode('utf-8')
+                receiver.send(msg2.encode('utf-8'))
+                receiver.recv(bufsize).decode('utf-8')
+                receiver.send(msg3.encode('utf-8'))
+                receiver.recv(bufsize).decode('utf-8')
+            player03 = int(msg1)
+            player04 = int(msg2)
+            card_num = int(msg3)
+            Player_Data[player03][1]-=1
+            Player_Data[player03][2][card_num]-=1
+            Player_Data[player04][1]+=1
+            Player_Data[player04][2][card_num]+=1
+            Player_Data[player04][10] += 1
+            Player_Data[player04][3] -= 1
+            if Player_Data[player04][11]==0 and Player_Data[player04][10]>=3:
+              largest_judge = True
+              for j in range(4):
+                if j!=player04:
+                  if Player_Data[j][10]>=Player_Data[player04][10]:
+                    largest_judge = False
+              if largest_judge:
+                for j in range(4):
+                  Player_Data[j][11]=0
+                Player_Data[player04][11]=1
+            svd.draw_server(screen,Mapdata_Mass,Mapdata_Side,Mapdata_Edge,Player_Data,land,landnumber,backlog)
+            svd.draw_image(screen,"./picture/Dice/Roll_of_Dice.png",60,540)
+            svd.draw_image(screen,"./picture/frame.png",540,540)
+            svd.draw_Dice(screen,Dice1[0],Dice2[0])
+          elif msg == "NoRob":
+            msg1 = sock.recv(bufsize).decode('utf-8')
+            sock.send("ok".encode('utf-8'))
+            for receiver in clients_socks:
+              if receiver!=sock:
+                receiver.send(msg.encode('utf-8'))
+                receiver.recv(bufsize).decode('utf-8')
+                receiver.send(msg1.encode('utf-8'))
+                receiver.recv(bufsize).decode('utf-8')
+            player05 = int(msg1)
+            Player_Data[player05][10] += 1
+            Player_Data[player05][3] -= 1
+            if Player_Data[player05][11]==0 and Player_Data[player05][10]>=3:
+              largest_judge = True
+              for j in range(4):
+                if j!=player05:
+                  if Player_Data[j][10]>=Player_Data[player05][10]:
+                    largest_judge = False
+              if largest_judge:
+                for j in range(4):
+                  Player_Data[j][11]=0
+                Player_Data[player05][11]=1
+            svd.draw_server(screen,Mapdata_Mass,Mapdata_Side,Mapdata_Edge,Player_Data,land,landnumber,backlog)
+            svd.draw_image(screen,"./picture/Dice/Roll_of_Dice.png",60,540)
+            svd.draw_image(screen,"./picture/frame.png",540,540)
+            svd.draw_Dice(screen,Dice1[0],Dice2[0])
+          #################
+          ### 騎士(終了) ###
+          #################
       #######################
       ###  本体処理(終了)  ###
       #######################
