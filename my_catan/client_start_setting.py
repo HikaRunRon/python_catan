@@ -1,4 +1,4 @@
-from __future__ import print_function
+from __future__ import print_function       ########クライアントの人数待ち画面を担うファイル
 import socket
 import sys
 import pygame

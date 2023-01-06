@@ -1,4 +1,4 @@
-from __future__ import print_function
+from __future__ import print_function        ########クライアントの開拓地建設を担うファイル
 import socket
 import sys
 import pygame

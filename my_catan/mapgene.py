@@ -1,4 +1,4 @@
-import random
+import random   ########マップをランダムで生成する関数(made by ochii)
 
 def landform(): ##資源を配置する関数
     resourse=[0,1,1,1,1,2,2,2,3,3,3,3,4,4,4,4,5,5,5]#資源の配置を決めるリスト

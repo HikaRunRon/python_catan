@@ -1,4 +1,4 @@
-from __future__ import print_function
+from __future__ import print_function ########サーバー最初期画面を担うファイル
 import pygame
 from pygame.locals import *
 import socket

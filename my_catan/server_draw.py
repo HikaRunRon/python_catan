@@ -1,4 +1,4 @@
-from __future__ import print_function
+from __future__ import print_function         ########サーバーの画像描写を担うファイル
 import pygame
 from pygame.locals import *
 import socket

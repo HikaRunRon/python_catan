@@ -1,4 +1,4 @@
-from __future__ import print_function
+from __future__ import print_function           ########クライアント(ターン本人)のサイコロフェーズを担うファイル
 import socket
 import sys
 import pygame
