@@ -9,13 +9,11 @@ import longest_road
 import random
 import client_draw as cld
 import point_calculation as pc
-def client_road_building(screen,Mapdata_Mass,Mapdata_Side,Mapdata_Edge,Player_Data,land,landnumber,backlog,yourturn,rightside,front,leftside,Dice1,Dice2,road_running,sock,bufsize,Winner,running1,running,readfds):
+def client_roadroad(screen,Mapdata_Mass,Mapdata_Side,Mapdata_Edge,Player_Data,land,landnumber,backlog,yourturn,rightside,front,leftside,Dice1,Dice2,road_running,sock,bufsize,Winner,running1,running,readfds):
   cld.draw_server(screen,Mapdata_Mass,Mapdata_Side,Mapdata_Edge,Player_Data,land,landnumber,backlog,yourturn,rightside,front,leftside)
   cld.draw_image(screen,"./picture/Dice/Roll_of_Dice.png",60,540)
   cld.draw_image(screen,"./picture/frame.png",540,540)
   cld.draw_Dice(screen,Dice1[0],Dice2[0])
-  cld.draw_image(screen,"./picture/Turnend_button.png",540,540)
-  cld.draw_image(screen,"./picture/Action.png",540,60)
   road_candidate = cld.draw_candidate_road(screen,yourturn,Mapdata_Edge,Mapdata_Side)
 
   while road_running[0]:
@@ -43,9 +41,6 @@ def client_road_building(screen,Mapdata_Mass,Mapdata_Side,Mapdata_Edge,Player_Da
               Mapdata_Side[i][0]=yourturn
               road_length = longest_road.longestroad(Mapdata_Side,yourturn)
               Player_Data[yourturn][8] = road_length
-              Player_Data[yourturn][1] -= 2
-              Player_Data[yourturn][2][0] -= 1
-              Player_Data[yourturn][2][1] -= 1
               Player_Data[yourturn][7] -= 1
               if Player_Data[yourturn][9]==0 and Player_Data[yourturn][8]>=5:
                 longest_judge = True
@@ -60,7 +55,7 @@ def client_road_building(screen,Mapdata_Mass,Mapdata_Side,Mapdata_Edge,Player_Da
                       
               player_str = str(yourturn)
               road_length_str = str(road_length)
-              sock.send("Road".encode('utf-8')) #道の情報を送信する
+              sock.send("Road2".encode('utf-8')) #道の情報を送信する
               sock.recv(bufsize)
               sock.send(i_str.encode('utf-8')) #どこに道を置くのか
               sock.recv(bufsize)
@@ -86,9 +81,6 @@ def client_road_building(screen,Mapdata_Mass,Mapdata_Side,Mapdata_Edge,Player_Da
           cld.draw_image(screen,"./picture/Dice/Roll_of_Dice.png",60,540)
           cld.draw_image(screen,"./picture/frame.png",540,540)
           cld.draw_Dice(screen,Dice1[0],Dice2[0])
-          cld.draw_image(screen,"./picture/Turnend_button.png",540,540)
-          cld.draw_image(screen,"./picture/Action.png",540,60)
-          pygame.display.update()
 
     if road_running[0] == False:  
       break 

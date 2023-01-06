@@ -228,7 +228,7 @@ def main(): #サーバー側
   [-1,3,[47,48,53],[35,37,46],[349,469]],[-1,-1,[38,48],[26,36],[325,510]],[-1,5,[49,54],[28,39],[398,132]],[-1,-1,[54,55,62],[38,40,47],[423,173]],[-1,-1,[50,55,56],[30,39,41],[398,216]],[-1,-1,[56,57,63],[40,42,49],[423,258]],[-1,-1,[51,57,58],[32,41,43],[398,300]],[-1,-1,[58,59,64],[42,44,51],[423,342]],[-1,-1,[52,59,60],[34,43,45],[398,384]],
   [-1,-1,[60,61,65],[44,46,53],[423,427]],[-1,3,[53,61],[36,45],[398,469]],[-1,0,[62,66],[39,48],[472,173]],[-1,0,[66,67],[47,49],[496,216]],[-1,-1,[63,67,68],[41,48,50],[472,258]],[-1,2,[68,69],[49,51],[496,300]],[-1,2,[64,69,70],[43,50,52],[472,342]],[-1,0,[70,71],[51,53],[496,384]],[-1,0,[65,71],[45,52],[472,427]]]
 
-  Player_Data = [[2,0,[0,0,0,0,0],0,[0,0,0,0,0,0,0,0,0],3,4,13,0,0,0,0,[0,0,0,0,0,0]],[2,0,[0,0,0,0,0],0,[0,0,0,0,0,0,0,0,0],3,4,13,0,0,0,0,[0,0,0,0,0,0]],[2,0,[0,0,0,0,0],0,[0,0,0,0,0,0,0,0,0],3,4,13,0,0,0,0,[0,0,0,0,0,0]],[2,0,[0,0,0,0,0],0,[0,0,0,0,0,0,0,0,0],3,4,13,0,0,0,0,[0,0,0,0,0,0]]]
+  Player_Data = [[2,0,[0,0,0,0,0],1,[0,0,1,0,0,0,0,0,0],3,4,13,0,0,0,0,[0,0,0,0,0,0]],[2,0,[0,0,0,0,0],0,[0,0,0,0,0,0,0,0,0],3,4,13,0,0,0,0,[0,0,0,0,0,0]],[2,0,[0,0,0,0,0],0,[0,0,0,0,0,0,0,0,0],3,4,13,0,0,0,0,[0,0,0,0,0,0]],[2,0,[0,0,0,0,0],0,[0,0,0,0,0,0,0,0,0],3,4,13,0,0,0,0,[0,0,0,0,0,0]]]
   #所持ポイント、所持資源カード合計枚数、所持資源カード枚数内訳(木、レンガ、羊、小麦、石)、所持発展カード合計枚数,その内訳(騎士、街道建設、発見、独占、大聖堂、図書館、市場、議会、大学),残り建設可能開拓地数、残り建設可能都市数、残り建設可能街道数、交易路の長さ、騎士力,優位トレード所持(1(wood2-1),2(brick2-1),3(sheep2-1),4(wheat2-1),5(ore2-1),0(3-1))(所持しているときは1(デフォルト0))
 
   secretcard=[0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,1,2,2,3,3,4,5,6,7,8] #発展カード順番決め(騎士14、街道建設2、発見2、独占2、大聖堂1、図書館1、市場1、議会1、大学1)
@@ -897,6 +897,101 @@ def main(): #サーバー側
             svd.draw_Dice(screen,Dice1[0],Dice2[0])
           #################
           ### 騎士(終了) ###
+          #################
+          ################
+          ### 街道2建設 ###
+          ################
+          elif msg == "roadroad":
+            msg1 = sock.recv(bufsize).decode('utf-8')
+            sock.send("ok".encode('utf-8'))
+            player06 = int(msg1)
+            Player_Data[player06][3] -= 1
+            for receiver in clients_socks:
+              if receiver != sock:
+                sock.send("roadroad".encode('utf-8'))
+                sock.recv(bufsize)
+                sock.send(msg1.encode('utf-8'))
+                sock.recv(bufsize)
+            Player_Data[player06][3] -= 1
+
+          elif msg == "Road2":
+
+            msg1=sock.recv(bufsize).decode(('utf-8')) #操作しているクライアント側からの送信
+            sock.send("ok".encode('utf-8'))
+            msg2=sock.recv(bufsize).decode(('utf-8'))
+            sock.send("ok".encode('utf-8'))
+            msg3=sock.recv(bufsize).decode(('utf-8'))
+            sock.send("ok".encode('utf-8'))
+            sock.recv(bufsize).decode(('utf-8'))
+            sock.send("ok".encode('utf-8'))
+
+            for receiver in clients_socks:           #他のクライアントへ一斉送信
+              if sock!=receiver:
+                receiver.send("Road2".encode('utf-8'))
+                receiver.recv(bufsize)        
+                receiver.send(msg1.encode('utf-8'))
+                receiver.recv(bufsize)
+                receiver.send(msg2.encode('utf-8'))
+                receiver.recv(bufsize)        
+                receiver.send(msg3.encode('utf-8'))
+                receiver.recv(bufsize)
+                receiver.send("MsgEnd".encode('utf-8'))
+                receiver.recv(bufsize)
+            
+            position = int(msg1)
+            player01 = int(msg2)
+            road_length = int(msg3)
+
+            Mapdata_Side[position][0]=player01
+            Player_Data[player01][8] = road_length
+            if Player_Data[player01][9]==0 and Player_Data[player01][8]>=5:
+              for j in range(4):
+                if j!=player01:
+                  if Player_Data[j][8]<Player_Data[player01][8]:
+                    Player_Data[player01][9]=1
+
+            svd.draw_server(screen,Mapdata_Mass,Mapdata_Side,Mapdata_Edge,Player_Data,land,landnumber,backlog)
+            svd.draw_image(screen,"./picture/Dice/Roll_of_Dice.png",60,540)
+            svd.draw_Dice(screen,Dice1[0],Dice2[0])
+            svd.draw_image(screen,"./picture/frame.png",540,540)
+            pygame.display.update()
+          ######################
+          ### 街道2建設(終了) ###
+          ######################
+          ############
+          ### 発見 ###
+          ############
+          elif msg == "Discovery":
+            msg1=sock.recv(bufsize).decode(('utf-8')) #操作しているクライアント側からの送信
+            sock.send("ok".encode('utf-8'))
+            msg2=sock.recv(bufsize).decode(('utf-8'))
+            sock.send("ok".encode('utf-8'))
+            msg3=sock.recv(bufsize).decode(('utf-8'))
+            sock.send("ok".encode('utf-8'))
+            for receiver in clients_socks:           #他のクライアントへ一斉送信
+              if sock!=receiver:
+                receiver.send("Discovery".encode('utf-8'))
+                receiver.recv(bufsize)        
+                receiver.send(msg1.encode('utf-8'))
+                receiver.recv(bufsize)
+                receiver.send(msg2.encode('utf-8'))
+                receiver.recv(bufsize)        
+                receiver.send(msg3.encode('utf-8'))
+                receiver.recv(bufsize)
+            player07 = int(msg1)
+            res0 = int(msg2)
+            res1 = int(msg3)
+            Player_Data[player07][3] -= 1
+            Player_Data[player07][1] += 2
+            Player_Data[player07][2][res0] += 1
+            Player_Data[player07][2][res1] += 1
+            svd.draw_server(screen,Mapdata_Mass,Mapdata_Side,Mapdata_Edge,Player_Data,land,landnumber,backlog)
+            svd.draw_image(screen,"./picture/Dice/Roll_of_Dice.png",60,540)
+            svd.draw_Dice(screen,Dice1[0],Dice2[0])
+            svd.draw_image(screen,"./picture/frame.png",540,540)
+            pygame.display.update()
+          #################
+          ### 発見(終了) ###
           #################
       #######################
       ###  本体処理(終了)  ###

@@ -481,6 +481,17 @@ def draw_client_development(screen,Player_Data,yourturn,Thisturn_Draw):
   draw_image(screen,select_num_image(Thisturn_Draw[2]),325,450)
   draw_image(screen,select_num_image(Thisturn_Draw[3]),375,450)
 
+def draw_candidate_choose(screen):
+  draw_image(screen,"./picture/candidate3.png",150,560)
+  draw_image(screen,"./picture/candidate3.png",210,560)
+  draw_image(screen,"./picture/candidate3.png",270,560)
+  draw_image(screen,"./picture/candidate3.png",330,560)
+  draw_image(screen,"./picture/candidate3.png",390,560)
+  return [[150,560],[210,560],[270,560],[330,560],[390,560]]
+
+  
+
+
 
   
 
