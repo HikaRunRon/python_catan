@@ -489,6 +489,15 @@ def draw_candidate_choose(screen):
   draw_image(screen,"./picture/candidate3.png",390,560)
   return [[150,560],[210,560],[270,560],[330,560],[390,560]]
 
+def draw_candidate_choose2(screen):
+  draw_image(screen,"./picture/candidate4.png",150,560)
+  draw_image(screen,"./picture/candidate4.png",210,560)
+  draw_image(screen,"./picture/candidate4.png",270,560)
+  draw_image(screen,"./picture/candidate4.png",330,560)
+  draw_image(screen,"./picture/candidate4.png",390,560)
+  return [[150,560],[210,560],[270,560],[330,560],[390,560]]
+
+
   
 
 

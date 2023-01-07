@@ -16,6 +16,7 @@ def client_road_building(screen,Mapdata_Mass,Mapdata_Side,Mapdata_Edge,Player_Da
   cld.draw_Dice(screen,Dice1[0],Dice2[0])
   cld.draw_image(screen,"./picture/Turnend_button.png",540,540)
   cld.draw_image(screen,"./picture/Action.png",540,60)
+  cld.draw_image(screen,"./picture/client_trade.png",60,60)
   road_candidate = cld.draw_candidate_road(screen,yourturn,Mapdata_Edge,Mapdata_Side)
 
   while road_running[0]:
@@ -88,6 +89,7 @@ def client_road_building(screen,Mapdata_Mass,Mapdata_Side,Mapdata_Edge,Player_Da
           cld.draw_Dice(screen,Dice1[0],Dice2[0])
           cld.draw_image(screen,"./picture/Turnend_button.png",540,540)
           cld.draw_image(screen,"./picture/Action.png",540,60)
+          cld.draw_image(screen,"./picture/client_trade.png",60,60)
           pygame.display.update()
 
     if road_running[0] == False:  

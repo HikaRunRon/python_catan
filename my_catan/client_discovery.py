@@ -78,6 +78,7 @@ def client_discovery(screen,Mapdata_Mass,Mapdata_Side,Mapdata_Edge,Player_Data,l
             cld.draw_Dice(screen,Dice1[0],Dice2[0])
             cld.draw_image(screen,"./picture/Turnend_button.png",540,540)
             cld.draw_image(screen,"./picture/Action.png",540,60)
+            cld.draw_image(screen,"./picture/client_trade.png",60,60)
             cld.draw_client_development(screen,Player_Data,yourturn,Thisturn_draw)
             pygame.display.update()
             Discovery[0]=False

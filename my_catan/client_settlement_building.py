@@ -16,6 +16,7 @@ def client_settlement_building(screen,Mapdata_Mass,Mapdata_Side,Mapdata_Edge,Pla
   cld.draw_Dice(screen,Dice1[0],Dice2[0])
   cld.draw_image(screen,"./picture/Turnend_button.png",540,540)
   cld.draw_image(screen,"./picture/Action.png",540,60)
+  cld.draw_image(screen,"./picture/client_trade.png",60,60)
   settlement_candidate = cld.draw_candidate_settlement(screen,yourturn,Mapdata_Edge,Mapdata_Side,1)
   while settlement_running[0]:
     pygame.display.update()
@@ -46,6 +47,9 @@ def client_settlement_building(screen,Mapdata_Mass,Mapdata_Side,Mapdata_Edge,Pla
               Player_Data[yourturn][2][2] -= 1
               Player_Data[yourturn][2][3] -= 1
               Player_Data[yourturn][5] -= 1
+              trade_judge = Mapdata_Edge[i][1]
+              if trade_judge!=-1:
+                Player_Data[yourturn][12][trade_judge]=1
               player_str = str(yourturn)
               sock.send("Settlement".encode('utf-8')) #開拓地の情報を送信する
               sock.recv(bufsize)
@@ -71,6 +75,7 @@ def client_settlement_building(screen,Mapdata_Mass,Mapdata_Side,Mapdata_Edge,Pla
           cld.draw_Dice(screen,Dice1[0],Dice2[0])
           cld.draw_image(screen,"./picture/Turnend_button.png",540,540)
           cld.draw_image(screen,"./picture/Action.png",540,60)
+          cld.draw_image(screen,"./picture/client_trade.png",60,60)
           pygame.display.update()
 
     if settlement_running[0] == False: 

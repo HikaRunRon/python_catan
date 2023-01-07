@@ -18,6 +18,7 @@ def client_development(screen,Mapdata_Mass,Mapdata_Side,Mapdata_Edge,Player_Data
   cld.draw_Dice(screen,Dice1[0],Dice2[0])
   cld.draw_image(screen,"./picture/Turnend_button.png",540,540)
   cld.draw_image(screen,"./picture/Action.png",540,60)
+  cld.draw_image(screen,"./picture/client_trade.png",60,60)
   cld.draw_client_development(screen,Player_Data,yourturn,Thisturn_draw)
   pygame.display.update()
      
@@ -84,6 +85,7 @@ def client_development(screen,Mapdata_Mass,Mapdata_Side,Mapdata_Edge,Player_Data
           cld.draw_Dice(screen,Dice1[0],Dice2[0])
           cld.draw_image(screen,"./picture/Turnend_button.png",540,540)
           cld.draw_image(screen,"./picture/Action.png",540,60)
+          cld.draw_image(screen,"./picture/client_trade.png",60,60)
           cld.draw_client_development(screen,Player_Data,yourturn,Thisturn_draw)
           pygame.display.update()
         ########################
@@ -119,6 +121,7 @@ def client_development(screen,Mapdata_Mass,Mapdata_Side,Mapdata_Edge,Player_Data
           client_roadroad.client_roadroad(screen,Mapdata_Mass,Mapdata_Side,Mapdata_Edge,Player_Data,land,landnumber,backlog,yourturn,rightside,front,leftside,Dice1,Dice2,road_running,sock,bufsize,Winner,running1,running,readfds)
           cld.draw_image(screen,"./picture/Turnend_button.png",540,540)
           cld.draw_image(screen,"./picture/Action.png",540,60)
+          cld.draw_image(screen,"./picture/client_trade.png",60,60)
           cld.draw_client_development(screen,Player_Data,yourturn,Thisturn_draw)
           pygame.display.update()
         #####################
@@ -163,6 +166,7 @@ def client_development(screen,Mapdata_Mass,Mapdata_Side,Mapdata_Edge,Player_Data
       cld.draw_Dice(screen,Dice1[0],Dice2[0])
       cld.draw_image(screen,"./picture/Turnend_button.png",540,540)
       cld.draw_image(screen,"./picture/Action.png",540,60)
+      cld.draw_image(screen,"./picture/client_trade.png",60,60)
       pygame.display.update()
       break 
         

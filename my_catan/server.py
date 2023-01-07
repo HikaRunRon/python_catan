@@ -1033,6 +1033,41 @@ def main(): #サーバー側
           #################
           ### 独占(終了) ###
           #################
+
+          #####################
+          ### セルフトレード ###
+          #####################
+          elif msg == "selftrade":
+            msg1=sock.recv(bufsize).decode(('utf-8')) #操作しているクライアント側からの送信
+            sock.send("ok".encode('utf-8'))
+            msg2=sock.recv(bufsize).decode(('utf-8'))
+            sock.send("ok".encode('utf-8'))
+            msg3=sock.recv(bufsize).decode(('utf-8'))
+            sock.send("ok".encode('utf-8'))
+            for receiver in clients_socks:           #他のクライアントへ一斉送信
+              if sock!=receiver:
+                receiver.send("selftrade".encode('utf-8'))
+                receiver.recv(bufsize)        
+                receiver.send(msg1.encode('utf-8'))
+                receiver.recv(bufsize)
+                receiver.send(msg2.encode('utf-8'))
+                receiver.recv(bufsize)
+                receiver.send(msg3.encode('utf-8'))
+                receiver.recv(bufsize)
+            player09 = int(msg1)
+            resource_sum = int(msg3) 
+            resources = msg2.split("/")
+            Player_Data[player09][1] = resource_sum
+            for j in range(5):
+              Player_Data[player09][2][j] = int(resources[j])
+            svd.draw_server(screen,Mapdata_Mass,Mapdata_Side,Mapdata_Edge,Player_Data,land,landnumber,backlog)
+            svd.draw_image(screen,"./picture/Dice/Roll_of_Dice.png",60,540)
+            svd.draw_Dice(screen,Dice1[0],Dice2[0])
+            svd.draw_image(screen,"./picture/frame.png",540,540)
+            pygame.display.update()       
+          ##########################
+          ### セルフトレード(終了) ###
+          ##########################
       #######################
       ###  本体処理(終了)  ###
       #######################

@@ -125,6 +125,9 @@ def client_first_phase(running,myturn,sock,readfds,bufsize,Mapdata_Edge,once,Map
         print(pos)
         player = int(msg3)
         Mapdata_Edge[pos][0]=player*2 #クライアント側のデータ更新完了
+        trade_judge = Mapdata_Edge[pos][1]
+        if trade_judge!=-1:
+          Player_Data[player][12][trade_judge]=1
         if once[player]!=0:
           for i in range(19):
             if pos in Mapdata_Mass[i][3]:
