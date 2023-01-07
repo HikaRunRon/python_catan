@@ -513,6 +513,10 @@ def main(): #クライアント側
                 Player_Data[player04][2][card_num]+=1
                 Player_Data[player04][10] += 1
                 Player_Data[player04][3] -= 1
+                if player03 == yourturn:
+                  cld.draw_image(screen,"./picture/Robbed.png",300,300)
+                  pygame.display.update()
+                  pygame.time.wait(1000)
                 if Player_Data[player04][11]==0 and Player_Data[player04][10]>=3:
                   largest_judge = True
                   for j in range(4):

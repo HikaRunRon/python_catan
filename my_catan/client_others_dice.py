@@ -319,6 +319,11 @@ def client_others_dice(running1,sock,bufsize,readfds,Dice1,Dice2,Mapdata_Mass,Ma
           card_num = int(msg3)
           Player_Data[player03][1]-=1
           Player_Data[player03][2][card_num]-=1
+          if player03 == yourturn:
+            cld.draw_image(screen,"./picture/Robbed.png",300,300)
+            pygame.display.update()
+            pygame.time.wait(1000)
+
           Player_Data[player04][1]+=1
           Player_Data[player04][2][card_num]+=1
           bandit[0]=False
