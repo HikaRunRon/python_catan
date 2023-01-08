@@ -228,7 +228,7 @@ def main(): #サーバー側
   [-1,3,[47,48,53],[35,37,46],[349,469]],[-1,-1,[38,48],[26,36],[325,510]],[-1,5,[49,54],[28,39],[398,132]],[-1,-1,[54,55,62],[38,40,47],[423,173]],[-1,-1,[50,55,56],[30,39,41],[398,216]],[-1,-1,[56,57,63],[40,42,49],[423,258]],[-1,-1,[51,57,58],[32,41,43],[398,300]],[-1,-1,[58,59,64],[42,44,51],[423,342]],[-1,-1,[52,59,60],[34,43,45],[398,384]],
   [-1,-1,[60,61,65],[44,46,53],[423,427]],[-1,3,[53,61],[36,45],[398,469]],[-1,0,[62,66],[39,48],[472,173]],[-1,0,[66,67],[47,49],[496,216]],[-1,-1,[63,67,68],[41,48,50],[472,258]],[-1,2,[68,69],[49,51],[496,300]],[-1,2,[64,69,70],[43,50,52],[472,342]],[-1,0,[70,71],[51,53],[496,384]],[-1,0,[65,71],[45,52],[472,427]]]
 
-  Player_Data = [[2,0,[0,0,0,0,0],4,[1,1,1,1,0,0,0,0,0],3,4,13,0,0,0,0,[0,0,0,0,0,0]],[2,0,[0,0,0,0,0],0,[0,0,0,0,0,0,0,0,0],3,4,13,0,0,0,0,[0,0,0,0,0,0]],[2,0,[0,0,0,0,0],0,[0,0,0,0,0,0,0,0,0],3,4,13,0,0,0,0,[0,0,0,0,0,0]],[2,0,[0,0,0,0,0],0,[0,0,0,0,0,0,0,0,0],3,4,13,0,0,0,0,[0,0,0,0,0,0]]]
+  Player_Data = [[2,0,[0,0,0,0,0],0,[0,0,0,0,0,0,0,0,0],3,4,13,0,0,0,0,[0,0,0,0,0,0]],[2,0,[0,0,0,0,0],0,[0,0,0,0,0,0,0,0,0],3,4,13,0,0,0,0,[0,0,0,0,0,0]],[2,0,[0,0,0,0,0],0,[0,0,0,0,0,0,0,0,0],3,4,13,0,0,0,0,[0,0,0,0,0,0]],[2,0,[0,0,0,0,0],0,[0,0,0,0,0,0,0,0,0],3,4,13,0,0,0,0,[0,0,0,0,0,0]]]
   #所持ポイント、所持資源カード合計枚数、所持資源カード枚数内訳(木、レンガ、羊、小麦、石)、所持発展カード合計枚数,その内訳(騎士、街道建設、発見、独占、大聖堂、図書館、市場、議会、大学),残り建設可能開拓地数、残り建設可能都市数、残り建設可能街道数、交易路の長さ、騎士力,優位トレード所持(1(wood2-1),2(brick2-1),3(sheep2-1),4(wheat2-1),5(ore2-1),0(3-1))(所持しているときは1(デフォルト0))
 
   secretcard=[0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,1,2,2,3,3,4,5,6,7,8] #発展カード順番決め(騎士14、街道建設2、発見2、独占2、大聖堂1、図書館1、市場1、議会1、大学1)
@@ -1068,6 +1068,88 @@ def main(): #サーバー側
           ##########################
           ### セルフトレード(終了) ###
           ##########################
+          ###############
+          ### 交易提案 ###
+          ###############
+          elif msg == "suggest":
+            msg1=sock.recv(bufsize).decode(('utf-8')) #操作しているクライアント側からの送信
+            sock.send("ok".encode('utf-8'))
+            msg2=sock.recv(bufsize).decode(('utf-8'))
+            sock.send("ok".encode('utf-8'))
+            msg3=sock.recv(bufsize).decode(('utf-8'))
+            sock.send("ok".encode('utf-8'))
+            partner = clients_socks[int(msg2)]
+            partner.send("suggest".encode('utf-8'))
+            partner.recv(bufsize)        
+            partner.send(msg1.encode('utf-8'))
+            partner.recv(bufsize)
+            partner.send(msg2.encode('utf-8'))
+            partner.recv(bufsize)
+            partner.send(msg3.encode('utf-8'))
+            partner.recv(bufsize)
+          #####################
+          ### 交易提案(終了) ###
+          #####################
+          ###############
+          ### 交易受諾 ###
+          ###############
+          elif msg == "accept":
+            msg1=sock.recv(bufsize).decode(('utf-8')) #操作しているクライアント側からの送信
+            sock.send("ok".encode('utf-8'))
+            msg2=sock.recv(bufsize).decode(('utf-8'))
+            sock.send("ok".encode('utf-8'))
+            msg3=sock.recv(bufsize).decode(('utf-8'))
+            sock.send("ok".encode('utf-8'))
+            for receiver in clients_socks:           #他のクライアントへ一斉送信
+              receiver.send("accept".encode('utf-8'))
+              receiver.recv(bufsize)        
+              receiver.send(msg1.encode('utf-8'))
+              receiver.recv(bufsize)
+              receiver.send(msg2.encode('utf-8'))
+              receiver.recv(bufsize)
+              receiver.send(msg3.encode('utf-8'))
+              receiver.recv(bufsize)
+            trl = msg3.split("/")
+            for i in range(5):
+              x_str = trl[i]
+              x = int(x_str)
+              trl[i] = x
+            Player_Data[int(msg1)][2][0] -= trl[0]
+            Player_Data[int(msg1)][2][1] -= trl[1]
+            Player_Data[int(msg1)][2][2] -= trl[2]
+            Player_Data[int(msg1)][2][3] -= trl[3]
+            Player_Data[int(msg1)][2][4] -= trl[4]
+            Player_Data[int(msg1)][1] = Player_Data[int(msg1)][2][0]+Player_Data[int(msg1)][2][1]+Player_Data[int(msg1)][2][2]+Player_Data[int(msg1)][2][3]+Player_Data[int(msg1)][2][4]
+            Player_Data[int(msg2)][2][0] += trl[0]
+            Player_Data[int(msg2)][2][1] += trl[1]
+            Player_Data[int(msg2)][2][2] += trl[2]
+            Player_Data[int(msg2)][2][3] += trl[3]
+            Player_Data[int(msg2)][2][4] += trl[4]
+            Player_Data[int(msg2)][1] = Player_Data[int(msg2)][2][0]+Player_Data[int(msg2)][2][1]+Player_Data[int(msg2)][2][2]+Player_Data[int(msg2)][2][3]+Player_Data[int(msg2)][2][4]
+            svd.draw_server(screen,Mapdata_Mass,Mapdata_Side,Mapdata_Edge,Player_Data,land,landnumber,backlog)
+            svd.draw_image(screen,"./picture/Dice/Roll_of_Dice.png",60,540)
+            svd.draw_Dice(screen,Dice1[0],Dice2[0])
+            svd.draw_image(screen,"./picture/frame.png",540,540)
+            pygame.display.update()
+          #####################
+          ### 交易受諾(終了) ###
+          #####################
+          ###############
+          ### 交易拒否 ###
+          ###############
+          elif msg == "refuse":
+            msg1=sock.recv(bufsize).decode(('utf-8')) #操作しているクライアント側からの送信
+            sock.send("ok".encode('utf-8'))
+            msg2=sock.recv(bufsize).decode(('utf-8'))
+            sock.send("ok".encode('utf-8'))
+            msg3=sock.recv(bufsize).decode(('utf-8'))
+            sock.send("ok".encode('utf-8'))
+            you = clients_socks[int(msg1)]
+            you.send("refuse".encode('utf-8'))
+            sock.recv(bufsize)
+          #####################
+          ### 交易拒否(終了) ###
+          #####################
       #######################
       ###  本体処理(終了)  ###
       #######################

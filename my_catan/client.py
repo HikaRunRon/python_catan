@@ -16,6 +16,7 @@ import client_road_building
 import client_settlement_building
 import client_city_building
 import client_development
+import client_selftrade
 
 def main(): #クライアント側
   (w,h)=(600,600)   #ゲーム画面の大きさ(幅600px,高さ600px)
@@ -82,7 +83,7 @@ def main(): #クライアント側
   [-1,3,[47,48,53],[35,37,46],[349,469]],[-1,-1,[38,48],[26,36],[325,510]],[-1,5,[49,54],[28,39],[398,132]],[-1,-1,[54,55,62],[38,40,47],[423,173]],[-1,-1,[50,55,56],[30,39,41],[398,216]],[-1,-1,[56,57,63],[40,42,49],[423,258]],[-1,-1,[51,57,58],[32,41,43],[398,300]],[-1,-1,[58,59,64],[42,44,51],[423,342]],[-1,-1,[52,59,60],[34,43,45],[398,384]],
   [-1,-1,[60,61,65],[44,46,53],[423,427]],[-1,3,[53,61],[36,45],[398,469]],[-1,0,[62,66],[39,48],[472,173]],[-1,0,[66,67],[47,49],[496,216]],[-1,-1,[63,67,68],[41,48,50],[472,258]],[-1,2,[68,69],[49,51],[496,300]],[-1,2,[64,69,70],[43,50,52],[472,342]],[-1,0,[70,71],[51,53],[496,384]],[-1,0,[65,71],[45,52],[472,427]]]
 
-  Player_Data = [[0,0,[0,0,0,0,0],4,[1,1,1,1,0,0,0,0,0],3,4,13,0,0,0,0,[0,0,0,0,0,0]],[0,0,[0,0,0,0,0],0,[0,0,0,0,0,0,0,0,0],3,4,13,0,0,0,0,[0,0,0,0,0,0]],[0,0,[0,0,0,0,0],0,[0,0,0,0,0,0,0,0,0],3,4,13,0,0,0,0,[0,0,0,0,0,0]],[0,0,[0,0,0,0,0],0,[0,0,0,0,0,0,0,0,0],3,4,13,0,0,0,0,[0,0,0,0,0,0]]]
+  Player_Data = [[0,0,[0,0,0,0,0],0,[0,0,0,0,0,0,0,0,0],3,4,13,0,0,0,0,[0,0,0,0,0,0]],[0,0,[0,0,0,0,0],0,[0,0,0,0,0,0,0,0,0],3,4,13,0,0,0,0,[0,0,0,0,0,0]],[0,0,[0,0,0,0,0],0,[0,0,0,0,0,0,0,0,0],3,4,13,0,0,0,0,[0,0,0,0,0,0]],[0,0,[0,0,0,0,0],0,[0,0,0,0,0,0,0,0,0],3,4,13,0,0,0,0,[0,0,0,0,0,0]]]
   #所持ポイント、所持資源カード合計枚数、所持資源カード枚数内訳(木、レンガ、羊、小麦、石)、所持発展カード合計枚数,その内訳(騎士、街道建設、発見、独占、大聖堂、図書館、市場、議会、大学),残り建設可能開拓地数、残り建設可能都市数、残り建設可能街道数、交易路の長さ、最長交易路の有無、騎士力,最大騎士力の有無、優位トレード所持(1(wood2-1),2(brick2-1),3(sheep2-1),4(wheat2-1),5(ore2-1),0(3-1))(所持しているときは1(デフォルト0))
 
   yourturn = -1 #プレイヤーのターン、後々サーバーから通知が来る。
@@ -680,6 +681,113 @@ def main(): #クライアント側
               ##########################
               ### セルフトレード(終了) ###
               ##########################
+              ###############
+              ### 交易交渉 ###
+              ###############
+              elif msg == "suggest":
+                msg1=sock.recv(bufsize).decode(('utf-8')) #操作しているクライアント側からの送信
+                sock.send("ok".encode('utf-8'))
+                msg2=sock.recv(bufsize).decode(('utf-8'))
+                sock.send("ok".encode('utf-8'))
+                msg3=sock.recv(bufsize).decode(('utf-8'))
+                sock.send("ok".encode('utf-8'))
+                trl = msg3.split("/")
+                for i in range(5):
+                  x_str = trl[i]
+                  x = int(x_str)
+                  trl[i] = x
+                cld.draw_trade_partner(screen,trl)
+                nego = [True]
+                while nego[0]:
+                  pygame.display.update()
+                  pygame.time.wait(50) #20fps
+                          
+                  for event in pygame.event.get():
+                    if event.type == QUIT:
+                      sock.send("QUIT".encode('utf-8'))
+                      pygame.quit()
+                      sys.exit()
+                    if event.type == KEYDOWN:
+                      if event.key == K_ESCAPE:
+                        sock.send("QUIT".encode('utf-8'))
+                        pygame.quit()
+                        sys.exit()
+                    if event.type == MOUSEBUTTONDOWN and event.button == 1: #蛮族の場所を選択
+                      x, y = event.pos
+                      if (x-145)*(x-145)+(y-145)*(y-145)<=1600: #accept
+                        sock.send("accept".encode('utf-8'))
+                        sock.recv(bufsize)        
+                        sock.send(msg1.encode('utf-8'))
+                        sock.recv(bufsize)
+                        sock.send(msg2.encode('utf-8'))
+                        sock.recv(bufsize)
+                        sock.send(msg3.encode('utf-8'))
+                        sock.recv(bufsize)
+                        nego[0]=False
+                      if (x-455)*(x-455)+(y-145)*(y-145)<=1600: #refuse
+                        sock.send("refuse".encode('utf-8'))
+                        sock.recv(bufsize)        
+                        sock.send(msg1.encode('utf-8'))
+                        sock.recv(bufsize)
+                        sock.send(msg2.encode('utf-8'))
+                        sock.recv(bufsize)
+                        sock.send(msg3.encode('utf-8'))
+                        sock.recv(bufsize)
+                        nego[0]=False
+                  if nego[0]==False:
+                    break
+                  
+                  rready, wready, xready = select.select(readfds, [], [],0.05) #処理を可能な物から順に選択
+                  for sock in rready:                                   #選択された処理を順次遂行
+                    msg = sock.recv(bufsize).decode('utf-8')
+                    print(msg)
+                    sock.send("ok".encode('utf-8'))
+                    if msg == "serverdown":
+                      pygame.quit()
+                      sys.exit()
+                cld.draw_server(screen,Mapdata_Mass,Mapdata_Side,Mapdata_Edge,Player_Data,land,landnumber,backlog,yourturn,rightside,front,leftside)
+                cld.draw_image(screen,"./picture/Dice/Roll_of_Dice.png",60,540)
+                cld.draw_Dice(screen,Dice1[0],Dice2[0])
+                cld.draw_image(screen,"./picture/frame.png",540,540)
+                pygame.display.update()
+              #####################
+              ### 交易交渉(終了) ###
+              #####################
+              ###############
+              ### 交易受諾 ###
+              ###############
+              elif msg == "accept":
+                msg1=sock.recv(bufsize).decode(('utf-8')) #操作しているクライアント側からの送信
+                sock.send("ok".encode('utf-8'))
+                msg2=sock.recv(bufsize).decode(('utf-8'))
+                sock.send("ok".encode('utf-8'))
+                msg3=sock.recv(bufsize).decode(('utf-8'))
+                sock.send("ok".encode('utf-8'))
+                trl = msg3.split("/")
+                for i in range(5):
+                  x_str = trl[i]
+                  x = int(x_str)
+                  trl[i] = x
+                Player_Data[int(msg1)][2][0] -= trl[0]
+                Player_Data[int(msg1)][2][1] -= trl[1]
+                Player_Data[int(msg1)][2][2] -= trl[2]
+                Player_Data[int(msg1)][2][3] -= trl[3]
+                Player_Data[int(msg1)][2][4] -= trl[4]
+                Player_Data[int(msg1)][1] = Player_Data[int(msg1)][2][0]+Player_Data[int(msg1)][2][1]+Player_Data[int(msg1)][2][2]+Player_Data[int(msg1)][2][3]+Player_Data[int(msg1)][2][4]
+                Player_Data[int(msg2)][2][0] += trl[0]
+                Player_Data[int(msg2)][2][1] += trl[1]
+                Player_Data[int(msg2)][2][2] += trl[2]
+                Player_Data[int(msg2)][2][3] += trl[3]
+                Player_Data[int(msg2)][2][4] += trl[4]
+                Player_Data[int(msg2)][1] = Player_Data[int(msg2)][2][0]+Player_Data[int(msg2)][2][1]+Player_Data[int(msg2)][2][2]+Player_Data[int(msg2)][2][3]+Player_Data[int(msg2)][2][4]
+                cld.draw_server(screen,Mapdata_Mass,Mapdata_Side,Mapdata_Edge,Player_Data,land,landnumber,backlog,yourturn,rightside,front,leftside)
+                cld.draw_image(screen,"./picture/Dice/Roll_of_Dice.png",60,540)
+                cld.draw_Dice(screen,Dice1[0],Dice2[0])
+                cld.draw_image(screen,"./picture/frame.png",540,540)
+                pygame.display.update()
+              #####################
+              ### 交易受諾(終了) ###
+              #####################
                 
           ######################
           ### 本体処理(終了)　###
@@ -793,17 +901,52 @@ def main(): #クライアント側
                   #######################
                   ###  セルフトレード  ###
                   #######################
-                  cld.draw_server(screen,Mapdata_Mass,Mapdata_Side,Mapdata_Edge,Player_Data,land,landnumber,backlog,yourturn,rightside,front,leftside)
-                  cld.draw_image(screen,"./picture/Dice/Roll_of_Dice.png",60,540)
-                  cld.draw_image(screen,"./picture/frame.png",540,540)
-                  cld.draw_Dice(screen,Dice1[0],Dice2[0])
-                  cld.draw_image(screen,"./picture/Turnend_button.png",540,540)
-                  cld.draw_image(screen,"./picture/Action.png",540,60)
-                  cld.draw_image(screen,"./picture/client_trade.png",60,60)
-                  discard_resource_list = cld.draw_candidate_choose2(screen)
-                  if self_trade[0]:
-                    self_trade_discard = [True]
-                    while self_trade_discard[0]:
+                  client_selftrade.client_selftrade(screen,Mapdata_Mass,Mapdata_Side,Mapdata_Edge,Player_Data,land,landnumber,backlog,yourturn,rightside,front,leftside,Dice1,Dice2,sock,self_trade,readfds,bufsize)
+                  ###########################
+                  ###  セルフトレード(終了) ###
+                  ###########################
+                
+                if 1<=x and x<=120 and 61<=y and y<=120: #発展
+                  others_trade = [True]
+                  select_partner = [False]
+                  trade_suggest = [False]
+                  trade_wait = [False]
+                  trade_partner = [-1]
+                  ##############
+                  ###  交易  ###
+                  ##############
+                  cld.draw_image(screen,"./picture/trade/select_partner.png",300,300)
+                  if backlog == 3:
+                    if yourturn == 0:
+                      cld.draw_image(screen,"./picture/trade/red.png",300,310)
+                      cld.draw_image(screen,"./picture/trade/blue.png",300,390)
+                    if yourturn == 1:
+                      cld.draw_image(screen,"./picture/trade/white.png",300,230)
+                      cld.draw_image(screen,"./picture/trade/blue.png",300,390)
+                    if yourturn == 2:
+                      cld.draw_image(screen,"./picture/trade/white.png",300,230)
+                      cld.draw_image(screen,"./picture/trade/red.png",300,310)
+                  if backlog == 4:
+                    if yourturn == 0:
+                      cld.draw_image(screen,"./picture/trade/red.png",300,310)
+                      cld.draw_image(screen,"./picture/trade/blue.png",300,390)
+                      cld.draw_image(screen,"./picture/trade/orange.png",300,470)
+                    if yourturn == 1:
+                      cld.draw_image(screen,"./picture/trade/white.png",300,230)
+                      cld.draw_image(screen,"./picture/trade/blue.png",300,390)
+                      cld.draw_image(screen,"./picture/trade/orange.png",300,470)
+                    if yourturn == 2:
+                      cld.draw_image(screen,"./picture/trade/white.png",300,230)
+                      cld.draw_image(screen,"./picture/trade/red.png",300,310)
+                      cld.draw_image(screen,"./picture/trade/orange.png",300,470)
+                    if yourturn == 3:
+                      cld.draw_image(screen,"./picture/trade/white.png",300,230)
+                      cld.draw_image(screen,"./picture/trade/red.png",300,310)
+                      cld.draw_image(screen,"./picture/trade/blue.png",300,390)
+
+                  if others_trade[0]:     #対人トレード開始
+                    select_partner[0] = True
+                    while select_partner[0]:   #交易相手の選択
                       pygame.display.update()
                       pygame.time.wait(50) #20fps
                               
@@ -819,22 +962,23 @@ def main(): #クライアント側
                             sys.exit()
                         if event.type == MOUSEBUTTONDOWN and event.button == 1: #蛮族の場所を選択
                           x, y = event.pos
-                          if 1<=x and x<=120 and 1<=y and y<=60:
-                            self_trade[0] = False
-                            self_trade_discard[0] = False
-                          for i in range(5):
-                            if (discard_resource_list[i][0]-x)*(discard_resource_list[i][0]-x)+(discard_resource_list[i][1]-y)*(discard_resource_list[i][1]-y)<=400:
-                              trade_rate = 4
-                              if Player_Data[yourturn][12][0]==1:
-                                trade_rate = 3
-                              if Player_Data[yourturn][12][i+1]==1:
-                                trade_rate = 2
-                              if Player_Data[yourturn][2][i]>=trade_rate:
-                                Player_Data[yourturn][1] -= trade_rate
-                                Player_Data[yourturn][2][i] -= trade_rate
-                                self_trade_discard[0]=False
-                              break
-                      if self_trade_discard[0]==False:
+                          if 1<=x and x<=120 and 61<=y and y<=120:
+                            others_trade[0] = False
+                            select_partner[0] = False
+
+                          if 210<=x and x<=390 and 200<=y and y<=260 and yourturn!=0:
+                            trade_partner[0] = 0
+                            select_partner[0] = False
+                          if 210<=x and x<=390 and 280<=y and y<=340 and yourturn!=1:
+                            trade_partner[0] = 1
+                            select_partner[0] = False
+                          if 210<=x and x<=390 and 360<=y and y<=420 and yourturn!=2:
+                            trade_partner[0] = 2
+                            select_partner[0] = False
+                          if 210<=x and x<=390 and 440<=y and y<=500 and yourturn!=3 and backlog==4:
+                            trade_partner[0] = 3
+                            select_partner[0] = False
+                      if select_partner[0]==False:
                         break
                       rready, wready, xready = select.select(readfds, [], [],0.05) #処理を可能な物から順に選択
                       for sock in rready:                                   #選択された処理を順次遂行
@@ -845,19 +989,13 @@ def main(): #クライアント側
                           pygame.quit()
                           sys.exit()
                       
-                    if self_trade[0]:
-                      cld.draw_server(screen,Mapdata_Mass,Mapdata_Side,Mapdata_Edge,Player_Data,land,landnumber,backlog,yourturn,rightside,front,leftside)
-                      cld.draw_image(screen,"./picture/Dice/Roll_of_Dice.png",60,540)
-                      cld.draw_image(screen,"./picture/frame.png",540,540)
-                      cld.draw_Dice(screen,Dice1[0],Dice2[0])
-                      cld.draw_image(screen,"./picture/Turnend_button.png",540,540)
-                      cld.draw_image(screen,"./picture/Action.png",540,60)
-                      cld.draw_image(screen,"./picture/client_trade.png",60,60)
-                      get_resource_list = cld.draw_candidate_choose(screen)
+                    if others_trade[0]:
+                      trade_suggest[0] = True
+                      trl = [0,0,0,0,0]
+                      cld.draw_trade_you_suggest(screen,trl)
                       pygame.display.update()
-                      self_trade_discard[0] = True
 
-                    while self_trade_discard[0]:
+                    while trade_suggest[0]:     #交易内容の入力
                       pygame.display.update()
                       pygame.time.wait(50) #20fps
                               
@@ -871,15 +1009,56 @@ def main(): #クライアント側
                             sock.send("QUIT".encode('utf-8'))
                             pygame.quit()
                             sys.exit()
-                        if event.type == MOUSEBUTTONDOWN and event.button == 1: #蛮族の場所を選択
+                        if event.type == MOUSEBUTTONDOWN and event.button == 1:
                           x, y = event.pos
-                          for i in range(5):
-                            if (discard_resource_list[i][0]-x)*(discard_resource_list[i][0]-x)+(discard_resource_list[i][1]-y)*(discard_resource_list[i][1]-y)<=400:
-                              Player_Data[yourturn][1] += 1
-                              Player_Data[yourturn][2][i] += 1
-                              self_trade_discard[0]=False
-                              break
-                      if self_trade_discard[0]==False:
+                          if 160<=x and x<=200 and 220<=y and y<=280 and 1-trl[0]<=Player_Data[trade_partner[0]][2][0]:
+                            trl[0] -= 1
+                            cld.draw_trade_you_suggest(screen,trl)
+                            pygame.display.update()
+                          if 220<=x and x<=260 and 220<=y and y<=280 and 1-trl[1]<=Player_Data[trade_partner[0]][2][1]:
+                            trl[1] -= 1 
+                            cld.draw_trade_you_suggest(screen,trl) 
+                            pygame.display.update()                       
+                          if 280<=x and x<=320 and 220<=y and y<=280 and 1-trl[2]<=Player_Data[trade_partner[0]][2][2]:
+                            trl[2] -= 1
+                            cld.draw_trade_you_suggest(screen,trl)
+                            pygame.display.update()
+                          if 340<=x and x<=380 and 220<=y and y<=280 and 1-trl[3]<=Player_Data[trade_partner[0]][2][3]:
+                            trl[3] -= 1
+                            cld.draw_trade_you_suggest(screen,trl)
+                            pygame.display.update()
+                          if 400<=x and x<=440 and 220<=y and y<=280 and 1-trl[4]<=Player_Data[trade_partner[0]][2][4]:
+                            trl[4] -= 1
+                            cld.draw_trade_you_suggest(screen,trl)
+                            pygame.display.update()
+
+                          if 160<=x and x<=200 and 320<=y and y<=380 and 1+trl[0]<=Player_Data[yourturn][2][0]:
+                            trl[0] += 1
+                            cld.draw_trade_you_suggest(screen,trl)
+                            pygame.display.update()
+                          if 220<=x and x<=260 and 320<=y and y<=380 and 1+trl[1]<=Player_Data[yourturn][2][1]:
+                            trl[1] += 1  
+                            cld.draw_trade_you_suggest(screen,trl) 
+                            pygame.display.update()                      
+                          if 280<=x and x<=320 and 320<=y and y<=380 and 1+trl[2]<=Player_Data[yourturn][2][2]:
+                            trl[2] += 1
+                            cld.draw_trade_you_suggest(screen,trl)
+                            pygame.display.update()
+                          if 340<=x and x<=380 and 320<=y and y<=380 and 1+trl[3]<=Player_Data[yourturn][2][3]:
+                            trl[3] += 1
+                            cld.draw_trade_you_suggest(screen,trl)
+                            pygame.display.update()
+                          if 400<=x and x<=440 and 320<=y and y<=380 and 1+trl[4]<=Player_Data[yourturn][2][4]:
+                            trl[4] += 1
+                            cld.draw_trade_you_suggest(screen,trl)
+                            pygame.display.update()
+                          
+                          if (x-145)*(x-145)+(y-145)*(y-145)<=1600:
+                            trade_suggest[0]=False
+                          if (x-455)*(x-455)+(y-145)*(y-145)<=1600:
+                            trade_suggest[0]=False
+                            others_trade[0]=False
+                      if trade_suggest[0]==False:
                         break
                       rready, wready, xready = select.select(readfds, [], [],0.05) #処理を可能な物から順に選択
                       for sock in rready:                                   #選択された処理を順次遂行
@@ -889,32 +1068,87 @@ def main(): #クライアント側
                         if msg == "serverdown":
                           pygame.quit()
                           sys.exit()
-                    msg1 = str(Player_Data[yourturn][2][0]) + "/" + str(Player_Data[yourturn][2][1]) + "/" + str(Player_Data[yourturn][2][2]) + "/" + str(Player_Data[yourturn][2][3]) + "/" + str(Player_Data[yourturn][2][4])
-                    sock.send("selftrade".encode('utf-8'))
+                  if others_trade[0]:
+                    sock.send("suggest".encode('utf-8'))
                     sock.recv(bufsize)
                     sock.send(str(yourturn).encode('utf-8'))
                     sock.recv(bufsize)
-                    sock.send(msg1.encode('utf-8'))
+                    sock.send(str(trade_partner[0]).encode('utf-8'))
                     sock.recv(bufsize)
-                    sock.send(str(Player_Data[yourturn][1]).encode('utf-8'))
+                    trl_str = str(trl[0])+"/"+str(trl[1])+"/"+str(trl[2])+"/"+str(trl[3])+"/"+str(trl[4])
+                    sock.send(str(trl_str).encode('utf-8'))
                     sock.recv(bufsize)
-                    cld.draw_server(screen,Mapdata_Mass,Mapdata_Side,Mapdata_Edge,Player_Data,land,landnumber,backlog,yourturn,rightside,front,leftside)
-                    cld.draw_image(screen,"./picture/Dice/Roll_of_Dice.png",60,540)
-                    cld.draw_image(screen,"./picture/frame.png",540,540)
-                    cld.draw_Dice(screen,Dice1[0],Dice2[0])
-                    cld.draw_image(screen,"./picture/Turnend_button.png",540,540)
-                    cld.draw_image(screen,"./picture/Action.png",540,60)
-                    cld.draw_image(screen,"./picture/client_trade.png",60,60)
+                    cld.draw_trade_you_waiting(screen,trl)
+                    trade_wait[0] = True
+                  while trade_wait[0]:
                     pygame.display.update()
-                  ###########################
-                  ###  セルフトレード(終了) ###
-                  ###########################
-                
-                if 1<=x and x<=120 and 61<=y and y<=120: #発展
-                  others_trade = [True]
-                  ##############
-                  ###  交易  ###
-                  ##############
+                    pygame.time.wait(50) #20fps
+                            
+                    for event in pygame.event.get():
+                      if event.type == QUIT:
+                        sock.send("QUIT".encode('utf-8'))
+                        pygame.quit()
+                        sys.exit()
+                      if event.type == KEYDOWN:
+                        if event.key == K_ESCAPE:
+                          sock.send("QUIT".encode('utf-8'))
+                          pygame.quit()
+                          sys.exit()
+                      if event.type == MOUSEBUTTONDOWN and event.button == 1: #蛮族の場所を選択
+                        x, y = event.pos
+
+                    rready, wready, xready = select.select(readfds, [], [],0.05) #処理を可能な物から順に選択
+                    for sock in rready:                                   #選択された処理を順次遂行
+                      msg = sock.recv(bufsize).decode('utf-8')
+                      print(msg)
+                      sock.send("ok".encode('utf-8'))
+                      if msg == "serverdown":
+                        pygame.quit()
+                        sys.exit()
+                      elif msg == "refuse":
+                        cld.draw_image(screen,"./picture/trade/refused.png",300,300)
+                        pygame.display.update()
+                        pygame.time.wait(1000)
+                        trade_wait[0] = False
+                      elif msg == "accept":
+                        msg1=sock.recv(bufsize).decode(('utf-8')) #操作しているクライアント側からの送信
+                        sock.send("ok".encode('utf-8'))
+                        msg2=sock.recv(bufsize).decode(('utf-8'))
+                        sock.send("ok".encode('utf-8'))
+                        msg3=sock.recv(bufsize).decode(('utf-8'))
+                        sock.send("ok".encode('utf-8'))
+                        trl = msg3.split("/")
+                        for i in range(5):
+                          x_str = trl[i]
+                          x = int(x_str)
+                          trl[i] = x
+                        Player_Data[int(msg1)][2][0] -= trl[0]
+                        Player_Data[int(msg1)][2][1] -= trl[1]
+                        Player_Data[int(msg1)][2][2] -= trl[2]
+                        Player_Data[int(msg1)][2][3] -= trl[3]
+                        Player_Data[int(msg1)][2][4] -= trl[4]
+                        Player_Data[int(msg1)][1] = Player_Data[int(msg1)][2][0]+Player_Data[int(msg1)][2][1]+Player_Data[int(msg1)][2][2]+Player_Data[int(msg1)][2][3]+Player_Data[int(msg1)][2][4]
+                        Player_Data[int(msg2)][2][0] += trl[0]
+                        Player_Data[int(msg2)][2][1] += trl[1]
+                        Player_Data[int(msg2)][2][2] += trl[2]
+                        Player_Data[int(msg2)][2][3] += trl[3]
+                        Player_Data[int(msg2)][2][4] += trl[4]
+                        Player_Data[int(msg2)][1] = Player_Data[int(msg2)][2][0]+Player_Data[int(msg2)][2][1]+Player_Data[int(msg2)][2][2]+Player_Data[int(msg2)][2][3]+Player_Data[int(msg2)][2][4]
+                        cld.draw_server(screen,Mapdata_Mass,Mapdata_Side,Mapdata_Edge,Player_Data,land,landnumber,backlog,yourturn,rightside,front,leftside)
+                        cld.draw_image(screen,"./picture/Dice/Roll_of_Dice.png",60,540)
+                        cld.draw_Dice(screen,Dice1[0],Dice2[0])
+                        cld.draw_image(screen,"./picture/frame.png",540,540)
+                        cld.draw_image(screen,"./picture/trade/accepted.png",300,300)
+                        pygame.display.update()
+                        trade_wait[0] = False
+                  cld.draw_server(screen,Mapdata_Mass,Mapdata_Side,Mapdata_Edge,Player_Data,land,landnumber,backlog,yourturn,rightside,front,leftside)
+                  cld.draw_image(screen,"./picture/Dice/Roll_of_Dice.png",60,540)
+                  cld.draw_image(screen,"./picture/frame.png",540,540)
+                  cld.draw_Dice(screen,Dice1[0],Dice2[0])
+                  cld.draw_image(screen,"./picture/Turnend_button.png",540,540)
+                  cld.draw_image(screen,"./picture/Action.png",540,60)
+                  cld.draw_image(screen,"./picture/client_trade.png",60,60)
+                  pygame.display.update()
                   ##################
                   ###  交易(終了) ###
                   ##################

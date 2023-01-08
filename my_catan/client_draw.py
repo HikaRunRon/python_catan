@@ -497,6 +497,161 @@ def draw_candidate_choose2(screen):
   draw_image(screen,"./picture/candidate4.png",390,560)
   return [[150,560],[210,560],[270,560],[330,560],[390,560]]
 
+def draw_trade_you_suggest(screen,trl):
+  draw_image(screen,"./picture/trade/you_suggest.png",300,300)
+  if trl[0]==0:
+    draw_image(screen,select_num_image(0),180,250)
+    draw_image(screen,select_num_image(0),180,350)
+  if trl[0]>0:
+    draw_image(screen,select_num_image(0),180,250)
+    draw_image(screen,select_num_image(trl[0]),180,350)
+  if trl[0]<0:
+    draw_image(screen,select_num_image(-trl[0]),180,250)
+    draw_image(screen,select_num_image(0),180,350)
+
+  if trl[1]==0:
+    draw_image(screen,select_num_image(0),240,250)
+    draw_image(screen,select_num_image(0),240,350)
+  if trl[1]>0:
+    draw_image(screen,select_num_image(0),240,250)
+    draw_image(screen,select_num_image(trl[1]),240,350)
+  if trl[1]<0:
+    draw_image(screen,select_num_image(-trl[1]),240,250)
+    draw_image(screen,select_num_image(0),240,350)
+
+  if trl[2]==0:
+    draw_image(screen,select_num_image(0),300,250)
+    draw_image(screen,select_num_image(0),300,350)
+  if trl[2]>0:
+    draw_image(screen,select_num_image(0),300,250)
+    draw_image(screen,select_num_image(trl[2]),300,350)
+  if trl[2]<0:
+    draw_image(screen,select_num_image(-trl[2]),300,250)
+    draw_image(screen,select_num_image(0),300,350)
+
+  if trl[3]==0:
+    draw_image(screen,select_num_image(0),360,250)
+    draw_image(screen,select_num_image(0),360,350)
+  if trl[3]>0:
+    draw_image(screen,select_num_image(0),360,250)
+    draw_image(screen,select_num_image(trl[3]),360,350)
+  if trl[3]<0:
+    draw_image(screen,select_num_image(-trl[3]),360,250)
+    draw_image(screen,select_num_image(0),360,350)
+
+  if trl[4]==0:
+    draw_image(screen,select_num_image(0),420,250)
+    draw_image(screen,select_num_image(0),420,350)
+  if trl[4]>0:
+    draw_image(screen,select_num_image(0),420,250)
+    draw_image(screen,select_num_image(trl[4]),420,350)
+  if trl[4]<0:
+    draw_image(screen,select_num_image(-trl[4]),420,250)
+    draw_image(screen,select_num_image(0),420,350)
+  
+def draw_trade_you_waiting(screen,trl):
+  draw_image(screen,"./picture/trade/you_waiting.png",300,300)
+  if trl[0]==0:
+    draw_image(screen,select_num_image(0),180,250)
+    draw_image(screen,select_num_image(0),180,350)
+  if trl[0]>0:
+    draw_image(screen,select_num_image(0),180,250)
+    draw_image(screen,select_num_image(trl[0]),180,350)
+  if trl[0]<0:
+    draw_image(screen,select_num_image(-trl[0]),180,250)
+    draw_image(screen,select_num_image(0),180,350)
+
+  if trl[1]==0:
+    draw_image(screen,select_num_image(0),240,250)
+    draw_image(screen,select_num_image(0),240,350)
+  if trl[1]>0:
+    draw_image(screen,select_num_image(0),240,250)
+    draw_image(screen,select_num_image(trl[1]),240,350)
+  if trl[1]<0:
+    draw_image(screen,select_num_image(-trl[1]),240,250)
+    draw_image(screen,select_num_image(0),240,350)
+
+  if trl[2]==0:
+    draw_image(screen,select_num_image(0),300,250)
+    draw_image(screen,select_num_image(0),300,350)
+  if trl[2]>0:
+    draw_image(screen,select_num_image(0),300,250)
+    draw_image(screen,select_num_image(trl[2]),300,350)
+  if trl[2]<0:
+    draw_image(screen,select_num_image(-trl[2]),300,250)
+    draw_image(screen,select_num_image(0),300,350)
+
+  if trl[3]==0:
+    draw_image(screen,select_num_image(0),360,250)
+    draw_image(screen,select_num_image(0),360,350)
+  if trl[3]>0:
+    draw_image(screen,select_num_image(0),360,250)
+    draw_image(screen,select_num_image(trl[3]),360,350)
+  if trl[3]<0:
+    draw_image(screen,select_num_image(-trl[3]),360,250)
+    draw_image(screen,select_num_image(0),360,350)
+
+  if trl[4]==0:
+    draw_image(screen,select_num_image(0),420,250)
+    draw_image(screen,select_num_image(0),420,350)
+  if trl[4]>0:
+    draw_image(screen,select_num_image(0),420,250)
+    draw_image(screen,select_num_image(trl[4]),420,350)
+  if trl[4]<0:
+    draw_image(screen,select_num_image(-trl[4]),420,250)
+    draw_image(screen,select_num_image(0),420,350)
+
+def draw_trade_partner(screen,trl):
+  draw_image(screen,"./picture/trade/partner.png",300,300)
+  if trl[0]==0:
+    draw_image(screen,select_num_image(0),180,350)
+    draw_image(screen,select_num_image(0),180,250)
+  if trl[0]>0:
+    draw_image(screen,select_num_image(0),180,350)
+    draw_image(screen,select_num_image(trl[0]),180,250)
+  if trl[0]<0:
+    draw_image(screen,select_num_image(-trl[0]),180,350)
+    draw_image(screen,select_num_image(0),180,250)
+
+  if trl[1]==0:
+    draw_image(screen,select_num_image(0),240,350)
+    draw_image(screen,select_num_image(0),240,250)
+  if trl[1]>0:
+    draw_image(screen,select_num_image(0),240,350)
+    draw_image(screen,select_num_image(trl[1]),240,250)
+  if trl[1]<0:
+    draw_image(screen,select_num_image(-trl[1]),240,350)
+    draw_image(screen,select_num_image(0),240,250)
+
+  if trl[2]==0:
+    draw_image(screen,select_num_image(0),300,350)
+    draw_image(screen,select_num_image(0),300,250)
+  if trl[2]>0:
+    draw_image(screen,select_num_image(0),300,350)
+    draw_image(screen,select_num_image(trl[2]),300,250)
+  if trl[2]<0:
+    draw_image(screen,select_num_image(-trl[2]),300,350)
+    draw_image(screen,select_num_image(0),300,250)
+
+  if trl[3]==0:
+    draw_image(screen,select_num_image(0),360,350)
+    draw_image(screen,select_num_image(0),360,250)
+  if trl[3]>0:
+    draw_image(screen,select_num_image(0),360,350)
+    draw_image(screen,select_num_image(trl[3]),360,250)
+  if trl[3]<0:
+    draw_image(screen,select_num_image(-trl[3]),360,350)
+    draw_image(screen,select_num_image(0),360,250)
+
+  if trl[4]==0:
+    draw_image(screen,select_num_image(0),420,350)
+    draw_image(screen,select_num_image(0),420,250)
+  if trl[4]>0:
+    draw_image(screen,select_num_image(0),420,350)
+    draw_image(screen,select_num_image(trl[4]),420,250)
+  if trl[4]<0:
+    draw_image(screen,select_num_image(-trl[4]),420,350)
+    draw_image(screen,select_num_image(0),420,250)
 
   
 
