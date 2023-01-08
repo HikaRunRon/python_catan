@@ -1146,7 +1146,7 @@ def main(): #サーバー側
             sock.send("ok".encode('utf-8'))
             you = clients_socks[int(msg1)]
             you.send("refuse".encode('utf-8'))
-            sock.recv(bufsize)
+            you.recv(bufsize)
           #####################
           ### 交易拒否(終了) ###
           #####################

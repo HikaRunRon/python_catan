@@ -896,7 +896,7 @@ def main(): #クライアント側
                   ###  発展(終了) ###
                   ##################
 
-                if 1<=x and x<=120 and 1<=y and y<=60: #発展
+                if 1<=x and x<=120 and 1<=y and y<=60: #セルフトレード
                   self_trade = [True]
                   #######################
                   ###  セルフトレード  ###
@@ -906,7 +906,7 @@ def main(): #クライアント側
                   ###  セルフトレード(終了) ###
                   ###########################
                 
-                if 1<=x and x<=120 and 61<=y and y<=120: #発展
+                if 1<=x and x<=120 and 61<=y and y<=120: #交易
                   others_trade = [True]
                   select_partner = [False]
                   trade_suggest = [False]
@@ -1140,6 +1140,7 @@ def main(): #クライアント側
                         cld.draw_image(screen,"./picture/frame.png",540,540)
                         cld.draw_image(screen,"./picture/trade/accepted.png",300,300)
                         pygame.display.update()
+                        pygame.time.wait(1000)
                         trade_wait[0] = False
                   cld.draw_server(screen,Mapdata_Mass,Mapdata_Side,Mapdata_Edge,Player_Data,land,landnumber,backlog,yourturn,rightside,front,leftside)
                   cld.draw_image(screen,"./picture/Dice/Roll_of_Dice.png",60,540)
