@@ -50,7 +50,7 @@ def main(): #クライアント側
   screen.blit(bg,rect_bg) #背景描画
   pygame.display.update() #ディスプレイ更新
   pygame.time.wait(300)
-  host = "192.168.11.3" 
+  host = "10.237.2.118" 
   port = 55992         #ポート番号 今回は55992に設定
   bufsize = 4096      #デフォルト4096
 

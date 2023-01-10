@@ -422,8 +422,14 @@ def draw_candidate_road(screen,player,Mapdata_Edge,Mapdata_Side):
       continue
     for j in Mapdata_Side[i][2]:
       if Mapdata_Side[j][0]==player:
-        Judge = True
-        break
+        for i_edge in Mapdata_Side[i][1]:
+          for j_edge in Mapdata_Side[j][1]:
+            if i_edge==j_edge:
+              if Mapdata_Edge[i_edge][0]==-1:
+                Judge = True
+                break
+          if Judge:
+            break
     if Judge:
       draw_image(screen,"./picture/candidate.png",Mapdata_Side[i][3][0],Mapdata_Side[i][3][1])
       l.append(i)
