@@ -5,18 +5,18 @@ import pygame
 from pygame.locals import *
 import select
 from contextlib import closing
-import point_calculation as pc
-import client_draw as cld
-import client_start_setting
-import client_map_display
-import client_first_phase
-import client_myturn_dice
-import client_others_dice
-import client_road_building
-import client_settlement_building
-import client_city_building
-import client_development
-import client_selftrade
+from modules import point_calculation as pc
+from modules import client_draw as cld
+from modules import client_start_setting
+from modules import client_map_display
+from modules import client_first_phase
+from modules import client_myturn_dice
+from modules import client_others_dice
+from modules import client_road_building
+from modules import client_settlement_building
+from modules import client_city_building
+from modules import client_development
+from modules import client_selftrade
 
 def main(): #クライアント側
   (w,h)=(600,600)   #ゲーム画面の大きさ(幅600px,高さ600px)
@@ -27,6 +27,19 @@ def main(): #クライアント側
   rect_bg = bg.get_rect() #背景画像の大きさを取得
   screen.blit(bg,rect_bg) #背景描画
   pygame.display.update() #ディスプレイ更新
+  pygame.mixer.init(frequency = 44100)    # 初期設定
+  pygame.mixer.music.load("./music/bgm.mp3")     # 音楽ファイルの読み込み
+  pygame.mixer.music.play(100)              # 音楽の再生回数(1回)
+
+  click_sound = pygame.mixer.Sound("./music/click01.mp3")
+  Bandit_sound = pygame.mixer.Sound("./music/Bandit.mp3")
+  settlement_sound01 = pygame.mixer.Sound("./music/settlement_sound01.mp3")
+  road_sound = pygame.mixer.Sound("./music/road_sound.mp3")
+  city_sound = pygame.mixer.Sound("./music/city_sound.mp3")
+  Turn_end = pygame.mixer.Sound("./music/Turn_end.mp3")
+  turn_start = pygame.mixer.Sound("./music/turn_start.mp3")
+
+  volume = [1.0]
 
   running = True #event発生までTrue
 
@@ -36,13 +49,27 @@ def main(): #クライアント側
         pygame.quit()
         sys.exit()
       if event.type == KEYDOWN:
+        print(event.key)
         if event.key == K_ESCAPE:
           pygame.quit()
           sys.exit()
         if event.key == K_RETURN:
           running = False
+        if event.key == 1073741906:
+          if volume[0] < 1.0:
+            pygame.mixer.music.pause()
+            volume[0] += 0.1
+            pygame.mixer.music.set_volume(volume[0])
+            pygame.mixer.music.unpause()
+        if event.key == 1073741905:
+          if volume[0] > 0.0:
+            pygame.mixer.music.pause()
+            volume[0] -= 0.1
+            pygame.mixer.music.set_volume(volume[0])
+            pygame.mixer.music.unpause()
       if event.type == MOUSEBUTTONDOWN and event.button == 1:
         x, y = event.pos
+        click_sound.play()
         if 145 <= x and x <= 460 and 350 <= y and y <= 510:
           running = False
   bg = pygame.image.load("./picture/Setting_Screen/setting.jpg").convert_alpha() #背景画像設定
@@ -50,7 +77,7 @@ def main(): #クライアント側
   screen.blit(bg,rect_bg) #背景描画
   pygame.display.update() #ディスプレイ更新
   pygame.time.wait(300)
-  host = "10.237.2.118" 
+  host = "192.168.11.3" 
   port = 55992         #ポート番号 今回は55992に設定
   bufsize = 4096      #デフォルト4096
 
@@ -91,7 +118,7 @@ def main(): #クライアント側
 
   with closing(sock):
     running = True
-    client_start_setting.client_start_setting(running,sock,readfds,bufsize,backlog,screen) #setting画面
+    client_start_setting.client_start_setting(running,sock,readfds,bufsize,backlog,screen,volume) #setting画面
 
     rect_bg = bg.get_rect() #背景画像の大きさを取得
     screen.blit(bg,rect_bg) #背景描画
@@ -153,6 +180,18 @@ def main(): #クライアント側
             sock.send("QUIT".encode('utf-8'))
             pygame.quit()
             sys.exit()
+          if event.key == 1073741906:
+            if volume[0] < 1.0:
+              pygame.mixer.music.pause()
+              volume[0] += 0.1
+              pygame.mixer.music.set_volume(volume[0])
+              pygame.mixer.music.unpause()
+          if event.key == 1073741905:
+            if volume[0] > 0.0:
+              pygame.mixer.music.pause()
+              volume[0] -= 0.1
+              pygame.mixer.music.set_volume(volume[0])
+              pygame.mixer.music.unpause()
       rready, wready, xready = select.select(readfds, [], [],0.05) #処理を可能な物から順に選択
       for sock in rready:                                   #選択された処理を順次遂行
         msg = sock.recv(bufsize).decode('utf-8')
@@ -242,7 +281,7 @@ def main(): #クライアント側
     else:
       once = [0,0,0,0]
     
-    client_first_phase.client_first_phase(running,myturn,sock,readfds,bufsize,Mapdata_Edge,once,Mapdata_Mass,Player_Data,screen,Mapdata_Side,land,landnumber,backlog,yourturn,rightside,leftside,front)
+    client_first_phase.client_first_phase(running,myturn,sock,readfds,bufsize,Mapdata_Edge,once,Mapdata_Mass,Player_Data,screen,Mapdata_Side,land,landnumber,backlog,yourturn,rightside,leftside,front,volume)
 
   ###################################
   ####  　　 ゲーム開始           ####
@@ -270,7 +309,19 @@ def main(): #クライアント側
             sock.send("QUIT".encode('utf-8'))
             pygame.quit()
             sys.exit()
-
+          if event.key == 1073741906:
+            if volume[0] < 1.0:
+              pygame.mixer.music.pause()
+              volume[0] += 0.1
+              pygame.mixer.music.set_volume(volume[0])
+              pygame.mixer.music.unpause()
+          if event.key == 1073741905:
+            if volume[0] > 0.0:
+              pygame.mixer.music.pause()
+              volume[0] -= 0.1
+              pygame.mixer.music.set_volume(volume[0])
+              pygame.mixer.music.unpause()
+  
       rready, wready, xready = select.select(readfds, [], [],0.05) #処理を可能な物から順に選択
       for sock in rready:                                   #選択された処理を順次遂行
         msg = sock.recv(bufsize).decode('utf-8')
@@ -311,7 +362,7 @@ def main(): #クライアント側
           burst=[False]
           waiting=[False]
           bandit=[False]
-          client_others_dice.client_others_dice(running1,sock,bufsize,readfds,Dice1,Dice2,Mapdata_Mass,Mapdata_Edge,Mapdata_Side,Player_Data,Dice7,bandit,screen,land,landnumber,backlog,yourturn,rightside,front,leftside,burst,waiting,bandit_pos)
+          client_others_dice.client_others_dice(running1,sock,bufsize,readfds,Dice1,Dice2,Mapdata_Mass,Mapdata_Edge,Mapdata_Side,Player_Data,Dice7,bandit,screen,land,landnumber,backlog,yourturn,rightside,front,leftside,burst,waiting,bandit_pos,volume)
           ################
           ### 本体処理　###
           ################
@@ -336,6 +387,18 @@ def main(): #クライアント側
                   sock.send("QUIT".encode('utf-8'))
                   pygame.quit()
                   sys.exit()
+                if event.key == 1073741906:
+                  if volume[0] < 1.0:
+                    pygame.mixer.music.pause()
+                    volume[0] += 0.1
+                    pygame.mixer.music.set_volume(volume[0])
+                    pygame.mixer.music.unpause()
+                if event.key == 1073741905:
+                  if volume[0] > 0.0:
+                    pygame.mixer.music.pause()
+                    volume[0] -= 0.1
+                    pygame.mixer.music.set_volume(volume[0])
+                    pygame.mixer.music.unpause()
 
             rready, wready, xready = select.select(readfds, [], [],0.05) #処理を可能な物から順に選択
             for sock in rready:                                   #選択された処理を順次遂行
@@ -394,6 +457,7 @@ def main(): #クライアント側
                 cld.draw_Dice(screen,Dice1[0],Dice2[0])
                 cld.draw_image(screen,"./picture/frame.png",540,540)
                 pygame.display.update()
+                road_sound.play()
 
               ######################
               ###  街道建設(終了) ###
@@ -424,6 +488,7 @@ def main(): #クライアント側
                 cld.draw_Dice(screen,Dice1[0],Dice2[0])
                 cld.draw_image(screen,"./picture/frame.png",540,540)
                 pygame.display.update()
+                settlement_sound01.play()
               ########################
               ###  開拓地建設(終了)  ###
               ########################
@@ -452,6 +517,7 @@ def main(): #クライアント側
                 cld.draw_Dice(screen,Dice1[0],Dice2[0])
                 cld.draw_image(screen,"./picture/frame.png",540,540)
                 pygame.display.update()
+                city_sound.play()
               #######################
               ###  都市建設(終了)  ###
               #######################
@@ -498,6 +564,7 @@ def main(): #クライアント側
                 cld.draw_image(screen,"./picture/frame.png",540,540)
                 cld.draw_Dice(screen,Dice1[0],Dice2[0]) 
                 pygame.display.update()
+                Bandit_sound.play()
               elif msg == "Rob":
                 msg1 = sock.recv(bufsize).decode('utf-8')
                 sock.send("ok".encode('utf-8'))
@@ -594,6 +661,7 @@ def main(): #クライアント側
                 cld.draw_Dice(screen,Dice1[0],Dice2[0])
                 cld.draw_image(screen,"./picture/frame.png",540,540)
                 pygame.display.update()
+                road_sound.play()
               ######################
               ### 街道2建設(終了) ###
               ######################
@@ -712,8 +780,21 @@ def main(): #クライアント側
                         sock.send("QUIT".encode('utf-8'))
                         pygame.quit()
                         sys.exit()
+                      if event.key == 1073741906:
+                        if volume[0] < 1.0:
+                          pygame.mixer.music.pause()
+                          volume[0] += 0.1
+                          pygame.mixer.music.set_volume(volume[0])
+                          pygame.mixer.music.unpause()
+                      if event.key == 1073741905:
+                        if volume[0] > 0.0:
+                          pygame.mixer.music.pause()
+                          volume[0] -= 0.1
+                          pygame.mixer.music.set_volume(volume[0])
+                          pygame.mixer.music.unpause()
                     if event.type == MOUSEBUTTONDOWN and event.button == 1: #蛮族の場所を選択
                       x, y = event.pos
+                      click_sound.play()
                       if (x-145)*(x-145)+(y-145)*(y-145)<=1600: #accept
                         sock.send("accept".encode('utf-8'))
                         sock.recv(bufsize)        
@@ -801,6 +882,7 @@ def main(): #クライアント側
           cld.draw_server(screen,Mapdata_Mass,Mapdata_Side,Mapdata_Edge,Player_Data,land,landnumber,backlog,yourturn,rightside,front,leftside)
           cld.draw_image(screen,"./picture/Turn_display/YourTurn.png",300,300)
           pygame.display.update()
+          turn_start.play()
           pygame.time.wait(1500)
           cld.draw_server(screen,Mapdata_Mass,Mapdata_Side,Mapdata_Edge,Player_Data,land,landnumber,backlog,yourturn,rightside,front,leftside)
           cld.draw_image(screen,"./picture/Dice/Roll_of_Dice.png",60,540)
@@ -819,7 +901,7 @@ def main(): #クライアント側
           burst=[False]
           waiting=[False]
           bandit=[False]
-          client_myturn_dice.client_myturn_dice(running1,sock,bufsize,readfds,Dice1,Dice2,Mapdata_Mass,Mapdata_Edge,Mapdata_Side,Player_Data,Dice7,bandit,screen,land,landnumber,backlog,yourturn,rightside,front,leftside,burst,waiting,bandit_pos)
+          client_myturn_dice.client_myturn_dice(running1,sock,bufsize,readfds,Dice1,Dice2,Mapdata_Mass,Mapdata_Edge,Mapdata_Side,Player_Data,Dice7,bandit,screen,land,landnumber,backlog,yourturn,rightside,front,leftside,burst,waiting,bandit_pos,volume)
           ################
           ### 本体処理　###
           ################
@@ -848,9 +930,23 @@ def main(): #クライアント側
                   sock.send("QUIT".encode('utf-8'))
                   pygame.quit()
                   sys.exit()
+                if event.key == 1073741906:
+                  if volume[0] < 1.0:
+                    pygame.mixer.music.pause()
+                    volume[0] += 0.1
+                    pygame.mixer.music.set_volume(volume[0])
+                    pygame.mixer.music.unpause()
+                if event.key == 1073741905:
+                  if volume[0] > 0.0:
+                    pygame.mixer.music.pause()
+                    volume[0] -= 0.1
+                    pygame.mixer.music.set_volume(volume[0])
+                    pygame.mixer.music.unpause()
               if event.type == MOUSEBUTTONDOWN and event.button == 1: #サイコロボタンのクリック
                 x, y = event.pos
+                click_sound.play()
                 if (x-540)*(x-540)+(y-540)*(y-540)<=2500: #枠内左クリックでwhileを抜け、次のページへ
+                  Turn_end.play()
                   sock.send("TurnEnd".encode('utf-8')) #ターンエンド
                   sock.recv(bufsize)
                   sock.send("ok".encode('utf-8'))
@@ -861,7 +957,7 @@ def main(): #クライアント側
                   #################
                   ###  街道建設  ###
                   #################
-                  client_road_building.client_road_building(screen,Mapdata_Mass,Mapdata_Side,Mapdata_Edge,Player_Data,land,landnumber,backlog,yourturn,rightside,front,leftside,Dice1,Dice2,road_running,sock,bufsize,Winner,running1,running,readfds)
+                  client_road_building.client_road_building(screen,Mapdata_Mass,Mapdata_Side,Mapdata_Edge,Player_Data,land,landnumber,backlog,yourturn,rightside,front,leftside,Dice1,Dice2,road_running,sock,bufsize,Winner,running1,running,readfds,volume)
                   ######################
                   ###  街道建設(終了) ###
                   ######################
@@ -871,7 +967,7 @@ def main(): #クライアント側
                   ###################
                   ###  開拓地建築  ###
                   ###################
-                  client_settlement_building.client_settlement_building(screen,Mapdata_Mass,Mapdata_Side,Mapdata_Edge,Player_Data,land,landnumber,backlog,yourturn,rightside,front,leftside,Dice1,Dice2,settlement_running,sock,bufsize,Winner,running1,running,readfds)
+                  client_settlement_building.client_settlement_building(screen,Mapdata_Mass,Mapdata_Side,Mapdata_Edge,Player_Data,land,landnumber,backlog,yourturn,rightside,front,leftside,Dice1,Dice2,settlement_running,sock,bufsize,Winner,running1,running,readfds,volume)
                   ########################
                   ###  開拓地建設(終了) ###
                   ########################
@@ -881,7 +977,7 @@ def main(): #クライアント側
                   #################
                   ###  都市建築  ###
                   #################
-                  client_city_building.client_city_building(screen,Mapdata_Mass,Mapdata_Side,Mapdata_Edge,Player_Data,land,landnumber,backlog,yourturn,rightside,front,leftside,Dice1,Dice2,city_running,sock,bufsize,Winner,running,running1,readfds)
+                  client_city_building.client_city_building(screen,Mapdata_Mass,Mapdata_Side,Mapdata_Edge,Player_Data,land,landnumber,backlog,yourturn,rightside,front,leftside,Dice1,Dice2,city_running,sock,bufsize,Winner,running,running1,readfds,volume)
                   ######################
                   ###  都市建設(終了) ###
                   ######################
@@ -891,7 +987,7 @@ def main(): #クライアント側
                   ##############
                   ###  発展  ###
                   ##############
-                  client_development.client_development(screen,Mapdata_Mass,Mapdata_Side,Mapdata_Edge,Player_Data,land,landnumber,backlog,yourturn,rightside,front,leftside,Dice1,Dice2,Thisturn_draw,development_running,secretcard_pos,sock,bufsize,Winner,running,running1,Thiturn_development,readfds,bandit_pos)
+                  client_development.client_development(screen,Mapdata_Mass,Mapdata_Side,Mapdata_Edge,Player_Data,land,landnumber,backlog,yourturn,rightside,front,leftside,Dice1,Dice2,Thisturn_draw,development_running,secretcard_pos,sock,bufsize,Winner,running,running1,Thiturn_development,readfds,bandit_pos,volume)
                   ##################
                   ###  発展(終了) ###
                   ##################
@@ -901,7 +997,7 @@ def main(): #クライアント側
                   #######################
                   ###  セルフトレード  ###
                   #######################
-                  client_selftrade.client_selftrade(screen,Mapdata_Mass,Mapdata_Side,Mapdata_Edge,Player_Data,land,landnumber,backlog,yourturn,rightside,front,leftside,Dice1,Dice2,sock,self_trade,readfds,bufsize)
+                  client_selftrade.client_selftrade(screen,Mapdata_Mass,Mapdata_Side,Mapdata_Edge,Player_Data,land,landnumber,backlog,yourturn,rightside,front,leftside,Dice1,Dice2,sock,self_trade,readfds,bufsize,volume)
                   ###########################
                   ###  セルフトレード(終了) ###
                   ###########################
@@ -960,8 +1056,21 @@ def main(): #クライアント側
                             sock.send("QUIT".encode('utf-8'))
                             pygame.quit()
                             sys.exit()
+                          if event.key == 1073741906:
+                            if volume[0] < 1.0:
+                              pygame.mixer.music.pause()
+                              volume[0] += 0.1
+                              pygame.mixer.music.set_volume(volume[0])
+                              pygame.mixer.music.unpause()
+                          if event.key == 1073741905:
+                            if volume[0] > 0.0:
+                              pygame.mixer.music.pause()
+                              volume[0] -= 0.1
+                              pygame.mixer.music.set_volume(volume[0])
+                              pygame.mixer.music.unpause()
                         if event.type == MOUSEBUTTONDOWN and event.button == 1: #蛮族の場所を選択
                           x, y = event.pos
+                          click_sound.play()
                           if 1<=x and x<=120 and 61<=y and y<=120:
                             others_trade[0] = False
                             select_partner[0] = False
@@ -1009,8 +1118,21 @@ def main(): #クライアント側
                             sock.send("QUIT".encode('utf-8'))
                             pygame.quit()
                             sys.exit()
+                          if event.key == 1073741906:
+                            if volume[0] < 1.0:
+                              pygame.mixer.music.pause()
+                              volume[0] += 0.1
+                              pygame.mixer.music.set_volume(volume[0])
+                              pygame.mixer.music.unpause()
+                          if event.key == 1073741905:
+                            if volume[0] > 0.0:
+                              pygame.mixer.music.pause()
+                              volume[0] -= 0.1
+                              pygame.mixer.music.set_volume(volume[0])
+                              pygame.mixer.music.unpause()
                         if event.type == MOUSEBUTTONDOWN and event.button == 1:
                           x, y = event.pos
+                          click_sound.play()
                           if 160<=x and x<=200 and 220<=y and y<=280 and 1-trl[0]<=Player_Data[trade_partner[0]][2][0]:
                             trl[0] -= 1
                             cld.draw_trade_you_suggest(screen,trl)
@@ -1094,8 +1216,21 @@ def main(): #クライアント側
                           sock.send("QUIT".encode('utf-8'))
                           pygame.quit()
                           sys.exit()
+                        if event.key == 1073741906:
+                          if volume[0] < 1.0:
+                            pygame.mixer.music.pause()
+                            volume[0] += 0.1
+                            pygame.mixer.music.set_volume(volume[0])
+                            pygame.mixer.music.unpause()
+                        if event.key == 1073741905:
+                          if volume[0] > 0.0:
+                            pygame.mixer.music.pause()
+                            volume[0] -= 0.1
+                            pygame.mixer.music.set_volume(volume[0])
+                            pygame.mixer.music.unpause()
                       if event.type == MOUSEBUTTONDOWN and event.button == 1: #蛮族の場所を選択
                         x, y = event.pos
+                        click_sound.play()
 
                     rready, wready, xready = select.select(readfds, [], [],0.05) #処理を可能な物から順に選択
                     for sock in rready:                                   #選択された処理を順次遂行
@@ -1205,6 +1340,18 @@ def main(): #クライアント側
             sock.send("QUIT".encode('utf-8'))
             pygame.quit()
             sys.exit()
+          if event.key == 1073741906:
+            if volume[0] < 1.0:
+              pygame.mixer.music.pause()
+              volume[0] += 0.1
+              pygame.mixer.music.set_volume(volume[0])
+              pygame.mixer.music.unpause()
+          if event.key == 1073741905:
+            if volume[0] > 0.0:
+              pygame.mixer.music.pause()
+              volume[0] -= 0.1
+              pygame.mixer.music.set_volume(volume[0])
+              pygame.mixer.music.unpause()
 
       rready, wready, xready = select.select(readfds, [], [],0.05) #処理を可能な物から順に選択
       for sock in rready:                                   #選択された処理を順次遂行

@@ -4,11 +4,11 @@ from pygame.locals import *
 import socket
 import select
 import sys
-import mapgene
+from modules import mapgene
 import random
-import server_draw as svd
-import server_activate
-import server_dice
+from modules import server_draw as svd
+from modules import server_activate
+from modules import server_dice
 
 
 def main(): #サーバー側
