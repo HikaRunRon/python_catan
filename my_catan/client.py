@@ -19,6 +19,9 @@ from modules import client_development
 from modules import client_selftrade
 
 def main(): #クライアント側
+
+  host = "192.168.11.3"
+
   (w,h)=(600,600)   #ゲーム画面の大きさ(幅600px,高さ600px)
   pygame.init()     #pygameを初期化
   pygame.display.set_mode((w,h),0,32)   #ディスプレイ設定
@@ -29,7 +32,7 @@ def main(): #クライアント側
   pygame.display.update() #ディスプレイ更新
   pygame.mixer.init(frequency = 44100)    # 初期設定
   pygame.mixer.music.load("./music/bgm.mp3")     # 音楽ファイルの読み込み
-  pygame.mixer.music.play(100)              # 音楽の再生回数(1回)
+  pygame.mixer.music.play(100)              # 音楽の再生回数(100回)
 
   click_sound = pygame.mixer.Sound("./music/click01.mp3")
   Bandit_sound = pygame.mixer.Sound("./music/Bandit.mp3")
@@ -76,8 +79,7 @@ def main(): #クライアント側
   rect_bg = bg.get_rect() #背景画像の大きさを取得
   screen.blit(bg,rect_bg) #背景描画
   pygame.display.update() #ディスプレイ更新
-  pygame.time.wait(300)
-  host = "192.168.11.3" 
+  pygame.time.wait(300) 
   port = 55992         #ポート番号 今回は55992に設定
   bufsize = 4096      #デフォルト4096
 
