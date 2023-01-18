@@ -20,7 +20,7 @@ from modules import client_selftrade
 
 def main(): #クライアント側
 
-  host = "192.168.11.3"
+  host = "172.20.10.6"
 
   (w,h)=(600,600)   #ゲーム画面の大きさ(幅600px,高さ600px)
   pygame.init()     #pygameを初期化
@@ -1366,3 +1366,4 @@ def main(): #クライアント側
 
 if __name__ == '__main__':
   main()
+###nyo###
